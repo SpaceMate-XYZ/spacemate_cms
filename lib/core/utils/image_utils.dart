@@ -1,7 +1,5 @@
-import 'dart:developer';
 import 'dart:io';
 import 'dart:math' as math;
-import 'dart:typed_data';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -67,7 +65,7 @@ class ImageUtils {
       }
       
       // Use CachedNetworkImage to handle the download and caching
-      final response = await CachedNetworkImage(
+      final response = CachedNetworkImage(
         imageUrl: url,
         imageBuilder: (context, imageProvider) => Container(),
         errorWidget: (context, url, error) => Container(),

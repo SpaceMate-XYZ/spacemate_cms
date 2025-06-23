@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart'; // Required for debugPrint
 import 'package:spacemate/features/menu/data/models/menu_item_model.dart';
 
 class ScreenModel extends Equatable {
@@ -17,14 +18,31 @@ class ScreenModel extends Equatable {
   });
 
   factory ScreenModel.fromJson(Map<String, dynamic> json) {
+    int? _parseInt(dynamic value) {
+      if (value == null) return null;
+      if (value is int) return value;
+      if (value is String) {
+        try {
+          return int.parse(value);
+        } catch (e) {
+          return null;
+        }
+      }
+      return null;
+    }
+
+
+
     return ScreenModel(
-      id: json['id'],
+      id: _parseInt(json['id']) ?? 0,
       name: json['name'],
       slug: json['slug'],
       title: json['title'],
-      menuGrid: (json['MenuGrid'] as List)
-          .map((item) => MenuItemModel.fromJson(item))
-          .toList(),
+      menuGrid: (json['MenuGrid'] != null && json['MenuGrid']['data'] is List)
+          ? (json['MenuGrid']['data'] as List)
+              .map((item) => MenuItemModel.fromJson(item))
+              .toList()
+          : [],
     );
   }
 

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:spacemate/core/theme/app_colors.dart';
 import 'package:spacemate/core/theme/app_text_styles.dart';
-import 'package:spacemate/core/utils/screen_utils.dart';
 import 'package:spacemate/features/menu/domain/entities/menu_item_entity.dart';
 import 'package:spacemate/features/menu/presentation/bloc/menu_bloc.dart';
 import 'package:spacemate/features/menu/presentation/bloc/menu_event.dart';
@@ -23,7 +21,7 @@ class MenuGrid extends StatelessWidget {
   final String? emptyMessage;
 
   const MenuGrid({
-    Key? key,
+    super.key,
     required this.items,
     this.isLoading = false,
     this.errorMessage,
@@ -36,7 +34,7 @@ class MenuGrid extends StatelessWidget {
     this.physics,
     this.controller,
     this.emptyMessage = 'No items found',
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -49,15 +47,14 @@ class MenuGrid extends StatelessWidget {
     }
 
     if (items.isEmpty) {
-      return _buildEmptyState(context, emptyMessage!);
+      return _buildEmptyState(context, emptyMessage ?? 'No items found.');
     }
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final screenSize = ScreenUtils.getScreenSize(context);
 
         final crossAxisCount = maxCrossAxisExtent != null
-            ? (constraints.maxWidth / maxCrossAxisExtent!).floor().clamp(1, 6)
+            ? (constraints.maxWidth / maxCrossAxisExtent!).floor().clamp(3, 6)
             : _calculateCrossAxisCount(constraints.maxWidth);
 
         final availableWidth = constraints.maxWidth -
@@ -94,12 +91,13 @@ class MenuGrid extends StatelessWidget {
   }
 
   int _calculateCrossAxisCount(double width) {
-    if (width > 1200) return 6;
-    if (width > 900) return 5;
-    if (width > 700) return 4;
-    if (width > 550) return 3;
-    if (width > 400) return 2;
-    return 2;
+    // Keep a minimum of 3 columns for typical mobile widths (~360-430px)
+    if (width >= 1200) return 6;
+    if (width >= 900) return 5;
+    if (width >= 700) return 4;
+    if (width >= 500) return 3;
+    // Narrower devices (rare) still get 3 but items will scale down
+    return 3;
   }
 
   Widget _buildLoadingState(BuildContext context) {
@@ -141,7 +139,10 @@ class MenuGrid extends StatelessWidget {
             ),
             const SizedBox(height: 24.0),
             ElevatedButton.icon(
-              onPressed: () => context.read<MenuBloc>().add(RefreshMenuEvent()),
+              onPressed: () {
+                final currentSlug = context.read<MenuBloc>().state.slug;
+                context.read<MenuBloc>().add(RefreshMenuEvent(slug: currentSlug));
+              },
               icon: const Icon(Icons.refresh_rounded),
               label: const Text('Try Again'),
               style: ElevatedButton.styleFrom(

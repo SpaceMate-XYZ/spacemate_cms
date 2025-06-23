@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import 'migration_helper.dart';
@@ -84,6 +83,13 @@ class DatabaseHelper {
     ''');
     await db.execute('CREATE INDEX IF NOT EXISTS idx_menu_items_slug ON menu_items(slug)');
     await db.execute('CREATE INDEX IF NOT EXISTS idx_menu_items_order ON menu_items("order")');
+
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS cache_metadata (
+        slug TEXT PRIMARY KEY,
+        timestamp INTEGER NOT NULL
+      )
+    ''');
   }
 
   Future<void> clearDatabase() async {
@@ -112,12 +118,10 @@ class DatabaseHelper {
 
   Future<void> initialize() async {
     if (kIsWeb || _isInitialized) return;
-    try {
-      await database;
-      _isInitialized = true;
-    } catch (e) {
-      // On web, this will throw, which is fine. We catch it and proceed.
-      _isInitialized = true; // Mark as initialized even if it fails on web.
-    }
+    // If database initialization fails on a supported platform (mobile/desktop),
+    // it will now throw an exception, preventing the app from starting in a broken state.
+    // This is safer than catching the error and pretending initialization succeeded.
+    await database;
+    _isInitialized = true;
   }
 }

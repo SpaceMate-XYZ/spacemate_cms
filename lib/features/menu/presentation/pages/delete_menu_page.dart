@@ -12,12 +12,12 @@ class MenuPage extends StatelessWidget {
   final bool enablePullToRefresh;
 
   const MenuPage({
-    Key? key,
+    super.key,
     required this.slug,
     this.appBarTitle,
     this.showAppBar = true,
     this.enablePullToRefresh = true,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

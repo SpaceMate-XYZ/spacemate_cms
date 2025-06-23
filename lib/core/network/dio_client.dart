@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:dio/dio.dart';
-import 'package:spacemate/core/config/strapi_config.dart';
 import 'package:spacemate/core/error/exceptions.dart';
 import 'package:spacemate/core/network/interceptors/auth_interceptor.dart';
 import 'package:spacemate/core/network/interceptors/logging_interceptor.dart';

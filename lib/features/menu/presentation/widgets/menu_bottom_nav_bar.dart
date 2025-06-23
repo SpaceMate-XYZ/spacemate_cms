@@ -2,16 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:spacemate/features/menu/domain/entities/menu_category.dart';
 
 class MenuBottomNavBar extends StatelessWidget {
-  const MenuBottomNavBar({super.key});
+  final int currentIndex;
+  final ValueChanged<int> onTap;
+
+  const MenuBottomNavBar({
+    super.key,
+    required this.currentIndex,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     return BottomNavigationBar(
       type: BottomNavigationBarType.fixed,
-      currentIndex: 0, // This will be managed by the state
-      onTap: (index) {
-        // Navigation logic will be added later
-      },
+      currentIndex: currentIndex,
+      onTap: onTap,
       items: MenuCategory.values.map((category) {
         return BottomNavigationBarItem(
           icon: Icon(_getIconForCategory(category)),

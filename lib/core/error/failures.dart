@@ -12,41 +12,36 @@ abstract class Failure extends Equatable {
 
 // General failures
 class ServerFailure extends Failure {
-  const ServerFailure([String message = 'Server error', int? statusCode])
-      : super(message, statusCode: statusCode);
+  const ServerFailure([super.message = 'Server error', int? statusCode])
+      : super(statusCode: statusCode);
 }
 
 class CacheFailure extends Failure {
-  const CacheFailure([String message = 'Cache error'])
-      : super(message);
+  const CacheFailure([super.message = 'Cache error']);
 }
 
 class NetworkFailure extends Failure {
-  const NetworkFailure([String message = 'No internet connection'])
-      : super(message);
+  const NetworkFailure([super.message = 'No internet connection']);
 }
 
 class InvalidInputFailure extends Failure {
-  const InvalidInputFailure([String message = 'Invalid input'])
-      : super(message);
+  const InvalidInputFailure([super.message = 'Invalid input']);
 }
 
 class UnauthorizedFailure extends Failure {
-  const UnauthorizedFailure([String message = 'Unauthorized'])
-      : super(message, statusCode: 401);
+  const UnauthorizedFailure([super.message = 'Unauthorized'])
+      : super(statusCode: 401);
 }
 
 class NotFoundFailure extends Failure {
-  const NotFoundFailure([String message = 'Resource not found'])
-      : super(message, statusCode: 404);
+  const NotFoundFailure([super.message = 'Resource not found'])
+      : super(statusCode: 404);
 }
 
 class TimeoutFailure extends Failure {
-  const TimeoutFailure([String message = 'Request timed out'])
-      : super(message);
+  const TimeoutFailure([super.message = 'Request timed out']);
 }
 
 class UnknownFailure extends Failure {
-  const UnknownFailure([String message = 'Unknown error occurred'])
-      : super(message);
+  const UnknownFailure([super.message = 'Unknown error occurred']);
 }

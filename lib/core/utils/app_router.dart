@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:spacemate/features/menu/presentation/pages/home_page.dart';
 import 'package:go_router/go_router.dart';
 
 class AppRouter {

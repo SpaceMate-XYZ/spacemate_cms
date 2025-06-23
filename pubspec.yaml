@@ -39,6 +39,7 @@ dependencies:
   flutter_svg: ^2.0.10+1
   google_fonts: ^5.1.0
   dynamic_color: ^1.5.0
+  material_symbols_icons: ^4.2665.0
   
   # Storage
   shared_preferences: ^2.2.1
@@ -56,6 +57,8 @@ dependencies:
   flutter_localizations:
     sdk: flutter
 
+  hive: any
+  bloc: any
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -76,6 +79,12 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - assets/.env
+    - .env
     - assets/images/
     - assets/translations/
+  fonts:
+    - family: MaterialSymbols
+      fonts:
+        - asset: packages/material_symbols_icons/fonts/MaterialSymbolsOutlined.ttf
+        - asset: packages/material_symbols_icons/fonts/MaterialSymbolsRounded.ttf
+        - asset: packages/material_symbols_icons/fonts/MaterialSymbolsSharp.ttf

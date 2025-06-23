@@ -90,7 +90,7 @@ void main() {
 
     test('should handle all MenuCategory values', () {
       // Arrange
-      final categories = MenuCategory.values;
+      const categories = MenuCategory.values;
       
       for (final category in categories) {
         final json = {

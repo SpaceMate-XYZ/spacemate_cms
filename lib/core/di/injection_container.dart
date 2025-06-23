@@ -3,7 +3,8 @@ import 'package:get_it/get_it.dart';
 import 'package:spacemate/core/database/database_helper.dart';
 import 'package:spacemate/core/network/dio_client.dart';
 import 'package:spacemate/core/network/network_info.dart';
-import 'package:spacemate/features/menu/data/datasources/menu_local_data_source.dart';
+import 'package:spacemate/features/menu/domain/repositories/menu_local_data_source.dart';
+import 'package:spacemate/features/menu/data/datasources/menu_local_data_source.dart' as data_source;
 import 'package:spacemate/features/menu/data/datasources/menu_remote_data_source.dart';
 import 'package:spacemate/features/menu/data/datasources/menu_remote_data_source_impl.dart';
 import 'package:spacemate/features/menu/data/repositories/menu_repository_impl.dart';
@@ -48,7 +49,7 @@ void _initMenuFeature() {
     () => MenuRemoteDataSourceImpl(dioClient: sl()),
   );
   sl.registerLazySingleton<MenuLocalDataSource>(
-    () => MenuLocalDataSourceImpl(dbHelper: sl()),
+    () => data_source.MenuLocalDataSourceImpl(dbHelper: sl()),
   );
 }
 

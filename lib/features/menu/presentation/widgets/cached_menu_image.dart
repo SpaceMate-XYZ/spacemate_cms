@@ -14,7 +14,7 @@ class CachedMenuImage extends StatelessWidget {
   final Widget? placeholder;
 
   const CachedMenuImage({
-    Key? key,
+    super.key,
     required this.imageUrl,
     this.placeholderIcon = 'menu',
     this.width,
@@ -25,7 +25,7 @@ class CachedMenuImage extends StatelessWidget {
     this.shape = BoxShape.rectangle,
     this.errorWidget,
     this.placeholder,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -85,11 +85,11 @@ class ErrorWidgetBuilder extends StatefulWidget {
   final Widget errorWidget;
 
   const ErrorWidgetBuilder({
-    Key? key,
+    super.key,
     required this.imageUrl,
     required this.builder,
     required this.errorWidget,
-  }) : super(key: key);
+  });
 
   @override
   _ErrorWidgetBuilderState createState() => _ErrorWidgetBuilderState();

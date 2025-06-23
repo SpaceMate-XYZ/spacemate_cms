@@ -19,7 +19,7 @@ void main() {
   late MockMenuRepository mockRepository;
   
   final mockMenuItems = <MenuItemEntity>[
-    MenuItemEntity(
+    const MenuItemEntity(
       id: '1',
       title: 'Dashboard',
       icon: 'dashboard',
@@ -30,7 +30,7 @@ void main() {
       analyticsId: 'dashboard',
       requiredPermissions: [],
     ),
-    MenuItemEntity(
+    const MenuItemEntity(
       id: '2',
       title: 'Settings',
       icon: 'settings',

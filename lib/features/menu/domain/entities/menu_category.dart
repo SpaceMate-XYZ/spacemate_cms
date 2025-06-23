@@ -2,7 +2,7 @@ enum MenuCategory {
   home,
   transport,
   access,
-  facility,
+  facilities,
   discover;
   
   @override
@@ -18,7 +18,7 @@ extension MenuCategoryX on MenuCategory {
         return 'Transport';
       case MenuCategory.access:
         return 'Access';
-      case MenuCategory.facility:
+      case MenuCategory.facilities:
         return 'Facilities';
       case MenuCategory.discover:
         return 'Discover';
@@ -33,7 +33,7 @@ extension MenuCategoryX on MenuCategory {
         return 'directions_car';
       case MenuCategory.access:
         return 'fingerprint';
-      case MenuCategory.facility:
+      case MenuCategory.facilities:
         return 'apartment';
       case MenuCategory.discover:
         return 'explore';
@@ -48,8 +48,10 @@ extension MenuCategoryX on MenuCategory {
         return MenuCategory.transport;
       case 'access':
         return MenuCategory.access;
-      case 'facility':
-        return MenuCategory.facility;
+      case 'facilities':
+        return MenuCategory.facilities;
+      case 'facility': // backward compatibility
+        return MenuCategory.facilities;
       case 'discover':
         return MenuCategory.discover;
       default:

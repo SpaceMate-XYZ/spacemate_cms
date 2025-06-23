@@ -24,7 +24,7 @@ class MockMenuRepository extends Mock implements MenuRepository {
         },
       ),
       returnValue: TaskEither.right([
-        MenuItemEntity(
+        const MenuItemEntity(
           id: '1',
           title: 'Dashboard',
           icon: 'assets/icons/dashboard.svg',
@@ -32,7 +32,7 @@ class MockMenuRepository extends Mock implements MenuRepository {
           isActive: true,
           order: 1,
         ),
-        MenuItemEntity(
+        const MenuItemEntity(
           id: '2',
           title: 'Settings',
           icon: 'assets/icons/settings.svg',

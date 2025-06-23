@@ -16,7 +16,7 @@ class StrapiConfig {
   static const Duration apiTimeout = Duration(seconds: 30);
   
   // Endpoints
-  static const String menuScreensEndpoint = '/menu-screens';
+  static const String screensEndpoint = '/screens';
   
   // Helper method to get the full API URL
   static String getApiUrl(String endpoint) {

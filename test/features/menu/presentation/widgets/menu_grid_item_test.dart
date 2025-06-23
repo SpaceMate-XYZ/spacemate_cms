@@ -20,10 +20,10 @@ class TestApp extends StatelessWidget {
   final Brightness brightness;
 
   const TestApp({
-    Key? key,
+    super.key,
     required this.child,
     this.brightness = Brightness.light,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -92,13 +92,13 @@ class TestMenuGridItem extends StatelessWidget {
   final bool showTitle;
 
   const TestMenuGridItem({
-    Key? key,
+    super.key,
     required this.item,
     this.onTap,
     this.isSelected = false,
     this.showBadge = true,
     this.showTitle = true,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -109,7 +109,7 @@ class TestMenuGridItem extends StatelessWidget {
         decoration: BoxDecoration(
           color: isSelected 
               ? Theme.of(context).colorScheme.primaryContainer 
-              : Theme.of(context).colorScheme.surfaceVariant,
+              : Theme.of(context).colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(12.0),
           border: isSelected
               ? Border.all(color: Theme.of(context).colorScheme.primary)
@@ -135,14 +135,14 @@ class TestMenuGridItem extends StatelessWidget {
             // Badge
             if (showBadge && (item.badgeCount ?? 0) > 0)
               Container(
-                padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
                 decoration: BoxDecoration(
                   color: Colors.red,
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
                   '${item.badgeCount}',
-                  style: TextStyle(color: Colors.white, fontSize: 10),
+                  style: const TextStyle(color: Colors.white, fontSize: 10),
                 ),
               ),
             

@@ -13,12 +13,12 @@ class MenuScreen extends StatefulWidget {
   final bool enablePullToRefresh;
 
   const MenuScreen({
-    Key? key,
+    super.key,
     required this.slug,
     this.appBarTitle,
     this.showAppBar = true,
     this.enablePullToRefresh = true,
-  }) : super(key: key);
+  });
 
   @override
   State<MenuScreen> createState() => _MenuScreenState();

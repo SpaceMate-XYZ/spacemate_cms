@@ -19,7 +19,7 @@ void main() {
   group('MenuItemEntity', () {
     test('should support value equality', () {
       // Arrange
-      final anotherMenuItem = MenuItemEntity(
+      const anotherMenuItem = MenuItemEntity(
         id: '1',
         title: 'Parking',
         icon: 'local_parking',

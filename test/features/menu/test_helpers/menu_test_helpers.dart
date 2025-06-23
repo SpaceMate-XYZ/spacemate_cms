@@ -56,14 +56,14 @@ class MockCachedMenuImage extends StatelessWidget {
   final Color? color;
 
   const MockCachedMenuImage({
-    Key? key,
+    super.key,
     required this.imageUrl,
     required this.placeholderIcon,
     this.width,
     this.height,
     this.fit,
     this.color,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

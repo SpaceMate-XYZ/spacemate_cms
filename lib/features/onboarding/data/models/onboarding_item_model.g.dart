@@ -8,11 +8,11 @@ part of 'onboarding_item_model.dart';
 
 OnboardingItemModel _$OnboardingItemModelFromJson(Map<String, dynamic> json) =>
     OnboardingItemModel(
-      id: (json['id'] as num).toInt(),
+      id: _parseInt(json['id']),
       title: json['title'] as String,
       description: json['description'] as String,
       imageUrl: json['imageUrl'] as String,
-      order: (json['order'] as num).toInt(),
+      order: _parseInt(json['order']),
     );
 
 Map<String, dynamic> _$OnboardingItemModelToJson(
