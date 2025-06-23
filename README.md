@@ -1,5 +1,24 @@
 # spacemate
 
+## 🚨 CRITICAL SECURITY WARNING 🚨
+
+**This project is temporarily configured to commit the `.env` file to version control.**
+
+This is for development convenience ONLY. Before making this repository public or sharing it, you **MUST** add the `.env` file back to your `.gitignore` to prevent leaking sensitive information like API keys and configuration secrets.
+
+To secure your project, add the following lines back to your `.gitignore` file:
+
+```gitignore
+# Local development secrets - DO NOT COMMIT
+.env
+.env.*
+!.env.example
+```
+
+---
+
+# spacemate_cms
+
 A new Flutter project.
 
 ## Getting Started

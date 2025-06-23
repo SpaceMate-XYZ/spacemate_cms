@@ -102,9 +102,6 @@ fastlane/readme.md
 !.vscode/extensions.json
 
 # Local development
-.env
-.env.*
-!.env.example
 
 # Build files
 build/
@@ -125,7 +122,6 @@ logs
 *.log
 
 # Local development
-*.env
 
 # VS Code
 .vscode/

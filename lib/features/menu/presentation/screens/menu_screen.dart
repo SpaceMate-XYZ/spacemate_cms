@@ -1,28 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:spacemate/features/menu/presentation/bloc/menu_event.dart';
-import 'package:spacemate/core/theme/app_colors.dart';
-import 'package:spacemate/core/theme/app_text_styles.dart';
-import 'package:spacemate/core/utils/screen_utils.dart';
 import 'package:spacemate/core/extensions/string_extensions.dart';
 import 'package:spacemate/features/menu/presentation/bloc/menu_bloc.dart';
+import 'package:spacemate/features/menu/presentation/bloc/menu_event.dart';
 import 'package:spacemate/features/menu/presentation/bloc/menu_state.dart';
 import 'package:spacemate/features/menu/presentation/widgets/menu_grid.dart';
 
 class MenuScreen extends StatefulWidget {
-  final String? placeId;
-  final String category;
-  final bool showAppBar;
+  final String slug;
   final String? appBarTitle;
+  final bool showAppBar;
   final bool enablePullToRefresh;
-  static const String defaultPlaceId = 'default_place_collection';
 
   const MenuScreen({
     Key? key,
-    this.placeId,
-    this.category = 'home',
-    this.showAppBar = true,
+    required this.slug,
     this.appBarTitle,
+    this.showAppBar = true,
     this.enablePullToRefresh = true,
   }) : super(key: key);
 
@@ -31,56 +25,43 @@ class MenuScreen extends StatefulWidget {
 }
 
 class _MenuScreenState extends State<MenuScreen> with AutomaticKeepAliveClientMixin {
-  final ScrollController _scrollController = ScrollController();
-  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
-
   @override
   void initState() {
     super.initState();
-    // Initial fetch of menu items
-    _fetchMenuItems();
-  }
-
-  @override
-  void didUpdateWidget(MenuScreen oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    // If placeId or category changed, fetch new data
-    if (oldWidget.placeId != widget.placeId || oldWidget.category != widget.category) {
+    // Initial data load is dispatched when the widget is first built
+    // if the BLoC state is initial or for a different slug.
+    final currentSlug = context.read<MenuBloc>().state.slug;
+    if (context.read<MenuBloc>().state.status == MenuStatus.initial || currentSlug != widget.slug) {
       _fetchMenuItems();
     }
   }
 
   @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
+  void didUpdateWidget(MenuScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.slug != oldWidget.slug) {
+      _fetchMenuItems();
+    }
   }
 
-  String get effectivePlaceId => widget.placeId ?? MenuScreen.defaultPlaceId;
-  String get effectiveCategory => widget.category.isNotEmpty 
-      ? widget.category 
-      : 'home';
-  String get effectiveAppBarTitle => widget.appBarTitle ?? 
-      (widget.category.isEmpty ? 'Menu' : widget.category.capitalize());
+  @override
+  bool get wantKeepAlive => true;
 
-  Future<void> _fetchMenuItems() async {
+  String get effectiveSlug => widget.slug.isNotEmpty ? widget.slug : 'home';
+  String get effectiveAppBarTitle =>
+      widget.appBarTitle ?? (widget.slug.isEmpty ? 'Menu' : widget.slug.capitalize());
+
+  Future<void> _fetchMenuItems({bool forceRefresh = false}) async {
     context.read<MenuBloc>().add(
           LoadMenuEvent(
-            placeId: effectivePlaceId,
-            category: effectiveCategory,
-            forceRefresh: false,
+            slug: effectiveSlug,
+            forceRefresh: forceRefresh,
           ),
         );
   }
 
   Future<void> _onRefresh() async {
-    context.read<MenuBloc>().add(
-          LoadMenuEvent(
-            placeId: effectivePlaceId,
-            category: effectiveCategory,
-            forceRefresh: true,
-          ),
-        );
+    await _fetchMenuItems(forceRefresh: true);
   }
 
   @override
@@ -89,181 +70,93 @@ class _MenuScreenState extends State<MenuScreen> with AutomaticKeepAliveClientMi
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    Widget content = BlocConsumer<MenuBloc, MenuState>(
-      listener: (context, state) {
-        if (state.status == MenuStatus.failure && state.errorMessage != null) {
-          // Show error snackbar
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.errorMessage!),
-              backgroundColor: colorScheme.error,
-              behavior: SnackBarBehavior.floating,
-              action: SnackBarAction(
-                label: 'Retry',
-                textColor: colorScheme.onError,
-                onPressed: _fetchMenuItems,
-              ),
-            ),
+    return Scaffold(
+      backgroundColor: colorScheme.surface,
+      appBar: widget.showAppBar
+          ? AppBar(
+              title: Text(effectiveAppBarTitle),
+              centerTitle: true,
+              elevation: 0,
+              backgroundColor: colorScheme.surface,
+              foregroundColor: colorScheme.onSurface,
+            )
+          : null,
+      body: BlocConsumer<MenuBloc, MenuState>(
+        listener: (context, state) {
+          if (state.status == MenuStatus.failure && state.errorMessage != null) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(state.errorMessage!),
+                    backgroundColor: colorScheme.error,
+                    behavior: SnackBarBehavior.floating,
+                    action: SnackBarAction(
+                      label: 'Retry',
+                      textColor: colorScheme.onError,
+                      onPressed: () => _fetchMenuItems(),
+                    ),
+                  ),
+                );
+              }
+            });
+          }
+        },
+        builder: (context, state) {
+          if (state.status == MenuStatus.loading && state.items.isEmpty) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (state.status == MenuStatus.failure && state.items.isEmpty) {
+            return _buildErrorState(context, state.errorMessage!);
+          }
+
+          final Widget grid = MenuGrid(
+            items: state.items,
+            isLoading: state.status == MenuStatus.loading,
           );
-        }
-      },
-      builder: (context, state) {
-        if (state.status == MenuStatus.loading && state.items.isEmpty) {
-          return const Center(child: CircularProgressIndicator());
-        }
 
-        if (state.status == MenuStatus.failure && state.errorMessage != null) {
-          return _buildErrorState(context, state.errorMessage!);
-        }
-
-        final menuItems = state.items;
-        final isLoading = state.status == MenuStatus.loading;
-
-        if (menuItems.isEmpty && !isLoading) {
-          return _buildEmptyState(context);
-        }
-
-        return MenuGrid(
-          items: menuItems,
-          isLoading: isLoading,
-          errorMessage: state.errorMessage,
-          controller: _scrollController,
-        );
-      },
-    );
-
-    // Wrap with RefreshIndicator if pull-to-refresh is enabled
-    if (widget.enablePullToRefresh) {
-      content = RefreshIndicator(
-        key: _refreshIndicatorKey,
-        onRefresh: _onRefresh,
-        child: content,
-      );
-    }
-
-    // Apply safe area and scrolling
-    content = CustomScrollView(
-      controller: _scrollController,
-      physics: widget.enablePullToRefresh
-          ? const AlwaysScrollableScrollPhysics()
-          : const BouncingScrollPhysics(),
-      slivers: [
-        if (widget.showAppBar) _buildAppBar(context),
-        SliverFillRemaining(
-          child: content,
-        ),
-      ],
-    );
-
-    return content;
-  }
-
-  SliverAppBar _buildAppBar(BuildContext context) {
-    return SliverAppBar(
-      title: Text(
-        widget.appBarTitle ?? widget.category,
-        style: AppTextStyles.appBarTitle,
+          if (widget.enablePullToRefresh) {
+            return RefreshIndicator(
+              onRefresh: _onRefresh,
+              child: grid,
+            );
+          }
+          return grid;
+        },
       ),
-      floating: true,
-      snap: true,
-      elevation: 0,
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      foregroundColor: Theme.of(context).textTheme.titleLarge?.color,
-      centerTitle: false,
-      titleSpacing: 20,
-      toolbarHeight: kToolbarHeight + 8,
-      automaticallyImplyLeading: false,
     );
   }
 
   Widget _buildErrorState(BuildContext context, String message) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(24.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.error_outline_rounded,
-              size: 48.0,
-              color: Theme.of(context).colorScheme.error,
-            ),
-            const SizedBox(height: 16.0),
+            const Icon(Icons.error_outline, size: 48, color: Colors.red),
+            const SizedBox(height: 16),
             Text(
-              'Something went wrong',
-              style: AppTextStyles.headlineSmall,
+              'Failed to Load Menu',
+              style: Theme.of(context).textTheme.headlineSmall,
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 8.0),
+            const SizedBox(height: 8),
             Text(
               message,
-              style: AppTextStyles.bodyMedium?.copyWith(
-                color: Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.7),
-              ),
+              style: Theme.of(context).textTheme.bodyMedium,
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 24.0),
+            const SizedBox(height: 24),
             ElevatedButton.icon(
-              onPressed: _fetchMenuItems,
-              icon: const Icon(Icons.refresh_rounded, size: 20),
+              icon: const Icon(Icons.refresh),
               label: const Text('Retry'),
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30.0),
-                ),
-              ),
+              onPressed: () => _fetchMenuItems(),
             ),
           ],
         ),
       ),
     );
   }
-
-  Widget _buildEmptyState(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.search_off_rounded,
-              size: 48.0,
-              color: Theme.of(context).primaryColor.withOpacity(0.5),
-            ),
-            const SizedBox(height: 16.0),
-            Text(
-              'No items found',
-              style: AppTextStyles.titleMedium,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 8.0),
-            Text(
-              'There are no menu items available in this category.',
-              style: AppTextStyles.bodyMedium?.copyWith(
-                color: Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.7),
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 24.0),
-            OutlinedButton.icon(
-              onPressed: _onRefresh,
-              icon: const Icon(Icons.refresh_rounded, size: 20),
-              label: const Text('Refresh'),
-              style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30.0),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  @override
-  bool get wantKeepAlive => true;
 }

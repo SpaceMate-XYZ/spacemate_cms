@@ -38,21 +38,13 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        BlocProvider(
-          create: (context) => di.sl<MenuBloc>(),
-        ),
-      ],
-      child: MaterialApp(
-        title: 'Spacemate',
-        theme: AppTheme.lightTheme,
-        darkTheme: AppTheme.darkTheme,
-        home: const MenuPage(
-          placeId: 'default_place_id',
-          initialCategory: 'home',
-          appBarTitle: 'Spacemate Menu',
-        ),
+    return MaterialApp(
+      title: 'Spacemate',
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      home: const MenuPage(
+        slug: 'home',
+        appBarTitle: 'Spacemate Menu',
       ),
     );
   }

@@ -4,13 +4,12 @@ import 'package:spacemate/core/database/database_helper.dart';
 import 'package:spacemate/core/network/dio_client.dart';
 import 'package:spacemate/core/network/network_info.dart';
 import 'package:spacemate/features/menu/data/datasources/menu_local_data_source.dart';
-import 'package:spacemate/features/menu/data/datasources/menu_local_data_source_sqflite.dart';
 import 'package:spacemate/features/menu/data/datasources/menu_remote_data_source.dart';
 import 'package:spacemate/features/menu/data/datasources/menu_remote_data_source_impl.dart';
 import 'package:spacemate/features/menu/data/repositories/menu_repository_impl.dart';
 import 'package:spacemate/features/menu/domain/repositories/menu_repository.dart';
 import 'package:spacemate/features/menu/domain/usecases/get_menu_items.dart';
-import 'package:spacemate/features/menu/domain/usecases/get_supported_locales.dart';
+
 import 'package:spacemate/features/menu/presentation/bloc/menu_bloc.dart';
 
 final sl = GetIt.instance;
@@ -28,13 +27,12 @@ void _initMenuFeature() {
   sl.registerFactory(
     () => MenuBloc(
       getMenuItems: sl(),
-      getSupportedLocales: sl(),
     ),
   );
 
   // Usecases
   sl.registerLazySingleton(() => GetMenuItems(sl()));
-  sl.registerLazySingleton(() => GetSupportedLocales(sl()));
+  
 
   // Repository
   sl.registerLazySingleton<MenuRepository>(
@@ -50,7 +48,7 @@ void _initMenuFeature() {
     () => MenuRemoteDataSourceImpl(dioClient: sl()),
   );
   sl.registerLazySingleton<MenuLocalDataSource>(
-    () => MenuLocalDataSourceSqflite(dbHelper: sl()),
+    () => MenuLocalDataSourceImpl(dbHelper: sl()),
   );
 }
 

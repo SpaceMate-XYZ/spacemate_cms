@@ -1,19 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:spacemate/features/menu/presentation/bloc/menu_event.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:spacemate/core/theme/app_colors.dart';
 import 'package:spacemate/core/theme/app_text_styles.dart';
 import 'package:spacemate/core/utils/screen_utils.dart';
 import 'package:spacemate/features/menu/domain/entities/menu_item_entity.dart';
 import 'package:spacemate/features/menu/presentation/bloc/menu_bloc.dart';
+import 'package:spacemate/features/menu/presentation/bloc/menu_event.dart';
 import 'package:spacemate/features/menu/presentation/widgets/menu_grid_item.dart';
 
 class MenuGrid extends StatelessWidget {
   final List<MenuItemEntity> items;
   final bool isLoading;
   final String? errorMessage;
-  final bool showBadge;
   final bool showTitle;
   final int? maxCrossAxisExtent;
   final double childAspectRatio;
@@ -29,7 +27,6 @@ class MenuGrid extends StatelessWidget {
     required this.items,
     this.isLoading = false,
     this.errorMessage,
-    this.showBadge = true,
     this.showTitle = true,
     this.maxCrossAxisExtent,
     this.childAspectRatio = 1.0,
@@ -58,15 +55,13 @@ class MenuGrid extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final screenSize = ScreenUtils.getScreenSize(context);
-        
-        // Calculate cross axis count based on available width or use provided maxCrossAxisExtent
+
         final crossAxisCount = maxCrossAxisExtent != null
             ? (constraints.maxWidth / maxCrossAxisExtent!).floor().clamp(1, 6)
             : _calculateCrossAxisCount(constraints.maxWidth);
 
-        // Calculate item width based on available space
-        final availableWidth = constraints.maxWidth - 
-            (crossAxisSpacing * (crossAxisCount - 1)) - 
+        final availableWidth = constraints.maxWidth -
+            (crossAxisSpacing * (crossAxisCount - 1)) -
             (padding?.horizontal ?? 0);
         final itemWidth = availableWidth / crossAxisCount;
 
@@ -87,10 +82,9 @@ class MenuGrid extends StatelessWidget {
               return MenuGridItem(
                 item: item,
                 onTap: () => _onItemTapped(context, item),
-                showBadge: showBadge,
                 showTitle: showTitle,
                 width: itemWidth,
-                height: itemWidth * 1.2, // Adjust height based on width
+                height: itemWidth * 1.2,
               );
             },
           ),
@@ -100,14 +94,13 @@ class MenuGrid extends StatelessWidget {
   }
 
   int _calculateCrossAxisCount(double width) {
-    if (width > 1200) return 6; // Big desktop
-    if (width > 900) return 5;   // Desktop
-    if (width > 700) return 4;   // Small desktop
-    if (width > 550) return 3;   // Large tablet
-    if (width > 400) return 2;   // Small tablet
-    return 2;                    // Phone (default)
+    if (width > 1200) return 6;
+    if (width > 900) return 5;
+    if (width > 700) return 4;
+    if (width > 550) return 3;
+    if (width > 400) return 2;
+    return 2;
   }
-
 
   Widget _buildLoadingState(BuildContext context) {
     return const Center(
@@ -118,7 +111,7 @@ class MenuGrid extends StatelessWidget {
   Widget _buildErrorState(BuildContext context, String message) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24.0),
@@ -148,7 +141,7 @@ class MenuGrid extends StatelessWidget {
             ),
             const SizedBox(height: 24.0),
             ElevatedButton.icon(
-              onPressed: () => context.read<MenuBloc>().add(const RefreshMenuEvent()),
+              onPressed: () => context.read<MenuBloc>().add(RefreshMenuEvent()),
               icon: const Icon(Icons.refresh_rounded),
               label: const Text('Try Again'),
               style: ElevatedButton.styleFrom(
@@ -170,7 +163,7 @@ class MenuGrid extends StatelessWidget {
   Widget _buildEmptyState(BuildContext context, String message) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24.0),
@@ -197,12 +190,6 @@ class MenuGrid extends StatelessWidget {
   }
 
   void _onItemTapped(BuildContext context, MenuItemEntity item) {
-    // Handle item tap
-    // You can use go_router, Navigator, or any other navigation solution
-    // Example with go_router:
-    // context.go(item.route);
-    
-    // For now, just print the item details
-    debugPrint('Menu item tapped: ${item.title} (${item.id})');
+    debugPrint('Menu item tapped: ${item.label} (${item.id})');
   }
 }

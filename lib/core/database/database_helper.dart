@@ -71,22 +71,18 @@ class DatabaseHelper {
   Future<void> _createSchema(Database db) async {
     await db.execute('''
       CREATE TABLE IF NOT EXISTS menu_items (
-        id TEXT PRIMARY KEY,
-        title TEXT NOT NULL,
-        icon TEXT NOT NULL,
-        category TEXT NOT NULL,
-        route TEXT NOT NULL,
-        is_active INTEGER NOT NULL DEFAULT 1,
-        "order" INTEGER,
-        badge_count INTEGER NOT NULL DEFAULT 0,
-        required_permissions TEXT,
-        analytics_id TEXT NOT NULL,
-        image_url TEXT,
-        created_at INTEGER NOT NULL,
-        updated_at INTEGER NOT NULL
+        id INTEGER PRIMARY KEY,
+        slug TEXT NOT NULL,
+        label TEXT NOT NULL,
+        icon TEXT,
+        "order" INTEGER NOT NULL,
+        is_visible INTEGER NOT NULL,
+        is_available INTEGER NOT NULL,
+        badge_count INTEGER,
+        cached_at INTEGER NOT NULL
       )
     ''');
-    await db.execute('CREATE INDEX IF NOT EXISTS idx_menu_items_category ON menu_items(category)');
+    await db.execute('CREATE INDEX IF NOT EXISTS idx_menu_items_slug ON menu_items(slug)');
     await db.execute('CREATE INDEX IF NOT EXISTS idx_menu_items_order ON menu_items("order")');
   }
 

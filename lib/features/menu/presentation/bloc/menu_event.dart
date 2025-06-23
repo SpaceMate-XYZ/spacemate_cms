@@ -7,56 +7,21 @@ abstract class MenuEvent extends Equatable {
   List<Object?> get props => [];
 }
 
+/// Event to load menu items for a specific screen slug.
 class LoadMenuEvent extends MenuEvent {
-  final String placeId;
-  final String category;
+  final String slug;
   final bool forceRefresh;
   final String? locale;
 
   const LoadMenuEvent({
-    required this.placeId,
-    required this.category,
+    required this.slug,
     this.forceRefresh = false,
     this.locale,
   });
 
   @override
-  List<Object?> get props => [placeId, category, forceRefresh, locale];
+  List<Object?> get props => [slug, forceRefresh, locale];
 }
 
-class ChangeCategoryEvent extends MenuEvent {
-  final String category;
-
-  const ChangeCategoryEvent(this.category);
-
-  @override
-  List<Object?> get props => [category];
-}
-
-class ChangeLocaleEvent extends MenuEvent {
-  final String locale;
-
-  const ChangeLocaleEvent(this.locale);
-
-  @override
-  List<Object?> get props => [locale];
-}
-
-class RefreshMenuEvent extends MenuEvent {
-  final String? category;
-  final String? locale;
-
-  const RefreshMenuEvent({this.category, this.locale});
-
-  @override
-  List<Object?> get props => [category, locale];
-}
-
-class LoadSupportedLocalesEvent extends MenuEvent {
-  final String placeId;
-
-  const LoadSupportedLocalesEvent(this.placeId);
-
-  @override
-  List<Object?> get props => [placeId];
-}
+/// Event to refresh the currently loaded menu.
+class RefreshMenuEvent extends MenuEvent {}

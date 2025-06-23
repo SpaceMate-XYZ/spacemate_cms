@@ -7,38 +7,31 @@ class MenuState extends Equatable {
   final MenuStatus status;
   final List<MenuItemEntity> items;
   final String? errorMessage;
-  final String? category;
-  final String? placeId;
+  final String slug;
   final String? selectedLocale;
-  final List<String>? supportedLocales;
 
   const MenuState({
     this.status = MenuStatus.initial,
     this.items = const [],
     this.errorMessage,
-    this.category,
-    this.placeId,
+    this.slug = 'home', // Default slug
     this.selectedLocale,
-    this.supportedLocales,
   });
 
   MenuState copyWith({
     MenuStatus? status,
     List<MenuItemEntity>? items,
     String? errorMessage,
-    String? category,
-    String? placeId,
+    String? slug,
     String? selectedLocale,
-    List<String>? supportedLocales,
+    bool clearErrorMessage = false,
   }) {
     return MenuState(
       status: status ?? this.status,
       items: items ?? this.items,
-      errorMessage: errorMessage,
-      category: category ?? this.category,
-      placeId: placeId ?? this.placeId,
+      errorMessage: clearErrorMessage ? null : errorMessage ?? this.errorMessage,
+      slug: slug ?? this.slug,
       selectedLocale: selectedLocale ?? this.selectedLocale,
-      supportedLocales: supportedLocales ?? this.supportedLocales,
     );
   }
 
@@ -47,9 +40,7 @@ class MenuState extends Equatable {
         status,
         items,
         errorMessage,
-        category,
-        placeId,
+        slug,
         selectedLocale,
-        supportedLocales,
       ];
 }

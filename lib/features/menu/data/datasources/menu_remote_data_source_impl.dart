@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:spacemate/core/error/exceptions.dart';
 import 'package:spacemate/core/network/dio_client.dart';
 import 'package:spacemate/features/menu/data/models/menu_item_model.dart';
+import 'package:spacemate/features/menu/data/models/screen_api_response.dart';
 import 'menu_remote_data_source.dart';
 
 class MenuRemoteDataSourceImpl implements MenuRemoteDataSource {
@@ -11,66 +12,38 @@ class MenuRemoteDataSourceImpl implements MenuRemoteDataSource {
 
   @override
   Future<List<MenuItemModel>> getMenuItems({
-    required String placeId,
-    required String category,
+    required String slug,
     String? locale,
     CancelToken? cancelToken,
   }) async {
     try {
-      final queryParams = <String, dynamic>{
-        'filters[category][\$eq]': category,
-        'sort': 'order:asc',
-        'populate': '*',
+      final Map<String, dynamic> queryParameters = {
+        'filters[slug[]\$eq]': slug,
+        'populate': 'MenuGrid',
       };
 
       if (locale != null) {
-        queryParams['locale'] = locale;
+        queryParameters['locale'] = locale;
       }
 
       final response = await _dioClient.get(
-        '/api/$placeId-menu-screens',
-        queryParameters: queryParams,
+        '/api/screens',
+        queryParameters: queryParameters,
         cancelToken: cancelToken,
       );
 
-      if (response.data == null || response.data['data'] == null) {
-        throw ServerException('Invalid response format');
+      final apiResponse = ScreenApiResponse.fromJson(response.data);
+
+      if (apiResponse.data.isEmpty) {
+        return [];
       }
 
-      final List<dynamic> data = response.data['data'];
-      return data
-          .map((item) => MenuItemModel.fromJson({
-                'id': item['id'],
-                ...item['attributes'],
-              }))
-          .toList();
+      return apiResponse.data.first.menuGrid;
     } on DioException catch (e) {
-      throw ServerException(e.message ?? 'Failed to load menu items');
+      throw ServerException(e.message ?? 'Failed to load menu items from server.');
     } catch (e) {
-      throw ServerException('Failed to load menu items: ${e.toString()}');
-    }
-  }
-
-  @override
-  Future<List<String>> getSupportedLocales({
-    required String placeId,
-    CancelToken? cancelToken,
-  }) async {
-    try {
-      final response = await _dioClient.get(
-        '/i18n/locales',
-        cancelToken: cancelToken,
-      );
-
-      if (response.data == null || !(response.data is List)) {
-        throw ServerException('Invalid locales format');
-      }
-
-      return (response.data as List).map((e) => e['code'] as String).toList();
-    } on DioException catch (e) {
-      throw ServerException(e.message ?? 'Failed to load supported locales');
-    } catch (e) {
-      throw ServerException('Failed to load supported locales: ${e.toString()}');
+      throw ServerException('An unexpected error occurred: ${e.toString()}');
     }
   }
 }
+
