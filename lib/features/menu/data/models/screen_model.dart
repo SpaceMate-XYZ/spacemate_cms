@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:flutter/foundation.dart'; // Required for debugPrint
+import 'package:flutter/foundation.dart';
 import 'package:spacemate/features/menu/data/models/menu_item_model.dart';
 
 class ScreenModel extends Equatable {
@@ -18,7 +18,7 @@ class ScreenModel extends Equatable {
   });
 
   factory ScreenModel.fromJson(Map<String, dynamic> json) {
-    int? _parseInt(dynamic value) {
+    int? parseInt(dynamic value) {
       if (value is String) {
         debugPrint('ScreenModel: _parseInt received string: $value');
       }
@@ -35,7 +35,7 @@ class ScreenModel extends Equatable {
       return null;
     }
 
-    bool? _parseBool(dynamic value) {
+    bool? parseBool(dynamic value) {
       if (value == null) return null;
       if (value is bool) return value;
       if (value is int) return value == 1;
@@ -47,21 +47,17 @@ class ScreenModel extends Equatable {
       return null;
     }
 
-
-
     final attributes = json['attributes'] as Map<String, dynamic>?;
-
-    // If attributes exist, use them for most fields, otherwise fall back to top-level json
     final source = attributes ?? json;
 
     return ScreenModel(
-      id: _parseInt(json['id']) ?? 0, // ID is typically at the top level
+      id: parseInt(json['id']) ?? 0,
       name: source['name'] as String? ?? '',
       slug: source['slug'] as String? ?? '',
       title: source['title'] as String? ?? '',
-      menuGrid: (source['MenuGrid'] != null && source['MenuGrid']['data'] is List)
-          ? (source['MenuGrid']['data'] as List)
-              .map((item) => MenuItemModel.fromJson(item))
+      menuGrid: (source['MenuGrid'] is List)
+          ? (source['MenuGrid'] as List)
+              .map((item) => MenuItemModel.fromJson(item as Map<String, dynamic>))
               .toList()
           : [],
     );
