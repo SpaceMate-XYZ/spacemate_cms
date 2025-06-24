@@ -1,4 +1,3 @@
-import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:spacemate/features/menu/domain/entities/menu_item_entity.dart';
 
@@ -14,7 +13,7 @@ class MenuItemModel extends MenuItemEntity {
   });
 
   factory MenuItemModel.fromJson(Map<String, dynamic> json) {
-    int? _parseInt(dynamic value) {
+    int? parseInt(dynamic value) {
       if (value is String) {
         debugPrint('MenuItemModel: _parseInt received string: $value');
       }
@@ -31,7 +30,7 @@ class MenuItemModel extends MenuItemEntity {
       return null;
     }
 
-    bool? _parseBool(dynamic value) {
+    bool? parseBool(dynamic value) {
       if (value is String) {
         debugPrint('MenuItemModel: _parseBool received string: $value');
       }
@@ -54,14 +53,14 @@ class MenuItemModel extends MenuItemEntity {
     final source = attributes ?? json;
 
     return MenuItemModel(
-      id: _parseInt(json['id']) ?? 0, // ID is typically at the top level
+      id: parseInt(json['id']) ?? 0, // ID is typically at the top level
       label: source['label'] as String? ?? source['title'] as String? ?? '', // Handle both 'label' and 'title' from old DB
       icon: source['icon'] as String?,
 
-      order: _parseInt(source['order']) ?? 0,
-      isVisible: _parseBool(source['is_visible']) ?? _parseBool(source['isVisible']) ?? false,
-      isAvailable: _parseBool(source['is_available']) ?? _parseBool(source['isAvailable']) ?? false,
-      badgeCount: _parseInt(source['badge_count']) ?? _parseInt(source['badgeCount']),
+      order: parseInt(source['order']) ?? 0,
+      isVisible: parseBool(source['is_visible']) ?? parseBool(source['isVisible']) ?? false,
+      isAvailable: parseBool(source['is_available']) ?? parseBool(source['isAvailable']) ?? false,
+      badgeCount: parseInt(source['badge_count']) ?? parseInt(source['badgeCount']),
     );
   }
 

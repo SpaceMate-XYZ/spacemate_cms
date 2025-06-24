@@ -1,47 +1,48 @@
-import 'package:hive/hive.dart';
+import 'dart:convert';
+import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spacemate/features/menu/data/models/menu_item_model.dart';
 
-class MenuItemModelAdapter extends TypeAdapter<MenuItemModel> {
-  @override
-  final int typeId = 0; // Unique ID for this adapter
+class MenuItemModelAdapter {
+  static const _menuItemsKey = 'menu_items';
 
-  @override
-  MenuItemModel read(BinaryReader reader) {
-    return MenuItemModel(
-      id: reader.readString(),
-      title: reader.readString(),
-      icon: reader.readString(),
-      category: MenuCategoryX.fromString(reader.readString()),
-      route: reader.readString(),
-      isActive: reader.readBool(),
-      order: reader.readInt(),
-      badgeCount: reader.readInt(),
-      requiredPermissions: (reader.read() as List).cast<String>(),
-      analyticsId: reader.readString(),
-    );
+  Future<void> saveMenuItem(MenuItemModel menuItem) async {
+    final prefs = await SharedPreferences.getInstance();
+    final menuItems = await getMenuItems();
+    final updatedMenuItems = menuItems
+        .where((item) => item.id != menuItem.id)
+        .toList()
+      ..add(menuItem);
+    await prefs.setString(_menuItemsKey, jsonEncode(updatedMenuItems));
   }
 
-  @override
-  void write(BinaryWriter writer, MenuItemModel obj) {
-    writer.writeString(obj.id);
-    writer.writeString(obj.title);
-    writer.writeString(obj.icon);
-    writer.writeString(obj.category.toString());
-    writer.writeString(obj.route);
-    writer.writeBool(obj.isActive);
-    writer.writeInt(obj.order ?? -1);
-    writer.writeInt(obj.badgeCount);
-    writer.write(obj.requiredPermissions);
-    writer.writeString(obj.analyticsId);
+  Future<MenuItemModel?> getMenuItem(String id) async {
+    final prefs = await SharedPreferences.getInstance();
+    final menuItems = await getMenuItems();
+    try {
+      return menuItems.firstWhere((item) => item.id == id);
+    } catch (e) {
+      return null;
+    }
   }
 
-  @override
-  int get hashCode => typeId.hashCode;
+  Future<List<MenuItemModel>> getMenuItems() async {
+    final prefs = await SharedPreferences.getInstance();
+    final menuItemsJson = prefs.getString(_menuItemsKey);
+    if (menuItemsJson == null) return [];
+    final menuItemsList = jsonDecode(menuItemsJson) as List;
+    return menuItemsList.map((item) => MenuItemModel.fromJson(item)).toList();
+  }
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is MenuItemModelAdapter &&
-          runtimeType == other.runtimeType &&
-          typeId == other.typeId;
+  Future<void> deleteMenuItem(String id) async {
+    final prefs = await SharedPreferences.getInstance();
+    final menuItems = await getMenuItems();
+    final updatedMenuItems = menuItems.where((item) => item.id != id).toList();
+    await prefs.setString(_menuItemsKey, jsonEncode(updatedMenuItems));
+  }
+
+  Future<void> clearMenuItems() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_menuItemsKey);
+  }
 }

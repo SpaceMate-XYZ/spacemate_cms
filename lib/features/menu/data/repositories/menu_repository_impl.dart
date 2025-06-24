@@ -75,8 +75,8 @@ class MenuRepositoryImpl implements MenuRepository {
         final itemsToCache = screen.menuGrid;
         await localDataSource.cacheMenuItems(itemsToCache, slug);
         return itemsToCache;
-      } on ServerException catch (e) {
-        throw e; // Re-throw ServerException to be caught by TaskEither.tryCatch
+      } on ServerException {
+        rethrow; // Re-throw ServerException to be caught by TaskEither.tryCatch
       }
     } else {
       throw NetworkException('You are offline. Please check your connection.'); // Throw NetworkException
@@ -84,7 +84,9 @@ class MenuRepositoryImpl implements MenuRepository {
   }
 
   @override
-  TaskEither<Failure, List<String>> getSupportedLocales() {
+  TaskEither<Failure, List<String>> getSupportedLocales({
+    required String placeId,
+  }) {
     return TaskEither.left(const ServerFailure('This feature is no longer supported.'));
   }
 }

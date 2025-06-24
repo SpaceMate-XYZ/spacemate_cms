@@ -20,6 +20,11 @@ class MenuRemoteDataSourceImpl implements MenuRemoteDataSource {
           'populate': 'MenuGrid',
         },
       );
+      
+      if (response.data == null) {
+        throw ServerException('No data received from server');
+      }
+      
       final screenResponse = ScreenApiResponse.fromJson(response.data);
       return screenResponse.data;
     } on DioException catch (e) {

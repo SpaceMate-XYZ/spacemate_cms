@@ -5,16 +5,13 @@ import 'package:spacemate/features/menu/domain/entities/menu_item_entity.dart';
 
 void main() {
   const tMenuItemModel = MenuItemModel(
-    id: '1',
-    title: 'Parking',
+    id: 1,
+    label: 'Parking',
     icon: 'local_parking',
-    category: MenuCategory.transport,
-    route: '/transport/parking',
-    isActive: true,
     order: 1,
+    isVisible: true,
+    isAvailable: true,
     badgeCount: 3,
-    requiredPermissions: ['user'],
-    analyticsId: 'transport_parking',
   );
 
   final tJson = {
@@ -82,10 +79,10 @@ void main() {
       final result = MenuItemModel.fromJson(json);
       
       // Assert
-      expect(result.isActive, isTrue);
+      expect(result.isVisible, isTrue);
       expect(result.order, isNull);
       expect(result.badgeCount, isZero);
-      expect(result.requiredPermissions, isEmpty);
+      // Removed as requiredPermissions is not a field in MenuItemModel
     });
 
     test('should handle all MenuCategory values', () {
@@ -132,8 +129,8 @@ void main() {
       // Assert
       expect(result.order, isNull);
       expect(result.badgeCount, isZero);
-      expect(result.requiredPermissions, isEmpty);
-      expect(result.imageUrl, isNull);
+      // Removed as requiredPermissions is not a field in MenuItemModel
+      // Removed as imageUrl is not a field in MenuItemModel
     });
 
     test('should handle special characters in strings', () {
@@ -152,10 +149,10 @@ void main() {
       final result = MenuItemModel.fromJson(json);
       
       // Assert
-      expect(result.title, equals(specialString));
+      expect(result.label, equals(specialString));
       expect(result.icon, equals(specialString));
-      expect(result.route, equals(specialString));
-      expect(result.analyticsId, equals(specialString));
+      // Removed as route is not a field in MenuItemModel
+      // Removed as analyticsId is not a field in MenuItemModel
     });
 
     test('should throw ArgumentError for invalid JSON', () {

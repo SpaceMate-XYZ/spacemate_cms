@@ -5,8 +5,8 @@ class AppColors {
   // Private constructor to prevent instantiation
   AppColors._();
 
-  // Brand colors
-  static const Color primary = Color(0xFF6200EE);
+  // Brand colors - Light Theme
+  static const Color primary = Color(0xFF1A237E); // Dark Blue from screenshots
   static const Color primaryVariant = Color(0xFF3700B3);
   static const Color secondary = Color(0xFF03DAC6);
   static const Color secondaryVariant = Color(0xFF018786);
@@ -19,6 +19,18 @@ class AppColors {
   static const Color onSurface = Color(0xFF000000);
   static const Color onError = Color(0xFFFFFFFF);
 
+  // Light Theme specific colors
+  static const Color surfaceLight = Color(0xFFFFFFFF);
+  static const Color backgroundLight = Color(0xFFF5F5F5);
+  static const Color onSurfaceLight = Color(0xFF1F1F1F);
+  static const Color onBackgroundLight = Color(0xFF1F1F1F);
+
+  // Dark Theme specific colors
+  static const Color surfaceDark = Color(0xFF121212);
+  static const Color backgroundDark = Color(0xFF121212);
+  static const Color onSurfaceDark = Color(0xFFFFFFFF);
+  static const Color onBackgroundDark = Color(0xFFFFFFFF);
+
   // Additional colors
   static const Color primaryLight = Color(0xFF9E47FF);
   static const Color primaryDark = Color(0xFF0400BA);
@@ -28,6 +40,12 @@ class AppColors {
   // Neutral colors
   static const Color black = Color(0xFF000000);
   static const Color white = Color(0xFFFFFFFF);
+  
+  // Surface container colors
+  static const Color surfaceContainerHighest = Color(0xFFE0E0E0);
+  static const Color onSurfaceVariant = Color(0xFF757575);
+  static const Color outline = Color(0xFF757575);
+  static const Color outlineVariant = Color(0xFFBDBDBD);
   static const Color transparent = Color(0x00000000);
   
   // Gray scale

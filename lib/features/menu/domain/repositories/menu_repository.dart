@@ -17,4 +17,13 @@ abstract class MenuRepository {
     bool forceRefresh = false,
     String? locale,
   });
+
+  /// Fetches supported locales for a given place ID.
+  ///
+  /// - [placeId]: The ID of the place to get supported locales for.
+  ///
+  /// Returns a [TaskEither] that resolves to either a [Failure] or a list of supported locale strings.
+  TaskEither<Failure, List<String>> getSupportedLocales({
+    required String placeId,
+  });
 }

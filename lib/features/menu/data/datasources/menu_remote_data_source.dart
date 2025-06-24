@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:spacemate/features/menu/data/models/screen_model.dart';
 
 abstract class MenuRemoteDataSource {

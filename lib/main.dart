@@ -1,14 +1,15 @@
-import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:spacemate/core/di/injection_container.dart' as di;
 import 'package:spacemate/core/theme/app_theme.dart';
+import 'package:spacemate/core/theme/theme_service.dart'; // Added import
 import 'package:spacemate/core/utils/app_router.dart';
 import 'package:spacemate/features/menu/domain/entities/menu_category.dart';
 import 'package:spacemate/features/menu/presentation/bloc/menu_bloc.dart';
 import 'package:spacemate/features/menu/presentation/bloc/menu_event.dart';
+import 'package:dynamic_color/dynamic_color.dart'; // Added import
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,6 +26,8 @@ void main() async {
     DeviceOrientation.portraitDown,
   ]);
 
+  // Theme service is now initialized in dependency injection
+
   runApp(const MyApp());
 }
 
@@ -33,53 +36,34 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DynamicColorBuilder(
-      builder: (lightColorScheme, darkColorScheme) {
-        final lightTheme = AppTheme.getTheme(
-          seedColor: lightColorScheme?.primary ?? Colors.blue,
-          brightness: Brightness.light,
-        );
-        
-        final darkTheme = AppTheme.getTheme(
-          seedColor: darkColorScheme?.primary ?? Colors.blue,
-          brightness: Brightness.dark,
-        );
-        
-        return MultiBlocProvider(
-          providers: [
-            BlocProvider<MenuBloc>(
-              create: (context) => di.sl<MenuBloc>()
-                ..add(LoadMenuEvent(
-                  slug: MenuCategory.home.name,
-                  forceRefresh: false,
-                )),
-            ),
-          ],
-          child: MaterialApp.router(
-            title: 'Spacemate',
-            theme: lightTheme,
-            darkTheme: darkTheme,
-            themeMode: ThemeMode.system,
-            debugShowCheckedModeBanner: false,
-            routerConfig: AppRouter.router,
-            builder: (context, child) {
-              // Ensure text contrast is good for accessibility
-              final textTheme = Theme.of(context).textTheme;
-              final colorScheme = Theme.of(context).colorScheme;
-              
-              return Theme(
-                data: Theme.of(context).copyWith(
-                  textTheme: textTheme.apply(
-                    bodyColor: colorScheme.onSurface,
-                    displayColor: colorScheme.onSurface,
-                  ),
-                ),
-                child: child!,
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<MenuBloc>(
+          create: (context) => di.sl<MenuBloc>()
+            ..add(LoadMenuEvent(
+              slug: MenuCategory.home.name,
+              forceRefresh: false,
+            )),
+        ),
+      ],
+      child: DynamicColorBuilder(
+        builder: (ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
+          return StreamBuilder<bool>(
+            stream: di.sl<ThemeService>().isDarkMode,
+            builder: (context, snapshot) {
+              final isDark = snapshot.data ?? false;
+              return MaterialApp.router(
+                title: 'Spacemate',
+                theme: AppTheme.getTheme(isDark: false, dynamicColorScheme: lightDynamic),
+                darkTheme: AppTheme.getTheme(isDark: true, dynamicColorScheme: darkDynamic),
+                themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
+                debugShowCheckedModeBanner: false,
+                routerConfig: AppRouter.router,
               );
             },
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 }

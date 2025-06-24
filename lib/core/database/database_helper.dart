@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import 'migration_helper.dart';
@@ -12,6 +13,7 @@ class DatabaseHelper {
 
   static final DatabaseHelper instance = DatabaseHelper._init();
   static Database? _database;
+  static SharedPreferences? _sharedPreferences;
   bool _isInitialized = false;
 
   DatabaseHelper._init();
@@ -23,11 +25,16 @@ class DatabaseHelper {
 
   Future<Database> get database async {
     if (kIsWeb) {
-      throw UnsupportedError('Database is not supported on the web.');
+      throw UnsupportedError('Database not supported on web. Use SharedPreferences instead.');
     }
     if (_database != null) return _database!;
     _database = await _initDatabase();
     return _database!;
+  }
+
+  Future<SharedPreferences> get sharedPreferences async {
+    _sharedPreferences ??= await SharedPreferences.getInstance();
+    return _sharedPreferences!;
   }
 
   Future<Database> _initDatabase() async {
@@ -117,7 +124,12 @@ class DatabaseHelper {
   }
 
   Future<void> initialize() async {
-    if (kIsWeb || _isInitialized) return;
+    if (kIsWeb) {
+      _sharedPreferences ??= await SharedPreferences.getInstance();
+      _isInitialized = true;
+      return;
+    }
+    if (_isInitialized) return;
     // If database initialization fails on a supported platform (mobile/desktop),
     // it will now throw an exception, preventing the app from starting in a broken state.
     // This is safer than catching the error and pretending initialization succeeded.

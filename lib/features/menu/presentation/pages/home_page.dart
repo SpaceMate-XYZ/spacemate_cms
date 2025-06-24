@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:spacemate/core/theme/app_theme.dart';
-import 'package:spacemate/core/utils/app_router.dart';
 import 'package:spacemate/features/menu/domain/entities/menu_category.dart';
 import 'package:spacemate/features/menu/presentation/bloc/menu_bloc.dart';
 import 'package:spacemate/features/menu/presentation/bloc/menu_event.dart';
@@ -11,6 +9,7 @@ import 'package:spacemate/features/menu/presentation/pages/discover_page.dart';
 import 'package:spacemate/features/menu/presentation/pages/facilities_page.dart';
 import 'package:spacemate/features/menu/presentation/pages/transport_page.dart';
 import 'package:spacemate/features/menu/presentation/widgets/menu_grid.dart';
+import 'package:spacemate/core/theme/theme_toggle.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -76,30 +75,65 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: Text(
           MenuCategory.values[_currentPageIndex].displayName,
-          style: theme.textTheme.titleLarge?.copyWith(
+          style: theme.appBarTheme.titleTextStyle?.copyWith(
+            color: theme.brightness == Brightness.dark ? Colors.black : Colors.white,
             fontWeight: FontWeight.w600,
           ),
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () {
-              final category = MenuCategory.values[_currentPageIndex];
-              HomePage.loadData(context, slug: category.name);
-            },
-          ),
+          // Theme toggle button
+          const ThemeToggle(),
         ],
       ),
-      body: PageView(
+      body: PageView.builder(
         controller: _pageController,
         onPageChanged: _onPageChanged,
-        children: const [
-          _CategoryPage(category: MenuCategory.home),
-          TransportPage(),
-          AccessPage(),
-          FacilitiesPage(),
-          DiscoverPage(),
-        ],
+        itemCount: 5,
+        itemBuilder: (context, index) {
+          Widget page;
+          switch (index) {
+            case 0:
+              page = const _CategoryPage(category: MenuCategory.home);
+              break;
+            case 1:
+              page = const TransportPage();
+              break;
+            case 2:
+              page = const AccessPage();
+              break;
+            case 3:
+              page = const FacilitiesPage();
+              break;
+            case 4:
+              page = const DiscoverPage();
+              break;
+            default:
+              page = const _CategoryPage(category: MenuCategory.home);
+          }
+          
+          return AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            transitionBuilder: (Widget child, Animation<double> animation) {
+              return FadeTransition(
+                opacity: animation,
+                child: SlideTransition(
+                  position: Tween<Offset>(
+                    begin: const Offset(0.1, 0),
+                    end: Offset.zero,
+                  ).animate(CurvedAnimation(
+                    parent: animation,
+                    curve: Curves.easeInOutCubic,
+                  )),
+                  child: child,
+                ),
+              );
+            },
+            child: Container(
+              key: ValueKey(index),
+              child: page,
+            ),
+          );
+        },
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _currentPageIndex,
@@ -107,7 +141,10 @@ class _HomePageState extends State<HomePage> {
         labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
         destinations: MenuCategory.values.map((category) {
           return NavigationDestination(
-            icon: Icon(_getIconForCategory(category)),
+            icon: Icon(
+              _getIconForCategory(category),
+              size: 28.0, // Increased icon size to match menu items
+            ),
             label: category.displayName,
           );
         }).toList(),

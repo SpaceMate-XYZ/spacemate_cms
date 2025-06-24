@@ -1,8 +1,10 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart'; // Added import
 import 'package:get_it/get_it.dart';
 import 'package:spacemate/core/database/database_helper.dart';
 import 'package:spacemate/core/network/dio_client.dart';
 import 'package:spacemate/core/network/network_info.dart';
+import 'package:spacemate/core/theme/theme_service.dart';
 import 'package:spacemate/features/menu/domain/repositories/menu_local_data_source.dart';
 import 'package:spacemate/features/menu/data/datasources/menu_local_data_source.dart' as data_source;
 import 'package:spacemate/features/menu/data/datasources/menu_remote_data_source.dart';
@@ -58,12 +60,19 @@ Future<void> _initExternalDependencies({required String baseUrl}) async {
   sl.registerLazySingleton<DatabaseHelper>(() => DatabaseHelper.instance);
   await sl<DatabaseHelper>().initialize();
 
+  // Theme Service
+  sl.registerLazySingleton<ThemeService>(() => ThemeService());
+  await sl<ThemeService>().initTheme();
+
   // Network
   sl.registerLazySingleton(() => Connectivity());
   sl.registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl(sl<Connectivity>()));
 
   // Dio
-  final dioClient = DioClient(baseUrl: baseUrl);
+  final dioClient = DioClient(
+    baseUrl: baseUrl,
+    // No auth token needed since Strapi is publicly accessible
+  );
   await dioClient.init();
   sl.registerLazySingleton<DioClient>(() => dioClient);
 }

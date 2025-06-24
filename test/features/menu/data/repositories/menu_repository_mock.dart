@@ -7,8 +7,7 @@ import 'package:spacemate/features/menu/domain/repositories/menu_repository.dart
 class MockMenuRepository extends Mock implements MenuRepository {
   @override
   TaskEither<Failure, List<MenuItemEntity>> getMenuItems({
-    required String placeId,
-    required String category,
+    required String slug,
     bool forceRefresh = false,
     String? locale,
   }) {
@@ -17,49 +16,31 @@ class MockMenuRepository extends Mock implements MenuRepository {
         #getMenuItems,
         [],
         {
-          #placeId: placeId,
-          #category: category,
+          #slug: slug,
           #forceRefresh: forceRefresh,
           if (locale != null) #locale: locale,
         },
       ),
-      returnValue: TaskEither.right([
-        const MenuItemEntity(
-          id: '1',
-          title: 'Dashboard',
-          icon: 'assets/icons/dashboard.svg',
-          route: '/dashboard',
-          isActive: true,
-          order: 1,
-        ),
-        const MenuItemEntity(
-          id: '2',
-          title: 'Settings',
-          icon: 'assets/icons/settings.svg',
-          route: '/settings',
-          isActive: true,
-          order: 2,
-        ),
-      ]),
-    ) as TaskEither<Failure, List<MenuItemEntity>>;
-  }
-
-  @override
-  TaskEither<Failure, bool> updateMenuItemOrder({
-    required String placeId,
-    required List<String> menuItemIds,
-  }) {
-    return super.noSuchMethod(
-      Invocation.method(
-        #updateMenuItemOrder,
-        [],
-        {
-          #placeId: placeId,
-          #menuItemIds: menuItemIds,
-        },
+    ) ?? TaskEither.right([
+      const MenuItemEntity(
+        id: 1,
+        label: 'Dashboard',
+        icon: 'dashboard',
+        order: 1,
+        isVisible: true,
+        isAvailable: true,
+        badgeCount: null,
       ),
-      returnValue: TaskEither.right(true),
-    ) as TaskEither<Failure, bool>;
+      const MenuItemEntity(
+        id: 2,
+        label: 'Settings',
+        icon: 'settings',
+        order: 2,
+        isVisible: true,
+        isAvailable: true,
+        badgeCount: null,
+      ),
+    ]);
   }
 
   @override
@@ -72,7 +53,6 @@ class MockMenuRepository extends Mock implements MenuRepository {
         [],
         {#placeId: placeId},
       ),
-      returnValue: TaskEither.right(['en', 'es']),
-    ) as TaskEither<Failure, List<String>>;
+    ) ?? TaskEither.right(['en', 'es']);
   }
 }

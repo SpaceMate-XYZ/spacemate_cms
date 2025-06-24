@@ -4,32 +4,26 @@ import 'package:spacemate/features/menu/domain/entities/menu_item_entity.dart';
 
 void main() {
   const tMenuItem = MenuItemEntity(
-    id: '1',
-    title: 'Parking',
+    id: 1,
+    label: 'Parking',
     icon: 'local_parking',
-    category: MenuCategory.transport,
-    route: '/transport/parking',
-    isActive: true,
     order: 1,
+    isVisible: true,
+    isAvailable: true,
     badgeCount: 3,
-    requiredPermissions: ['user'],
-    analyticsId: 'transport_parking',
   );
 
   group('MenuItemEntity', () {
     test('should support value equality', () {
       // Arrange
       const anotherMenuItem = MenuItemEntity(
-        id: '1',
-        title: 'Parking',
+        id: 1,
+        label: 'Parking',
         icon: 'local_parking',
-        category: MenuCategory.transport,
-        route: '/transport/parking',
-        isActive: true,
         order: 1,
+        isVisible: true,
+        isAvailable: true,
         badgeCount: 3,
-        requiredPermissions: ['user'],
-        analyticsId: 'transport_parking',
       );
       
       // Assert
@@ -41,33 +35,17 @@ void main() {
       expect(
         tMenuItem.props,
         equals([
-          '1', // id
-          'Parking', // title
+          1, // id
+          'Parking', // label
           'local_parking', // icon
-          MenuCategory.transport, // category
-          '/transport/parking', // route
-          true, // isActive
           1, // order
+          true, // isVisible
+          true, // isAvailable
           3, // badgeCount
-          ['user'], // requiredPermissions
-          'transport_parking', // analyticsId
-          null, // imageUrl
         ]),
       );
     });
 
-    test('should return a copy with updated values', () {
-      // Act
-      final result = tMenuItem.copyWith(
-        title: 'Valet Parking',
-        badgeCount: 5,
-      );
-      
-      // Assert
-      expect(result.title, 'Valet Parking');
-      expect(result.badgeCount, 5);
-      expect(result.icon, tMenuItem.icon);
-      expect(result.category, tMenuItem.category);
-    });
+    // Removed copyWith test as it's not available in MenuItemEntity
   });
 }

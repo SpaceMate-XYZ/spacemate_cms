@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:spacemate/main.dart' as app;
-import 'package:spacemate/features/menu/presentation/pages/menu_page.dart';
+import 'package:spacemate/features/menu/presentation/pages/home_page.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -14,7 +14,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Verify the menu page is displayed
-      expect(find.byType(MenuPage), findsOneWidget);
+      expect(find.byType(HomePage), findsOneWidget);
 
       // Verify menu items are loaded (adjust this based on your actual menu items)
       expect(find.byType(CircularProgressIndicator), findsNothing);
@@ -32,7 +32,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Verify navigation occurred (adjust this based on your routing)
-      expect(find.byType(MenuPage), findsNothing);
+      expect(find.byType(HomePage), findsNothing);
     });
 
     testWidgets('Menu updates when user permissions change', (tester) async {
