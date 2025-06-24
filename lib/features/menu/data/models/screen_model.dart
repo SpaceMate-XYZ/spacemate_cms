@@ -19,6 +19,10 @@ class ScreenModel extends Equatable {
 
   factory ScreenModel.fromJson(Map<String, dynamic> json) {
     int? _parseInt(dynamic value) {
+      if (value is String) {
+        debugPrint('ScreenModel: _parseInt received string: $value');
+      }
+
       if (value == null) return null;
       if (value is int) return value;
       if (value is String) {
@@ -31,15 +35,32 @@ class ScreenModel extends Equatable {
       return null;
     }
 
+    bool? _parseBool(dynamic value) {
+      if (value == null) return null;
+      if (value is bool) return value;
+      if (value is int) return value == 1;
+      if (value is String) {
+        debugPrint('ScreenModel: _parseBool received string: $value');
+        if (value.toLowerCase() == 'true' || value == '1') return true;
+        if (value.toLowerCase() == 'false' || value == '0') return false;
+      }
+      return null;
+    }
 
+
+
+    final attributes = json['attributes'] as Map<String, dynamic>?;
+
+    // If attributes exist, use them for most fields, otherwise fall back to top-level json
+    final source = attributes ?? json;
 
     return ScreenModel(
-      id: _parseInt(json['id']) ?? 0,
-      name: json['name'],
-      slug: json['slug'],
-      title: json['title'],
-      menuGrid: (json['MenuGrid'] != null && json['MenuGrid']['data'] is List)
-          ? (json['MenuGrid']['data'] as List)
+      id: _parseInt(json['id']) ?? 0, // ID is typically at the top level
+      name: source['name'] as String? ?? '',
+      slug: source['slug'] as String? ?? '',
+      title: source['title'] as String? ?? '',
+      menuGrid: (source['MenuGrid'] != null && source['MenuGrid']['data'] is List)
+          ? (source['MenuGrid']['data'] as List)
               .map((item) => MenuItemModel.fromJson(item))
               .toList()
           : [],

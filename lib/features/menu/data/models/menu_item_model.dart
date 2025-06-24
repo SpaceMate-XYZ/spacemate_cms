@@ -15,6 +15,10 @@ class MenuItemModel extends MenuItemEntity {
 
   factory MenuItemModel.fromJson(Map<String, dynamic> json) {
     int? _parseInt(dynamic value) {
+      if (value is String) {
+        debugPrint('MenuItemModel: _parseInt received string: $value');
+      }
+
       if (value == null) return null;
       if (value is int) return value;
       if (value is String) {
@@ -28,6 +32,10 @@ class MenuItemModel extends MenuItemEntity {
     }
 
     bool? _parseBool(dynamic value) {
+      if (value is String) {
+        debugPrint('MenuItemModel: _parseBool received string: $value');
+      }
+
       if (value == null) return null;
       if (value is bool) return value;
       if (value is int) return value == 1;
@@ -40,15 +48,20 @@ class MenuItemModel extends MenuItemEntity {
 
 
 
-    return MenuItemModel(
-      id: _parseInt(json['id']) ?? 0, // Default to 0 if parsing fails
-      label: json['label'] as String? ?? json['title'] as String? ?? '', // Handle both 'label' and 'title' from old DB
-      icon: json['icon'] as String?,
+    final attributes = json['attributes'] as Map<String, dynamic>?;
 
-      order: _parseInt(json['order']) ?? 0,
-      isVisible: _parseBool(json['is_visible']) ?? _parseBool(json['isVisible']) ?? false,
-      isAvailable: _parseBool(json['is_available']) ?? _parseBool(json['isAvailable']) ?? false,
-      badgeCount: _parseInt(json['badge_count']) ?? _parseInt(json['badgeCount']),
+    // If attributes exist, use them for most fields, otherwise fall back to top-level json
+    final source = attributes ?? json;
+
+    return MenuItemModel(
+      id: _parseInt(json['id']) ?? 0, // ID is typically at the top level
+      label: source['label'] as String? ?? source['title'] as String? ?? '', // Handle both 'label' and 'title' from old DB
+      icon: source['icon'] as String?,
+
+      order: _parseInt(source['order']) ?? 0,
+      isVisible: _parseBool(source['is_visible']) ?? _parseBool(source['isVisible']) ?? false,
+      isAvailable: _parseBool(source['is_available']) ?? _parseBool(source['isAvailable']) ?? false,
+      badgeCount: _parseInt(source['badge_count']) ?? _parseInt(source['badgeCount']),
     );
   }
 
