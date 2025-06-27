@@ -10,6 +10,7 @@ import 'package:spacemate/features/menu/presentation/pages/facilities_page.dart'
 import 'package:spacemate/features/menu/presentation/pages/transport_page.dart';
 import 'package:spacemate/features/menu/presentation/widgets/menu_grid.dart';
 import 'package:spacemate/core/theme/theme_toggle.dart';
+import 'package:spacemate/features/carousel/presentation/widgets/carousel_widget.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -80,9 +81,9 @@ class _HomePageState extends State<HomePage> {
             fontWeight: FontWeight.w600,
           ),
         ),
-        actions: [
+        actions: const [
           // Theme toggle button
-          const ThemeToggle(),
+          ThemeToggleButton(),
         ],
       ),
       body: PageView.builder(
@@ -177,6 +178,23 @@ class _CategoryPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<MenuBloc, MenuState>(
       builder: (context, state) {
+        if (category == MenuCategory.home) {
+          return Column(
+            children: [
+              const CarouselWidget(),
+              const SizedBox(height: 16),
+              Expanded(
+                child: MenuGrid(
+                  items: state.items,
+                  isLoading: state.status == MenuStatus.loading,
+                  errorMessage: state.errorMessage,
+                ),
+              ),
+            ],
+          );
+        }
+        
+        // For other categories, just show the grid
         return MenuGrid(
           items: state.items,
           isLoading: state.status == MenuStatus.loading,

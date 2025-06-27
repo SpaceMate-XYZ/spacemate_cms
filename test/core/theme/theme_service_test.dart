@@ -1,40 +1,108 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:material_color_utilities/material_color_utilities.dart';
-import '../../../core/theme/color_schemes.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:spacemate/core/theme/theme_service.dart';
 
 void main() {
-  group('getColorScheme', () {
-    test('returns a light color scheme when isDark is false and corePalette is null', () {
-      final colorScheme = getColorScheme(corePalette: null, isDark: false);
+  late ThemeService themeService;
 
-      expect(colorScheme.brightness, Brightness.light);
-      expect(colorScheme.primary, isNotNull);
+  setUp(() {
+    themeService = ThemeService();
+  });
+
+  tearDown(() {
+    themeService.dispose();
+  });
+
+  group('ThemeService', () {
+    test('initTheme loads dark mode preference correctly', () async {
+      // Arrange
+      SharedPreferences.setMockInitialValues({'theme_mode': 'dark'});
+
+      // Act
+      await themeService.init();
+
+      // Assert
+      expect(themeService.themeMode, ThemeMode.dark);
     });
 
-    test('returns a dark color scheme when isDark is true and corePalette is null', () {
-      final colorScheme = getColorScheme(corePalette: null, isDark: true);
+    test('initTheme defaults to system mode if no preference is saved', () async {
+      // Arrange
+      SharedPreferences.setMockInitialValues({}); // No 'theme_mode' key
 
-      expect(colorScheme.brightness, Brightness.dark);
-      expect(colorScheme.primary, isNotNull);
+      // Act
+      await themeService.init();
+
+      // Assert
+      expect(themeService.themeMode, ThemeMode.system);
     });
 
-    test('returns a light color scheme with custom colors when corePalette is provided', () {
-      final corePalette = CorePalette.of(Colors.blue.value);
-      final colorScheme = getColorScheme(corePalette: corePalette, isDark: false);
+    test('toggleTheme cycles through theme modes and saves preference', () async {
+      // Arrange
+      SharedPreferences.setMockInitialValues({'theme_mode': 'light'});
+      await themeService.init(); // Initialize with light mode
+      
+      // Act - First toggle (light -> dark)
+      await themeService.toggleTheme();
+      expect(themeService.themeMode, ThemeMode.dark);
+      
+      // Act - Second toggle (dark -> system)
+      await themeService.toggleTheme();
+      expect(themeService.themeMode, ThemeMode.system);
+      
+      // Act - Third toggle (system -> light)
+      await themeService.toggleTheme();
+      expect(themeService.themeMode, ThemeMode.light);
 
-      expect(colorScheme.brightness, Brightness.light);
-      expect(colorScheme.primary, isNotNull);
-      expect(colorScheme.primary, equals(Color(corePalette.primary.get(40))));
+      // Assert
+      final prefs = await SharedPreferences.getInstance();
+      expect(prefs.getString('theme_mode'), 'light');
     });
 
-    test('returns a dark color scheme with custom colors when corePalette is provided', () {
-      final corePalette = CorePalette.of(Colors.blue.value);
-      final colorScheme = getColorScheme(corePalette: corePalette, isDark: true);
+    test('toggleTheme switches to light mode and saves preference', () async {
+      // Arrange
+      SharedPreferences.setMockInitialValues({'theme_mode': 'dark'});
+      await themeService.init(); // Initialize with dark mode
 
-      expect(colorScheme.brightness, Brightness.dark);
-      expect(colorScheme.primary, isNotNull);
-      expect(colorScheme.primary, equals(Color(corePalette.primary.get(40))));
+      // Act
+      await themeService.toggleTheme();
+
+      // Assert
+      final prefs = await SharedPreferences.getInstance();
+      expect(themeService.themeMode, ThemeMode.system);
+      expect(prefs.getString('theme_mode'), 'system');
+    });
+
+    test('setThemeMode updates theme mode and saves preference', () async {
+      // Arrange
+      SharedPreferences.setMockInitialValues({'theme_mode': 'light'});
+      await themeService.init();
+
+      // Act
+      await themeService.setThemeMode(ThemeMode.dark);
+
+      // Assert
+      final prefs = await SharedPreferences.getInstance();
+      expect(themeService.themeMode, ThemeMode.dark);
+      expect(prefs.getString('theme_mode'), 'dark');
+    });
+
+    test('themeMode changes correctly on toggle', () async {
+      // Arrange
+      SharedPreferences.setMockInitialValues({'theme_mode': 'light'});
+      await themeService.init();
+      
+      // Act & Assert - First toggle (light -> dark)
+      await themeService.toggleTheme();
+      expect(themeService.themeMode, ThemeMode.dark);
+      
+      // Second toggle (dark -> system)
+      await themeService.toggleTheme();
+      expect(themeService.themeMode, ThemeMode.system);
+      
+      // Third toggle (system -> light)
+      await themeService.toggleTheme();
+      expect(themeService.themeMode, ThemeMode.light);
     });
   });
 }

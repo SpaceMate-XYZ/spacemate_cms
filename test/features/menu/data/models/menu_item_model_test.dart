@@ -1,214 +1,213 @@
+import 'dart:convert';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:spacemate/features/menu/data/models/menu_item_model.dart';
-import 'package:spacemate/features/menu/domain/entities/menu_category.dart';
 import 'package:spacemate/features/menu/domain/entities/menu_item_entity.dart';
 
 void main() {
   const tMenuItemModel = MenuItemModel(
     id: 1,
-    label: 'Parking',
-    icon: 'local_parking',
+    label: 'Test Label',
+    icon: 'test_icon',
     order: 1,
     isVisible: true,
     isAvailable: true,
-    badgeCount: 3,
+    badgeCount: 5,
   );
 
-  final tJson = {
-    'id': '1',
-    'title': 'Parking',
-    'icon': 'local_parking',
-    'category': 'transport',
-    'route': '/transport/parking',
-    'isActive': true,
-    'order': 1,
-    'badgeCount': 3,
-    'requiredPermissions': ['user'],
-    'analyticsId': 'transport_parking',
-  };
-
-  group('MenuItemModel', () {
-    test('should be a subclass of MenuItemEntity', () {
+  test(
+    'should be a subclass of MenuItemEntity',
+    () async {
       expect(tMenuItemModel, isA<MenuItemEntity>());
-    });
+    },
+  );
 
-    test('should return a valid model from JSON', () {
-      // Act
-      final result = MenuItemModel.fromJson(tJson);
-      
-      // Assert
-      expect(result, equals(tMenuItemModel));
-    });
+  group('fromJson', () {
+    test(
+      'should return a valid model when the JSON is complete',
+      () async {
+        // Arrange
+        final Map<String, dynamic> jsonMap = json.decode(
+          '''
+          {
+            "id": 1,
+            "attributes": {
+              "label": "Test Label",
+              "icon": "test_icon",
+              "order": 1,
+              "is_visible": true,
+              "is_available": true,
+              "badge_count": 5
+            }
+          }
+          ''',
+        );
 
-    test('should return a JSON map containing proper data', () {
-      // Act
-      final result = tMenuItemModel.toJson();
-      
-      // Assert
-      final expectedMap = {
-        'id': '1',
-        'title': 'Parking',
-        'icon': 'local_parking',
-        'category': 'transport',
-        'route': '/transport/parking',
-        'is_active': 1,
-        'isActive': true,
-        'order': 1,
-        'badge_count': 3,
-        'badgeCount': 3,
-        'required_permissions': ['user'],
-        'requiredPermissions': ['user'],
-        'analytics_id': 'transport_parking',
-        'analyticsId': 'transport_parking',
-      };
-      expect(result, equals(expectedMap));
-    });
+        // Act
+        final result = MenuItemModel.fromJson(jsonMap);
 
-    test('should return default values for optional fields', () {
-      // Arrange
-      final json = {
-        'id': '1',
-        'title': 'Parking',
-        'icon': 'local_parking',
-        'category': 'transport',
-        'route': '/transport/parking',
-        'analyticsId': 'transport_parking',
-      };
-      
-      // Act
-      final result = MenuItemModel.fromJson(json);
-      
-      // Assert
-      expect(result.isVisible, isTrue);
-      expect(result.order, isNull);
-      expect(result.badgeCount, isZero);
-      // Removed as requiredPermissions is not a field in MenuItemModel
-    });
+        // Assert
+        expect(result, tMenuItemModel);
+      },
+    );
 
-    test('should handle all MenuCategory values', () {
-      // Arrange
-      const categories = MenuCategory.values;
-      
-      for (final category in categories) {
-        final json = {
-          'id': '1',
-          'title': 'Test Item',
-          'icon': 'icon',
-          'category': category.toString().split('.').last,
-          'route': '/test',
-          'analyticsId': 'test_id',
+    test(
+      'should return a valid model when the JSON has missing optional fields',
+      () async {
+        // Arrange
+        final Map<String, dynamic> jsonMap = json.decode(
+          '''
+          {
+            "id": 1,
+            "attributes": {
+              "label": "Test Label",
+              "order": 1,
+              "is_visible": true,
+              "is_available": true
+            }
+          }
+          ''',
+        );
+        const expectedModel = MenuItemModel(
+          id: 1,
+          label: 'Test Label',
+          icon: null,
+          order: 1,
+          isVisible: true,
+          isAvailable: true,
+          badgeCount: null,
+        );
+
+        // Act
+        final result = MenuItemModel.fromJson(jsonMap);
+
+        // Assert
+        expect(result, expectedModel);
+      },
+    );
+
+    test(
+      'should return a valid model when using "title" instead of "label"',
+      () async {
+        // Arrange
+        final Map<String, dynamic> jsonMap = json.decode(
+          '''
+          {
+            "id": 1,
+            "attributes": {
+              "title": "Test Label",
+              "order": 1,
+              "is_visible": true,
+              "is_available": true
+            }
+          }
+          ''',
+        );
+        const expectedModel = MenuItemModel(
+          id: 1,
+          label: 'Test Label',
+          icon: null,
+          order: 1,
+          isVisible: true,
+          isAvailable: true,
+          badgeCount: null,
+        );
+
+        // Act
+        final result = MenuItemModel.fromJson(jsonMap);
+
+        // Assert
+        expect(result, expectedModel);
+      },
+    );
+
+    test(
+      'should return a valid model when boolean and int values are strings',
+      () async {
+        // Arrange
+        final Map<String, dynamic> jsonMap = json.decode(
+          '''
+          {
+            "id": "1",
+            "attributes": {
+              "label": "Test Label",
+              "order": "1",
+              "is_visible": "true",
+              "is_available": "0",
+              "badge_count": "5"
+            }
+          }
+          ''',
+        );
+        const expectedModel = MenuItemModel(
+          id: 1,
+          label: 'Test Label',
+          icon: null,
+          order: 1,
+          isVisible: true,
+          isAvailable: false,
+          badgeCount: 5,
+        );
+
+        // Act
+        final result = MenuItemModel.fromJson(jsonMap);
+
+        // Assert
+        expect(result, expectedModel);
+      },
+    );
+  });
+
+  group('toJson', () {
+    test(
+      'should return a JSON map containing the proper data',
+      () async {
+        // Act
+        final result = tMenuItemModel.toJson();
+
+        // Assert
+        final expectedJsonMap = {
+          'id': 1,
+          'label': 'Test Label',
+          'icon': 'test_icon',
+          'order': 1,
+          'is_visible': 1,
+          'is_available': 1,
+          'badge_count': 5,
         };
-        
-        // Act & Assert
-        expect(
-          () => MenuItemModel.fromJson(json),
-          returnsNormally,
-          reason: 'Should handle ${category.toString()}',
+        expect(result, expectedJsonMap);
+      },
+    );
+
+    test(
+      'should return a JSON map with null optional fields handled',
+      () async {
+        // Arrange
+        const modelWithNulls = MenuItemModel(
+          id: 1,
+          label: 'Test Label',
+          icon: null,
+          order: 1,
+          isVisible: true,
+          isAvailable: true,
+          badgeCount: null,
         );
-      }
-    });
 
-    test('should handle null/empty values for optional fields', () {
-      // Arrange
-      final json = {
-        'id': '1',
-        'title': 'Test Item',
-        'icon': 'icon',
-        'category': 'transport',
-        'route': '/test',
-        'analyticsId': 'test_id',
-        'order': null,
-        'badgeCount': null,
-        'requiredPermissions': null,
-        'imageUrl': null,
-      };
-      
-      // Act
-      final result = MenuItemModel.fromJson(json);
-      
-      // Assert
-      expect(result.order, isNull);
-      expect(result.badgeCount, isZero);
-      // Removed as requiredPermissions is not a field in MenuItemModel
-      // Removed as imageUrl is not a field in MenuItemModel
-    });
+        // Act
+        final result = modelWithNulls.toJson();
 
-    test('should handle special characters in strings', () {
-      // Arrange
-      const specialString = '!@#%^&*()_+{}|:<>?~[];\',./';
-      final json = {
-        'id': '1',
-        'title': specialString,
-        'icon': specialString,
-        'category': 'transport',
-        'route': specialString,
-        'analyticsId': specialString,
-      };
-      
-      // Act
-      final result = MenuItemModel.fromJson(json);
-      
-      // Assert
-      expect(result.label, equals(specialString));
-      expect(result.icon, equals(specialString));
-      // Removed as route is not a field in MenuItemModel
-      // Removed as analyticsId is not a field in MenuItemModel
-    });
-
-    test('should throw ArgumentError for invalid JSON', () {
-      // Arrange
-      final invalidJson = {'invalid': 'data'};
-      
-      // Act & Assert
-      expect(
-        () => MenuItemModel.fromJson(invalidJson),
-        throwsA(isA<ArgumentError>()),
-      );
-    });
-
-    test('should handle missing or invalid fields', () {
-      // Test with minimal valid JSON (only required fields)
-      final minimalJson = {
-        'id': '1',
-        'title': 'Test',
-        'icon': 'icon',
-        'category': 'transport',
-        'route': '/test',
-        'analyticsId': 'test_id',
-      };
-      
-      // Should not throw with minimal valid JSON
-      expect(
-        () => MenuItemModel.fromJson(minimalJson),
-        returnsNormally,
-      );
-      
-      // Test with missing category (should throw)
-      final jsonWithoutCategory = Map<String, dynamic>.from(minimalJson)..remove('category');
-      expect(
-        () => MenuItemModel.fromJson(jsonWithoutCategory),
-        throwsA(isA<ArgumentError>()),
-        reason: 'Should throw when category is missing',
-      );
-      
-      // Test with invalid category (should throw)
-      final jsonWithInvalidCategory = Map<String, dynamic>.from(minimalJson)..['category'] = 'invalid_category';
-      expect(
-        () => MenuItemModel.fromJson(jsonWithInvalidCategory),
-        throwsA(isA<ArgumentError>()),
-        reason: 'Should throw when category is invalid',
-      );
-      
-      // Test with other missing fields (should not throw)
-      final otherRequiredFields = ['id', 'title', 'icon', 'route', 'analyticsId'];
-      for (final field in otherRequiredFields) {
-        final json = Map<String, dynamic>.from(minimalJson)..remove(field);
-        expect(
-          () => MenuItemModel.fromJson(json),
-          returnsNormally,
-          reason: 'Should not throw when $field is missing',
-        );
-      }
-    });
+        // Assert
+        final expectedJsonMap = {
+          'id': 1,
+          'label': 'Test Label',
+          'icon': '', // icon is explicitly set to '' if null
+          'order': 1,
+          'is_visible': 1,
+          'is_available': 1,
+          'badge_count': null,
+        };
+        expect(result, expectedJsonMap);
+      },
+    );
   });
 }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:spacemate/features/menu/domain/entities/menu_category.dart';
 import 'package:spacemate/features/menu/domain/entities/menu_item_entity.dart';
 
 // Create a test menu item
@@ -7,27 +6,19 @@ MenuItemEntity createTestMenuItem({
   String? id,
   String? title,
   String? icon,
-  MenuCategory? category,
-  String? route,
-  bool? isActive,
   int? order,
+  bool? isVisible,
+  bool? isAvailable,
   int? badgeCount,
-  List<String>? requiredPermissions,
-  String? analyticsId,
-  String? imageUrl,
 }) {
   return MenuItemEntity(
-    id: id ?? '1',
-    title: title ?? 'Test Item',
-    icon: icon ?? 'home',
-    category: category ?? MenuCategory.transport,
-    route: route ?? '/test',
-    isActive: isActive ?? true,
-    order: order,
-    badgeCount: badgeCount ?? 0,
-    requiredPermissions: requiredPermissions ?? const [],
-    analyticsId: analyticsId ?? 'test_item',
-    imageUrl: imageUrl,
+    id: int.tryParse(id ?? '1') ?? 1,
+    label: title ?? 'Test Item',
+    icon: icon,
+    order: order ?? 0,
+    isVisible: isVisible ?? true,
+    isAvailable: isAvailable ?? true,
+    badgeCount: badgeCount,
   );
 }
 

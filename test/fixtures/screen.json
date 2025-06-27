@@ -1,0 +1,38 @@
+{
+  "id": 1,
+  "attributes": {
+    "slug": "home",
+    "title": "Home Screen",
+    "createdAt": "2023-10-26T10:00:00.000Z",
+    "updatedAt": "2023-10-26T10:00:00.000Z",
+    "publishedAt": "2023-10-26T10:00:00.000Z",
+    "locale": "en",
+    "MenuGrid": {
+      "id": 1,
+      "title": "Main Menu",
+      "createdAt": "2023-10-26T10:00:00.000Z",
+      "updatedAt": "2023-10-26T10:00:00.000Z",
+      "publishedAt": "2023-10-26T10:00:00.000Z",
+      "menu_items": [
+        {
+          "id": 1,
+          "label": "Dashboard",
+          "icon": "dashboard",
+          "order": 1,
+          "isVisible": true,
+          "isAvailable": true,
+          "badgeCount": 0
+        },
+        {
+          "id": 2,
+          "label": "Settings",
+          "icon": "settings",
+          "order": 2,
+          "isVisible": true,
+          "isAvailable": true,
+          "badgeCount": 0
+        }
+      ]
+    }
+  }
+}

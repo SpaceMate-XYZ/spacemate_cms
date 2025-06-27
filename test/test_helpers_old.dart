@@ -44,9 +44,13 @@ extension MockImageUtilsExtension on MockImageUtils {
 
 // Helper function to set up mocks
 void setupTestMocks() {
-  // Override the default image loading behavior for tests
-  debugDefaultTargetPlatformOverride = TargetPlatform.android;
+  // For image loading behavior in tests, use the testWidgets function's binding
   debugPrint('Test mocks initialized');
+  
+  // If you need to set a specific platform for testing, consider using:
+  // TestWidgetsFlutterBinding.ensureInitialized();
+  // TestWidgetsFlutterBinding.instance.platformDispatcher.platform = 
+  //   TargetPlatform.android;
 }
 
 // Create a test app with Material and other required providers
@@ -99,26 +103,18 @@ MenuItemEntity createMockMenuItem({
   String? id,
   String? title,
   String? icon,
-  MenuCategory? category,
-  String? route,
-  bool? isActive,
   int? order,
+  bool? isVisible,
+  bool? isAvailable,
   int? badgeCount,
-  List<String>? requiredPermissions,
-  String? analyticsId,
-  String? imageUrl,
 }) {
   return MenuItemEntity(
-    id: id ?? '1',
-    title: title ?? 'Test Item',
-    icon: icon ?? 'home',
-    category: category ?? MenuCategory.transport,
-    route: route ?? '/test',
-    isActive: isActive ?? true,
-    order: order,
-    badgeCount: badgeCount ?? 0,
-    requiredPermissions: requiredPermissions ?? const [],
-    analyticsId: analyticsId ?? 'test_item',
-    imageUrl: imageUrl,
+    id: int.tryParse(id ?? '1') ?? 1,  // Convert string ID to int
+    label: title ?? 'Test Item',
+    icon: icon,
+    order: order ?? 0,
+    isVisible: isVisible ?? true,
+    isAvailable: isAvailable ?? true,
+    badgeCount: badgeCount,
   );
 }

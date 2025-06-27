@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:spacemate/features/menu/domain/entities/menu_category.dart';
 import 'package:spacemate/core/theme/theme_toggle.dart';
+import 'package:spacemate/features/menu/domain/entities/menu_category.dart';
 
 class MenuBottomNavBar extends StatelessWidget {
   final int currentIndex;
@@ -17,7 +17,7 @@ class MenuBottomNavBar extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        const ThemeToggle(), // Added ThemeToggle
+        const ThemeToggleButton(), // Theme toggle button
         BottomNavigationBar(
           type: BottomNavigationBarType.shifting,
           backgroundColor: Colors.grey[300], // Light gray background

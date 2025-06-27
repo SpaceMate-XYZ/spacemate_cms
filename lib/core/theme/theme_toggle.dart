@@ -1,31 +1,41 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:spacemate/core/theme/theme_service.dart';
-import 'package:spacemate/core/di/injection_container.dart' as di;
 
-class ThemeToggle extends StatelessWidget {
-  const ThemeToggle({super.key});
+/// A widget that provides a button to toggle between light, dark, and system theme modes.
+///
+/// This widget uses `Provider` to access and interact with the `ThemeService`,
+/// allowing users to change the application's theme preference.
+class ThemeToggleButton extends StatelessWidget {
+  const ThemeToggleButton({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<bool>(
-      stream: di.sl<ThemeService>().isDarkMode,
-      builder: (context, snapshot) {
-        final isDark = snapshot.data ?? false;
-        return Padding(
-          padding: EdgeInsets.only(
-            right: MediaQuery.of(context).size.height * 0.02, // 2% of screen height
-          ),
-          child: IconButton(
-            icon: Icon(
-              isDark ? Icons.light_mode : Icons.dark_mode,
-              color: isDark ? Colors.black : Colors.white, // Black for dark theme, white for light theme
-            ),
-            onPressed: () {
-              di.sl<ThemeService>().toggleTheme();
-            },
-            tooltip: isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode',
-          ),
-        );
+    final themeService = context.watch<ThemeService>();
+
+    IconData iconData;
+    String tooltip;
+
+    switch (themeService.themeMode) {
+      case ThemeMode.light:
+        iconData = Icons.light_mode;
+        tooltip = 'Switch to Dark Mode';
+        break;
+      case ThemeMode.dark:
+        iconData = Icons.dark_mode;
+        tooltip = 'Switch to System Theme';
+        break;
+      case ThemeMode.system:
+        iconData = Icons.settings_brightness;
+        tooltip = 'Switch to Light Mode';
+        break;
+    }
+
+    return IconButton(
+      icon: Icon(iconData),
+      tooltip: tooltip,
+      onPressed: () {
+        themeService.toggleTheme();
       },
     );
   }

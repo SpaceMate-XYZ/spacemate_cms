@@ -1,232 +1,117 @@
-# SpaceMate CMS Architecture
+# High-Level Architecture for SpaceMate Superapp
 
-## 1. System Overview
+## 1. Introduction
+This document outlines the high-level architecture for the SpaceMate Superapp, a white-labeled, multi-tenant, multi-platform application designed for property management. The app will integrate seamlessly with a Strapi Content Management System (CMS) to dynamically deliver content and features based on specific `placeId` (representing a building or property).
 
-SpaceMate is a multi-tenant CMS for managing menus and onboarding experiences across multiple physical locations. The system is designed with an offline-first approach, where content is cached locally after the initial load.
+## 2. Core Principles
+*   **Modularity:** Components are designed to be independent and reusable.
+*   **Scalability:** The architecture supports easy expansion for new features and increased user load.
+*   **Maintainability:** Clean code, clear separation of concerns, and adherence to best practices.
+*   **Multi-Platform Compatibility:** Designed for Android, iOS, Web, Windows, and macOS.
+*   **Dynamic Content:** Content and features are driven by Strapi CMS, allowing for white-labeling and tenant-specific experiences.
 
-## 2. URL Structure Options
+## 3. System Context Diagram
 
-### Option 1: Tenant-based Subdomain (SaaS Model)
-```
-{placeId}-{cityCode}.spacemate.xyz
-```
-**Example:** `google-mtv.spacemate.xyz`
-
-**Pros:**
-- Clear tenant separation
-- Brandable per location
-- Easy to implement DNS-based routing
-
-**Cons:**
-- Requires wildcard SSL certificate
-- More complex DNS management
-- Potential naming conflicts
-
-### Option 2: Path-based (SaaS Model)
-```
-spacemate.xyz/{placeId}
-```
-**Example:** `spacemate.xyz/google-mtv`
-
-**Pros:**
-- Single SSL certificate
-- Simpler DNS management
-- Better CDN caching
-
-**Cons:**
-- Less brandable per location
-- Harder to implement tenant isolation
-
-### Option 3: Client-hosted Subdomain (Self-hosted)
-```
-spacemate.{clientdomain}.com/{placeId}
-```
-**Example:** `spacemate.clientcompany.com/google-building1`
-
-**Pros:**
-- Client controls DNS
-- Clear separation from main domain
-- Easier SSL certificate management
-
-**Cons:**
-- Requires client DNS configuration
-- Harder to update across multiple clients
-
-## 3. Recommended Implementation
-
-### For SaaS Deployment:
-```
-{slugifiedName}-{locationCode}.spacemate.xyz
-```
-- **Example:** `google-mtv.spacemate.xyz`
-- Uses wildcard DNS and SSL
-- Best for managed service offering
-
-### For Client-hosted Deployment:
-```
-spacemate.{clientdomain}.com/{placeId}
-```
-- **Example:** `spacemate.clientcompany.com/google-building1`
-- Easier client-side DNS management
-- Better for enterprise clients with IT policies
-
-## 4. API Endpoints
-
-### Base URL Structure
-```
-/api/v1/places/{placeId}
+```mermaid
+graph TD
+    A[Flutter Superapp Client] -->|API Calls (HTTP/HTTPS)| B(Strapi CMS Backend)
+    B -->|Database Interaction| C[Database (e.g., PostgreSQL)]
+    A -->|Local Storage| D[Device Local Storage (e.g., SQLite, SharedPreferences)]
+    A -->|Authentication| E[Authentication Service (e.g., Firebase Auth, Strapi Users & Permissions)]
+    E --> B
 ```
 
-### Key Endpoints
-- `GET /api/v1/places/{placeId}` - Place details
-- `GET /api/v1/places/{placeId}/menu` - Full menu structure
-- `GET /api/v1/places/{placeId}/onboarding` - Onboarding content
-- `GET /api/v1/places/{placeId}/sync` - Get updates since last sync
+## 4. Architectural Layers (Client-Side - Flutter App)
 
-## 5. Data Flow
+The Flutter application will follow a clean architecture pattern, separating concerns into distinct layers:
 
-1. **Initial Load**:
-   - App extracts placeId from URL
-   - Checks local cache
-   - Fetches from Strapi if needed
-   - Caches data locally
+### 4.1. Presentation Layer (UI & State Management)
+*   **Purpose:** Handles user interface rendering and user interactions. Manages UI state.
+*   **Components:**
+    *   **Widgets/UI Components:** Visual elements of the application.
+    *   **Pages/Screens:** Compositions of widgets forming distinct views.
+    *   **BLoC (Business Logic Component):** Manages the state of the UI, reacting to events and emitting new states. Interacts with the Domain Layer.
+*   **Key Technologies:** Flutter Widgets, BLoC, `flutter_bloc`.
 
-2. **Subsequent Loads**:
-   - Serves from local cache
-   - Background sync if network available
+### 4.2. Domain Layer (Business Logic & Entities)
+*   **Purpose:** Contains the core business logic and rules of the application. Independent of any framework.
+*   **Components:**
+    *   **Entities:** Plain Dart objects representing the core data structures (e.g., `User`, `Property`, `Announcement`, `MaintenanceRequest`).
+    *   **Use Cases (Interactors):** Encapsulate specific business operations. Orchestrate interactions between repositories. (e.g., `LoginUser`, `GetAnnouncementsByPlaceId`, `SubmitMaintenanceRequest`).
+    *   **Repositories (Abstract):** Define contracts for data operations. Implemented in the Data Layer.
+*   **Key Technologies:** Pure Dart.
 
-3. **Image Handling**:
-   - Lazy-loaded in UI
-   - Cached using `cached_network_image`
-   - Stored in Cloudflare R2/Firebase Storage
+### 4.3. Data Layer (Data Sources & Repositories)
+*   **Purpose:** Responsible for retrieving and storing data. Implements the repository contracts defined in the Domain Layer.
+*   **Components:**
+    *   **Repositories (Concrete Implementation):** Implement the abstract repository interfaces. Coordinate data from various sources.
+    *   **Data Sources (Remote):** Interact with external APIs (e.g., Strapi REST API).
+    *   **Data Sources (Local):** Interact with local storage (e.g., SQLite, SharedPreferences).
+    *   **Models:** Data structures for serialization/deserialization from/to JSON (e.g., `UserModel`, `PropertyModel`). These are often extensions of Domain Entities.
+*   **Key Technologies:** `dio` for HTTP requests, `json_serializable`, `sqflite`, `shared_preferences`.
 
-## 6. Strapi Configuration
+## 5. Strapi CMS Backend
 
-### Content Types
+*   **Purpose:** Provides a flexible and extensible content management system.
+*   **Key Features:**
+    *   **Custom Content Types:** Define schemas for `Buildings`, `Units`, `Users`, `Announcements`, `MaintenanceRequests`, `Features`, etc.
+    *   **Role-Based Access Control (RBAC):** Manage permissions for different user roles (Occupant, Property Manager, Builder).
+    *   **API Endpoints:** Automatically generated RESTful or GraphQL APIs for content interaction.
+    *   **Media Library:** Store and manage images, documents, and other assets.
+    *   **Webhooks:** Potentially used for real-time updates or integrations.
+*   **Data Structure for Multi-tenancy:** Each content type will likely have a `placeId` field to filter content specific to a building/property.
 
-#### Place
-- `slug` (UID, required)
-- `displayName` (Text)
-- `isActive` (Boolean)
-- `config` (JSON)
+## 6. Cross-Cutting Concerns
 
-#### MenuCategory
-- `place` (Relation to Place)
-- `name` (Text)
-- `order` (Number)
-- `isActive` (Boolean)
+*   **Dependency Injection (GetIt):** Manages dependencies throughout the application, ensuring loose coupling and testability.
+*   **Error Handling:** Consistent error handling across all layers, mapping exceptions to `Failure` objects.
+*   **Theming & Styling:** Centralized theme management (light/dark mode, dynamic colors) using `dynamic_color`.
+*   **Navigation:** Robust routing solution (e.g., `go_router`) for deep linking and complex navigation flows.
+*   **Internationalization (i18n):** Support for multiple languages.
+*   **Environment Configuration:** Using `flutter_dotenv` for managing API keys, base URLs, etc.
 
-#### MenuItem
-- `category` (Relation to MenuCategory)
-- `name` (Text)
-- `description` (Rich Text)
-- `price` (Number)
-- `image` (Media)
+## 7. Proposed Directory Structure
 
-#### OnboardingScreen
-- `place` (Relation to Place)
-- `title` (Text)
-- `description` (Text)
-- `image` (Media)
-- `buttonText` (Text)
-- `order` (Number)
-
-## 7. Client-Side Implementation
-
-### Dependencies
-```yaml
-dependencies:
-  # State Management
-  flutter_bloc: ^8.1.4
-  hydrated_bloc: ^9.1.2
-  
-  # Network
-  dio: ^5.4.0
-  cached_network_image: ^3.3.1
-  
-  # Local Storage
-  sqflite: ^2.3.2
-  path_provider: ^2.1.1
-  
-  # Utils
-  intl: ^0.20.2
-  equatable: ^2.0.5
-```
-
-### Folder Structure
 ```
 lib/
-  features/
-    menu/
-      data/
-        datasources/
-        models/
-        repositories/
-      domain/
-        entities/
-        repositories/
-        usecases/
-      presentation/
-        bloc/
-        pages/
-        widgets/
-    onboarding/
-      # Similar structure as menu
-  core/
-    config/
-    database/
-    network/
-    theme/
-    utils/
+├───main.dart
+├───core/
+│   ├───config/             # Environment variables, app constants
+│   ├───database/           # Local database helpers (SQLite)
+│   ├───di/                 # Dependency Injection setup (GetIt)
+│   ├───error/              # Custom exceptions and failures
+│   ├───extensions/         # Dart/Flutter extensions
+│   ├───network/            # Dio client, interceptors, network info
+│   ├───theme/              # App themes, colors, text styles, theme service
+│   ├───usecases/           # Base use case classes
+│   └───utils/              # Utility functions (router, image, icon, screen utils)
+├───features/
+│   ├───<feature_name>/
+│   │   ├───data/
+│   │   │   ├───adapters/       # Data mapping (e.g., JSON to Entity)
+│   │   │   ├───datasources/    # Remote/Local data sources
+│   │   │   ├───models/         # Data models for serialization
+│   │   │   └───repositories/   # Concrete repository implementations
+│   │   ├───domain/
+│   │   │   ├───entities/       # Core business entities
+│   │   │   ├───repositories/   # Abstract repository interfaces
+│   │   │   └───usecases/       # Business logic use cases
+│   │   └───presentation/
+│   │       ├───bloc/           # BLoC event, state, and bloc files
+│   │       ├───pages/          # Full-screen pages
+│   │       ├───screens/        # Reusable screen components
+│   │       └───widgets/        # Reusable UI widgets
+│   └───onboarding/
+│       └───data/
+│           └───models/
+└───shared/
+    ├───widgets/              # Widgets shared across multiple features
+    └───constants/            # Global constants
+
 ```
 
-## 8. Deployment Options
-
-### Option A: Cloud Hosted (SaaS)
-- **URL:** `{placeId}.spacemate.xyz`
-- **Infrastructure:**
-  - Cloudflare for DNS/CDN
-  - Strapi on managed Kubernetes/Heroku
-  - R2 for media storage
-
-### Option B: Client Hosted
-- **URL:** `spacemate.{clientdomain}.com`
-- **Infrastructure:**
-  - Client-managed DNS
-  - Docker container for easy deployment
-  - Client's storage solution
-
-## 9. Security Considerations
-
-1. **Authentication**:
-   - API keys per client
-   - Rate limiting
-   - CORS configuration
-
-2. **Data Protection**:
-   - Tenant isolation
-   - Regular backups
-   - Data encryption at rest
-
-3. **Compliance**:
-   - GDPR/CCPA ready
-   - Data residency options
-
-## 10. Monitoring and Analytics
-
-- Error tracking (Sentry)
-- Usage analytics
-- Performance monitoring
-- Uptime monitoring
-
-## 11. Future Considerations
-
-1. Multi-language support
-2. Advanced analytics dashboard
-3. Client self-service portal
-4. Integration with POS systems
-5. Advanced media management
-
----
-*Document Version: 1.0.0*
-*Last Updated: 2025-06-22*
+## 8. Future Considerations
+*   **Offline Support:** Robust caching mechanisms for offline access.
+*   **Real-time Updates:** WebSockets or push notifications for instant content updates.
+*   **Search:** Integration with Meilisearch for efficient content search.
+*   **Augmented Reality (AR):** Potential AR features for property viewing.

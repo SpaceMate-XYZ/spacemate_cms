@@ -1,5 +1,5 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart'; // Added import
+// Added import
 import 'package:get_it/get_it.dart';
 import 'package:spacemate/core/database/database_helper.dart';
 import 'package:spacemate/core/network/dio_client.dart';
@@ -13,6 +13,7 @@ import 'package:spacemate/features/menu/data/repositories/menu_repository_impl.d
 import 'package:spacemate/features/menu/domain/repositories/menu_repository.dart';
 import 'package:spacemate/features/menu/domain/usecases/get_menu_items.dart';
 
+import 'package:spacemate/features/carousel/di/carousel_injection.dart';
 import 'package:spacemate/features/menu/presentation/bloc/menu_bloc.dart';
 
 final sl = GetIt.instance;
@@ -20,6 +21,7 @@ final sl = GetIt.instance;
 Future<void> init({required String baseUrl}) async {
   //! Features
   _initMenuFeature();
+  initCarouselFeature();
 
   //! External
   await _initExternalDependencies(baseUrl: baseUrl);
@@ -62,7 +64,7 @@ Future<void> _initExternalDependencies({required String baseUrl}) async {
 
   // Theme Service
   sl.registerLazySingleton<ThemeService>(() => ThemeService());
-  await sl<ThemeService>().initTheme();
+  await sl<ThemeService>().init();
 
   // Network
   sl.registerLazySingleton(() => Connectivity());

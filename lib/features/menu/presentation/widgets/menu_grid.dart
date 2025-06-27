@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:spacemate/core/theme/app_text_styles.dart';
+import 'package:go_router/go_router.dart';
+
 import 'package:spacemate/features/menu/domain/entities/menu_item_entity.dart';
 import 'package:spacemate/features/menu/presentation/bloc/menu_bloc.dart';
 import 'package:spacemate/features/menu/presentation/bloc/menu_event.dart';
@@ -124,7 +125,7 @@ class MenuGrid extends StatelessWidget {
             const SizedBox(height: 16.0),
             Text(
               'Oops!',
-              style: AppTextStyles.headlineSmall?.copyWith(
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                 color: colorScheme.error,
                 fontWeight: FontWeight.bold,
               ),
@@ -133,8 +134,8 @@ class MenuGrid extends StatelessWidget {
             Text(
               message,
               textAlign: TextAlign.center,
-              style: AppTextStyles.bodyMedium?.copyWith(
-                color: colorScheme.onSurface.withOpacity(0.7),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurfaceVariant,
               ),
             ),
             const SizedBox(height: 24.0),
@@ -180,7 +181,7 @@ class MenuGrid extends StatelessWidget {
             Text(
               message,
               textAlign: TextAlign.center,
-              style: AppTextStyles.titleMedium?.copyWith(
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 color: colorScheme.onSurface.withOpacity(0.7),
               ),
             ),
@@ -192,5 +193,8 @@ class MenuGrid extends StatelessWidget {
 
   void _onItemTapped(BuildContext context, MenuItemEntity item) {
     debugPrint('Menu item tapped: ${item.label} (${item.id})');
+    if (item.label == 'Parking') {
+      context.go('/parking-onboarding');
+    }
   }
 }

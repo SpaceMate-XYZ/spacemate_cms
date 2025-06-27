@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:spacemate/features/menu/domain/entities/menu_item_entity.dart';
 
 // Mock classes for testing
 class MockBuildContext extends Mock implements BuildContext {}
@@ -10,6 +11,9 @@ class MockThemeData extends Mock implements ThemeData {
   
   @override
   TextTheme get textTheme => const TextTheme();
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) => 'MockThemeData';
 }
 
 // Helper functions for testing
@@ -26,27 +30,19 @@ MenuItemEntity createMockMenuItem({
   String? id,
   String? title,
   String? icon,
-  MenuCategory? category,
-  String? route,
-  bool? isActive,
   int? order,
+  bool? isVisible,
+  bool? isAvailable,
   int? badgeCount,
-  List<String>? requiredPermissions,
-  String? analyticsId,
-  String? imageUrl,
 }) {
   return MenuItemEntity(
-    id: id ?? '1',
-    title: title ?? 'Test Item',
-    icon: icon ?? 'home',
-    category: category ?? MenuCategory.transport,
-    route: route ?? '/test',
-    isActive: isActive ?? true,
-    order: order,
-    badgeCount: badgeCount ?? 0,
-    requiredPermissions: requiredPermissions ?? const [],
-    analyticsId: analyticsId ?? 'test_item',
-    imageUrl: imageUrl,
+    id: int.tryParse(id ?? '1') ?? 1,
+    label: title ?? 'Test Item',
+    icon: icon,
+    order: order ?? 0,
+    isVisible: isVisible ?? true,
+    isAvailable: isAvailable ?? true,
+    badgeCount: badgeCount,
   );
 }
 
