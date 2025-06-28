@@ -1,0 +1,31 @@
+{
+  "data": [
+    {
+      "id": 1,
+      "attributes": {
+        "name": "Parking",
+        "onboarding_carousel": {
+          "slides": [
+            {
+              "id": 1,
+              "feature": "Parking",
+              "screen": 1,
+              "title": "Welcome to Parking",
+              "imageUrl": "https://example.com/image1.png",
+              "header": "Find your perfect spot",
+              "body": "Easily locate and reserve parking spaces.",
+              "button_label": null
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": 2,
+      "attributes": {
+        "name": "Another Feature",
+        "onboarding_carousel": null
+      }
+    }
+  ]
+}

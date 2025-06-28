@@ -4,9 +4,9 @@ class CarouselLoadingWidget extends StatelessWidget {
   final double height;
 
   const CarouselLoadingWidget({
-    Key? key,
+    super.key,
     this.height = 200.0,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

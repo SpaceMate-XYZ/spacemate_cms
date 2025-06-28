@@ -13,6 +13,7 @@ void main() {
     isVisible: true,
     isAvailable: true,
     badgeCount: 5,
+    navigationTarget: '/test-route',
   );
 
   test(
@@ -37,7 +38,8 @@ void main() {
               "order": 1,
               "is_visible": true,
               "is_available": true,
-              "badge_count": 5
+              "badge_count": 5,
+              "navigationTarget": "/test-route"
             }
           }
           ''',
@@ -76,6 +78,7 @@ void main() {
           isVisible: true,
           isAvailable: true,
           badgeCount: null,
+          navigationTarget: null,
         );
 
         // Act
@@ -111,6 +114,7 @@ void main() {
           isVisible: true,
           isAvailable: true,
           badgeCount: null,
+          navigationTarget: null,
         );
 
         // Act
@@ -134,7 +138,8 @@ void main() {
               "order": "1",
               "is_visible": "true",
               "is_available": "0",
-              "badge_count": "5"
+              "badge_count": "5",
+              "navigationTarget": "/test-route"
             }
           }
           ''',
@@ -147,6 +152,7 @@ void main() {
           isVisible: true,
           isAvailable: false,
           badgeCount: 5,
+          navigationTarget: '/test-route',
         );
 
         // Act
@@ -174,6 +180,7 @@ void main() {
           'is_visible': 1,
           'is_available': 1,
           'badge_count': 5,
+          'navigationTarget': '/test-route',
         };
         expect(result, expectedJsonMap);
       },
@@ -191,6 +198,7 @@ void main() {
           isVisible: true,
           isAvailable: true,
           badgeCount: null,
+          navigationTarget: null,
         );
 
         // Act
@@ -205,6 +213,7 @@ void main() {
           'is_visible': 1,
           'is_available': 1,
           'badge_count': null,
+          'navigationTarget': null,
         };
         expect(result, expectedJsonMap);
       },

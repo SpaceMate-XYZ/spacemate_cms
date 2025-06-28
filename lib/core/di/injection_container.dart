@@ -15,6 +15,8 @@ import 'package:spacemate/features/menu/domain/usecases/get_menu_items.dart';
 
 import 'package:spacemate/features/carousel/di/carousel_injection.dart';
 import 'package:spacemate/features/menu/presentation/bloc/menu_bloc.dart';
+import 'package:spacemate/features/onboarding/di/onboarding_injection.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 final sl = GetIt.instance;
 
@@ -22,6 +24,7 @@ Future<void> init({required String baseUrl}) async {
   //! Features
   _initMenuFeature();
   initCarouselFeature();
+  initOnboardingFeature();
 
   //! External
   await _initExternalDependencies(baseUrl: baseUrl);
@@ -65,6 +68,10 @@ Future<void> _initExternalDependencies({required String baseUrl}) async {
   // Theme Service
   sl.registerLazySingleton<ThemeService>(() => ThemeService());
   await sl<ThemeService>().init();
+
+  // Shared Preferences
+  final sharedPreferences = await SharedPreferences.getInstance();
+  sl.registerLazySingleton<SharedPreferences>(() => sharedPreferences);
 
   // Network
   sl.registerLazySingleton(() => Connectivity());

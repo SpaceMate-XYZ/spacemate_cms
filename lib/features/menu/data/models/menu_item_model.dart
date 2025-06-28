@@ -1,6 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:spacemate/features/menu/domain/entities/menu_item_entity.dart';
 
+import 'package:flutter/foundation.dart';
+import 'package:spacemate/features/menu/domain/entities/menu_item_entity.dart';
+
 class MenuItemModel extends MenuItemEntity {
   const MenuItemModel({
     required super.id,
@@ -10,6 +13,7 @@ class MenuItemModel extends MenuItemEntity {
     required super.isVisible,
     required super.isAvailable,
     super.badgeCount,
+    super.navigationTarget,
   });
 
   factory MenuItemModel.fromJson(Map<String, dynamic> json) {
@@ -61,6 +65,7 @@ class MenuItemModel extends MenuItemEntity {
       isVisible: parseBool(source['is_visible']) ?? parseBool(source['isVisible']) ?? false,
       isAvailable: parseBool(source['is_available']) ?? parseBool(source['isAvailable']) ?? false,
       badgeCount: parseInt(source['badge_count']) ?? parseInt(source['badgeCount']),
+      navigationTarget: source['navigationTarget'] as String?,
     );
   }
 
@@ -73,6 +78,7 @@ class MenuItemModel extends MenuItemEntity {
       'is_visible': isVisible ? 1 : 0,
       'is_available': isAvailable ? 1 : 0,
       'badge_count': badgeCount,
+      'navigationTarget': navigationTarget,
     };
   }
 }

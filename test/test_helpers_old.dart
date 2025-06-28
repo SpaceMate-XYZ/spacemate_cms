@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:spacemate/features/menu/domain/entities/menu_item_entity.dart';
-import 'package:spacemate/features/menu/domain/entities/menu_category.dart';
 
 // Mock for ScreenUtils
 class MockScreenUtils {

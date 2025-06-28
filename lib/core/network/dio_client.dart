@@ -43,10 +43,12 @@ class DioClient {
       receiveTimeout: timeout,
       sendTimeout: timeout,
       responseType: ResponseType.json,
-      headers: {
+headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
       },
+      followRedirects: false,
+      validateStatus: (status) => status! < 500,
     );
 
     _dio = Dio(options);

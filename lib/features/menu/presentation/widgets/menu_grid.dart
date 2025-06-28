@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 
 import 'package:spacemate/features/menu/domain/entities/menu_item_entity.dart';
 import 'package:spacemate/features/menu/presentation/bloc/menu_bloc.dart';
 import 'package:spacemate/features/menu/presentation/bloc/menu_event.dart';
 import 'package:spacemate/features/menu/presentation/widgets/menu_grid_item.dart';
+import 'package:spacemate/features/menu/presentation/widgets/feature_card_with_onboarding.dart';
 
 class MenuGrid extends StatelessWidget {
   final List<MenuItemEntity> items;
@@ -20,6 +20,7 @@ class MenuGrid extends StatelessWidget {
   final ScrollPhysics? physics;
   final ScrollController? controller;
   final String? emptyMessage;
+  final Function(BuildContext, MenuItemEntity)? onItemTapped;
 
   const MenuGrid({
     super.key,
@@ -35,6 +36,7 @@ class MenuGrid extends StatelessWidget {
     this.physics,
     this.controller,
     this.emptyMessage = 'No items found',
+    this.onItemTapped,
   });
 
   @override
@@ -77,12 +79,8 @@ class MenuGrid extends StatelessWidget {
             itemCount: items.length,
             itemBuilder: (context, index) {
               final item = items[index];
-              return MenuGridItem(
+              return FeatureCardWithOnboarding(
                 item: item,
-                onTap: () => _onItemTapped(context, item),
-                showTitle: showTitle,
-                width: itemWidth,
-                height: itemWidth * 1.2,
               );
             },
           ),
@@ -191,10 +189,5 @@ class MenuGrid extends StatelessWidget {
     );
   }
 
-  void _onItemTapped(BuildContext context, MenuItemEntity item) {
-    debugPrint('Menu item tapped: ${item.label} (${item.id})');
-    if (item.label == 'Parking') {
-      context.go('/parking-onboarding');
-    }
-  }
+  
 }

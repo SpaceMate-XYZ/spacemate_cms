@@ -1,4 +1,3 @@
-import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 
 import 'package:spacemate/core/theme/app_colors.dart';
@@ -33,9 +32,9 @@ class AppTheme {
         foregroundColor: colorScheme.onSecondary,
       ),
       cardTheme: baseTheme.cardTheme.copyWith(
-        color: colorScheme.surfaceVariant,
+        color: colorScheme.surfaceContainerHighest,
         elevation: 0,
-        surfaceTintColor: colorScheme.surfaceVariant,
+        surfaceTintColor: colorScheme.surfaceContainerHighest,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12.0),
         ),
@@ -64,9 +63,9 @@ class AppTheme {
         foregroundColor: colorScheme.onSecondary,
       ),
       cardTheme: baseTheme.cardTheme.copyWith(
-        color: colorScheme.surfaceVariant,
+        color: colorScheme.surfaceContainerHighest,
         elevation: 0,
-        surfaceTintColor: colorScheme.surfaceVariant,
+        surfaceTintColor: colorScheme.surfaceContainerHighest,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12.0),
         ),

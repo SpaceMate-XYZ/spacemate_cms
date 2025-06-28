@@ -22,16 +22,17 @@ void main() {
   });
 
   group('getMenuItems', () {
-    final tScreenModel = ScreenModel.fromJson(json.decode(fixture('screen.json'))['data'][0]);
-    final tScreenList = [tScreenModel];
 
     test(
       'should return List<ScreenModel> when the response code is 200 (success)',
       () async {
         // Arrange
         when(() => mockDioClient.get(
-              any(),
-              queryParameters: any(named: 'queryParameters'),
+              '/api/screens',
+              queryParameters: {
+                'filters[slug][\$eq]': 'home',
+                'populate': 'MenuGrid',
+              },
             )).thenAnswer(
           (_) async => Response(
             requestOptions: RequestOptions(path: '/api/screens'),
@@ -44,7 +45,10 @@ void main() {
         final result = await dataSource.getMenuItems(slug: 'home');
 
         // Assert
-        expect(result, equals(tScreenList));
+        expect(result, isA<List<ScreenModel>>());
+        expect(result.length, equals(1));
+        expect(result[0].id, equals(1));
+        expect(result[0].slug, equals('home'));
       },
     );
 
@@ -53,8 +57,11 @@ void main() {
       () async {
         // Arrange
         when(() => mockDioClient.get(
-              any(),
-              queryParameters: any(named: 'queryParameters'),
+              '/api/screens',
+              queryParameters: {
+                'filters[slug][\$eq]': 'home',
+                'populate': 'MenuGrid',
+              },
             )).thenThrow(
           DioException(
             requestOptions: RequestOptions(path: '/api/screens'),
@@ -67,12 +74,9 @@ void main() {
           ),
         );
 
-        // Act
-        final call = dataSource.getMenuItems;
-
-        // Assert
+        // Act & Assert
         expect(
-          () => call(slug: 'home'),
+          () => dataSource.getMenuItems(slug: 'home'),
           throwsA(const TypeMatcher<ServerException>()),
         );
       },
@@ -83,8 +87,11 @@ void main() {
       () async {
         // Arrange
         when(() => mockDioClient.get(
-              any(),
-              queryParameters: any(named: 'queryParameters'),
+              '/api/screens',
+              queryParameters: {
+                'filters[slug][\$eq]': 'home',
+                'populate': 'MenuGrid',
+              },
             )).thenAnswer(
           (_) async => Response(
             requestOptions: RequestOptions(path: '/api/screens'),
@@ -93,12 +100,9 @@ void main() {
           ),
         );
 
-        // Act
-        final call = dataSource.getMenuItems;
-
-        // Assert
+        // Act & Assert
         expect(
-          () => call(slug: 'home'),
+          () => dataSource.getMenuItems(slug: 'home'),
           throwsA(const TypeMatcher<ServerException>()),
         );
       },

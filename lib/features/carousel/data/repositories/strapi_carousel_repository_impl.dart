@@ -32,7 +32,6 @@ class StrapiCarouselRepository implements CarouselRepository {
           queryParameters: {
             'populate': '*',
             if (placeId != null) r'filters[placeId][$eq]': placeId,
-            'sort': 'order:asc',
           },
         );
 
@@ -105,7 +104,7 @@ extension StrapiCarouselItemX on StrapiCarouselItem {
     }
     
     // Otherwise, construct the full URL
-    final baseUrl = 'https://strapi.apps.rredu.in';
+    const baseUrl = 'https://strapi.apps.rredu.in';
     return url.startsWith('/') ? '$baseUrl$url' : '$baseUrl/$url';
   }
 }

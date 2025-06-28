@@ -14,7 +14,7 @@ class CarouselWidget extends StatelessWidget {
   final bool showIndicator;
 
   const CarouselWidget({
-    Key? key,
+    super.key,
     this.placeId,
     this.height = 200.0,
     this.viewportFraction = 0.9,
@@ -22,7 +22,7 @@ class CarouselWidget extends StatelessWidget {
     this.autoPlayInterval = const Duration(seconds: 5),
     this.autoPlayAnimationDuration = const Duration(milliseconds: 800),
     this.showIndicator = true,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

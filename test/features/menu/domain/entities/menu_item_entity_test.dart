@@ -41,6 +41,7 @@ void main() {
           true, // isVisible
           true, // isAvailable
           3, // badgeCount
+          null, // navigationTarget
         ]),
       );
     });

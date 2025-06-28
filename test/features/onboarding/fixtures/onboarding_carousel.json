@@ -1,0 +1,38 @@
+{
+  "slides": [
+    {
+      "id": 1,
+      "feature": "Parking",
+      "screen": 1,
+      "title": "Welcome to Parking",
+      "image": {
+        "data": {
+          "id": 101,
+          "attributes": {
+            "url": "https://example.com/image1.png"
+          }
+        }
+      },
+      "header": "Find your perfect spot",
+      "body": "Easily locate and reserve parking spaces.",
+      "button_label": null
+    },
+    {
+      "id": 2,
+      "feature": "Parking",
+      "screen": 2,
+      "title": "Secure and Convenient",
+      "image": {
+        "data": {
+          "id": 102,
+          "attributes": {
+            "url": "https://example.com/image2.png"
+          }
+        }
+      },
+      "header": "Your vehicle is safe with us",
+      "body": "Advanced security features for peace of mind.",
+      "button_label": "Get Started"
+    }
+  ]
+}

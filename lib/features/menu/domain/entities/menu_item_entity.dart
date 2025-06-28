@@ -8,6 +8,7 @@ class MenuItemEntity extends Equatable {
   final bool isVisible;
   final bool isAvailable;
   final int? badgeCount;
+  final String? navigationTarget;
 
   const MenuItemEntity({
     required this.id,
@@ -17,8 +18,9 @@ class MenuItemEntity extends Equatable {
     required this.isVisible,
     required this.isAvailable,
     this.badgeCount,
+    this.navigationTarget,
   });
 
   @override
-  List<Object?> get props => [id, label, icon, order, isVisible, isAvailable, badgeCount];
+  List<Object?> get props => [id, label, icon, order, isVisible, isAvailable, badgeCount, navigationTarget];
 }

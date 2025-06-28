@@ -11,14 +11,14 @@ class CarouselItemWidget extends StatelessWidget {
   final bool showActionButton;
 
   const CarouselItemWidget({
-    Key? key,
+    super.key,
     required this.item,
     this.borderRadius,
     this.fit,
     this.showTitle = true,
     this.showDescription = true,
     this.showActionButton = true,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +42,7 @@ class CarouselItemWidget extends StatelessWidget {
                 item.imageUrl,
                 fit: fit ?? BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) => Container(
-                  color: colorScheme.surfaceVariant,
+                  color: colorScheme.surfaceContainerHighest,
                   child: const Icon(Icons.broken_image),
                 ),
               ),

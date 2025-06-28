@@ -82,12 +82,14 @@ dev_dependencies:
   test_api: any
   build_runner: ^2.4.8
   json_serializable: ^6.8.0
+  freezed: ^2.4.7
 
 flutter:
   uses-material-design: true
   assets:
     - .env
     - designs/
+    - test/fixtures/
   fonts:
     - family: MaterialSymbols
       fonts:
