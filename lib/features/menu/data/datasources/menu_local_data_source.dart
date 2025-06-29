@@ -165,4 +165,11 @@ class MenuLocalDataSourceImpl implements MenuLocalDataSource {
       return false;
     }
   }
+
+  @override
+  Future<List<MenuItemEntity>> getMenuItems({String? placeId}) async {
+    // For now, return empty list since we don't have placeId-based caching implemented
+    // This can be enhanced later to support placeId-based caching
+    return [];
+  }
 }

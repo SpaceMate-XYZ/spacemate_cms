@@ -16,35 +16,78 @@ class AppRouter {
   static final router = GoRouter(
     initialLocation: '/',
     debugLogDiagnostics: true,
+    redirect: (context, state) {
+      developer.log('AppRouter: Redirect called for path: ${state.uri.path}');
+      return null;
+    },
     routes: [
-      // Main navigation routes
+      // Main navigation routes with category support
       GoRoute(
         path: '/',
         name: 'home',
-        builder: (context, state) => const HomePage(),
+        builder: (context, state) {
+          developer.log('AppRouter: Building home page');
+          return const HomePage();
+        },
+      ),
+      GoRoute(
+        path: '/category/:category',
+        name: 'category',
+        builder: (context, state) {
+          final category = state.pathParameters['category']!;
+          developer.log('AppRouter: Building category page for: $category');
+          return _buildCategoryPage(category);
+        },
       ),
       GoRoute(
         path: '/access',
         name: 'access',
-        builder: (context, state) => const AccessPage(),
+        builder: (context, state) {
+          developer.log('AppRouter: Building access page');
+          return const AccessPage();
+        },
       ),
       GoRoute(
         path: '/facilities',
         name: 'facilities',
-        builder: (context, state) => const FacilitiesPage(),
+        builder: (context, state) {
+          developer.log('AppRouter: Building facilities page');
+          return const FacilitiesPage();
+        },
       ),
       GoRoute(
         path: '/transport',
         name: 'transport',
-        builder: (context, state) => const TransportPage(),
+        builder: (context, state) {
+          developer.log('AppRouter: Building transport page');
+          return const TransportPage();
+        },
       ),
       GoRoute(
         path: '/discover',
         name: 'discover',
-        builder: (context, state) => const DiscoverPage(),
+        builder: (context, state) {
+          developer.log('AppRouter: Building discover page');
+          return const DiscoverPage();
+        },
       ),
       
-      // Feature-specific routes with deep linking support
+      // Feature-specific routes with category support
+      GoRoute(
+        path: '/category/:category/feature/:featureName',
+        name: 'category-feature',
+        builder: (context, state) {
+          final category = state.pathParameters['category']!;
+          final featureName = state.pathParameters['featureName']!;
+          developer.log('AppRouter: Building category feature page for: $category/$featureName');
+          return FeatureLandingPage(
+            category: category,
+            featureName: featureName,
+          );
+        },
+      ),
+      
+      // Feature-specific routes with deep linking support (legacy)
       GoRoute(
         path: '/feature/:featureName',
         name: 'feature',
@@ -52,6 +95,21 @@ class AppRouter {
           final featureName = state.pathParameters['featureName']!;
           developer.log('AppRouter: Building feature page for: $featureName');
           return FeatureLandingPage(featureName: featureName);
+        },
+      ),
+      
+      // Onboarding routes with category support
+      GoRoute(
+        path: '/category/:category/onboarding/:featureName',
+        name: 'category-onboarding',
+        builder: (context, state) {
+          final category = state.pathParameters['category']!;
+          final featureName = state.pathParameters['featureName']!;
+          developer.log('AppRouter: Building category onboarding page for: $category/$featureName');
+          return OnboardingLoaderPage(
+            category: category,
+            featureName: featureName,
+          );
         },
       ),
       
@@ -66,17 +124,44 @@ class AppRouter {
         },
       ),
       
-      // Direct onboarding slide routes
+      // Individual onboarding slide routes with category support
       GoRoute(
-        path: '/onboarding/:featureName/slide/:slideIndex',
+        path: '/category/:category/onboarding/:featureName/:slideNumber',
+        name: 'category-onboarding-slide',
+        builder: (context, state) {
+          final category = state.pathParameters['category']!;
+          final featureName = state.pathParameters['featureName']!;
+          final slideNumber = state.pathParameters['slideNumber']!;
+          
+          // Convert slide number to index (1-based to 0-based)
+          final slideIndex = int.tryParse(slideNumber) ?? 1;
+          final actualIndex = slideIndex - 1; // Convert to 0-based index
+          
+          developer.log('AppRouter: Building category onboarding slide page for: $category/$featureName, slide: $slideNumber (index: $actualIndex)');
+          return OnboardingLoaderPage(
+            category: category,
+            featureName: featureName,
+            initialSlideIndex: actualIndex,
+          );
+        },
+      ),
+      
+      // Individual onboarding slide routes (1, 2, 3, 4)
+      GoRoute(
+        path: '/onboarding/:featureName/:slideNumber',
         name: 'onboarding-slide',
         builder: (context, state) {
           final featureName = state.pathParameters['featureName']!;
-          final slideIndex = int.tryParse(state.pathParameters['slideIndex'] ?? '0') ?? 0;
-          developer.log('AppRouter: Building onboarding slide page for: $featureName, slide: $slideIndex');
+          final slideNumber = state.pathParameters['slideNumber']!;
+          
+          // Convert slide number to index (1-based to 0-based)
+          final slideIndex = int.tryParse(slideNumber) ?? 1;
+          final actualIndex = slideIndex - 1; // Convert to 0-based index
+          
+          developer.log('AppRouter: Building onboarding slide page for: $featureName, slide: $slideNumber (index: $actualIndex)');
           return OnboardingLoaderPage(
             featureName: featureName,
-            initialSlideIndex: slideIndex,
+            initialSlideIndex: actualIndex,
           );
         },
       ),
@@ -125,32 +210,94 @@ class AppRouter {
     },
   );
 
-  // Helper methods for navigation
-  static void navigateToFeature(BuildContext context, String featureName) {
-    developer.log('AppRouter: Navigating to feature: $featureName');
-    context.go('/feature/$featureName');
+  // Helper method to build category pages
+  static Widget _buildCategoryPage(String category) {
+    switch (category.toLowerCase()) {
+      case 'home':
+        return const HomePage();
+      case 'access':
+        return const AccessPage();
+      case 'facilities':
+        return const FacilitiesPage();
+      case 'transport':
+        return const TransportPage();
+      case 'discover':
+        return const DiscoverPage();
+      default:
+        return const HomePage();
+    }
   }
 
-  static void navigateToOnboarding(BuildContext context, String featureName, {int? initialSlideIndex}) {
-    developer.log('AppRouter: Navigating to onboarding for feature: $featureName, slide: $initialSlideIndex');
-    if (initialSlideIndex != null) {
-      context.go('/onboarding/$featureName/slide/$initialSlideIndex');
-    } else {
-      context.go('/onboarding/$featureName');
+  // Helper methods for navigation
+  static void navigateToCategory(BuildContext context, String category) {
+    developer.log('AppRouter: navigateToCategory called with category: $category');
+    try {
+      context.go('/category/$category');
+      developer.log('AppRouter: Category navigation completed successfully');
+    } catch (e) {
+      developer.log('AppRouter: Category navigation failed: $e');
+      rethrow;
+    }
+  }
+
+  static void navigateToFeature(BuildContext context, String featureName, {String? category}) {
+    developer.log('AppRouter: navigateToFeature called with featureName: $featureName, category: $category');
+    try {
+      if (category != null) {
+        context.go('/category/$category/feature/$featureName');
+      } else {
+        context.go('/feature/$featureName');
+      }
+      developer.log('AppRouter: Feature navigation completed successfully');
+    } catch (e) {
+      developer.log('AppRouter: Feature navigation failed: $e');
+      rethrow;
+    }
+  }
+
+  static void navigateToOnboarding(BuildContext context, String featureName, {String? category, int? initialSlideIndex}) {
+    developer.log('AppRouter: navigateToOnboarding called with featureName: $featureName, category: $category, slide: $initialSlideIndex');
+    try {
+      if (initialSlideIndex != null) {
+        // Convert 0-based index to 1-based slide number
+        final slideNumber = initialSlideIndex + 1;
+        if (category != null) {
+          context.go('/category/$category/onboarding/$featureName/$slideNumber');
+        } else {
+          context.go('/onboarding/$featureName/$slideNumber');
+        }
+      } else {
+        if (category != null) {
+          context.go('/category/$category/onboarding/$featureName');
+        } else {
+          context.go('/onboarding/$featureName');
+        }
+      }
+      developer.log('AppRouter: Onboarding navigation completed successfully');
+    } catch (e) {
+      developer.log('AppRouter: Onboarding navigation failed: $e');
+      rethrow;
     }
   }
 
   static void navigateToOnboardingWithSlides(BuildContext context, List<OnboardingSlide> slides) {
-    developer.log('AppRouter: Navigating to onboarding with ${slides.length} slides');
-    context.go('/onboarding', extra: slides);
+    developer.log('AppRouter: navigateToOnboardingWithSlides called with ${slides.length} slides');
+    try {
+      context.go('/onboarding', extra: slides);
+      developer.log('AppRouter: Onboarding with slides navigation completed successfully');
+    } catch (e) {
+      developer.log('AppRouter: Onboarding with slides navigation failed: $e');
+      rethrow;
+    }
   }
 }
 
 // Feature Landing Page - shows feature details and allows navigation to onboarding
 class FeatureLandingPage extends StatelessWidget {
   final String featureName;
+  final String? category;
 
-  const FeatureLandingPage({super.key, required this.featureName});
+  const FeatureLandingPage({super.key, required this.featureName, this.category});
 
   @override
   Widget build(BuildContext context) {
@@ -180,7 +327,7 @@ class FeatureLandingPage extends StatelessWidget {
             ),
             const SizedBox(height: 32),
             ElevatedButton(
-              onPressed: () => AppRouter.navigateToOnboarding(context, featureName),
+              onPressed: () => AppRouter.navigateToOnboarding(context, featureName, category: category),
               child: const Text('Start Onboarding'),
             ),
           ],
@@ -251,11 +398,13 @@ class FeatureLandingPage extends StatelessWidget {
 // Onboarding Loader Page - loads onboarding data and displays the carousel
 class OnboardingLoaderPage extends StatefulWidget {
   final String featureName;
+  final String? category;
   final int initialSlideIndex;
 
   const OnboardingLoaderPage({
     super.key,
     required this.featureName,
+    this.category,
     this.initialSlideIndex = 0,
   });
 
@@ -274,25 +423,28 @@ class _OnboardingLoaderPageState extends State<OnboardingLoaderPage> {
 
   Future<List<OnboardingSlide>> _loadOnboardingSlides() async {
     try {
+      developer.log('OnboardingLoaderPage: Loading slides for feature: ${widget.featureName}');
       final getFeatureByName = sl<GetFeatureByName>();
-      final result = await getFeatureByName(widget.featureName).run();
+      final result = await getFeatureByName(GetFeatureByNameParams(featureName: widget.featureName));
       
       return result.fold(
-        (failure) => throw Exception(failure.message),
-        (response) {
-          final slides = response.data
-              .where((feature) => feature.attributes.onboardingCarousel != null)
-              .expand((feature) => feature.attributes.onboardingCarousel!)
-              .toList();
+        (failure) {
+          developer.log('OnboardingLoaderPage: API call failed: ${failure.message}');
+          throw Exception(failure.message);
+        },
+        (feature) {
+          developer.log('OnboardingLoaderPage: API call successful for feature: ${widget.featureName}');
+          developer.log('OnboardingLoaderPage: Feature has ${feature.attributes.onboardingCarousel?.length ?? 0} slides');
           
-          if (slides.isEmpty) {
+          if (feature.attributes.onboardingCarousel == null || feature.attributes.onboardingCarousel!.isEmpty) {
             throw Exception('No onboarding slides found for ${widget.featureName}');
           }
           
-          return slides;
+          return feature.attributes.onboardingCarousel!;
         },
       );
     } catch (e) {
+      developer.log('OnboardingLoaderPage: Failed to load onboarding slides: $e');
       throw Exception('Failed to load onboarding slides: $e');
     }
   }

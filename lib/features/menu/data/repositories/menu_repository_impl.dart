@@ -1,12 +1,14 @@
-import 'package:fpdart/fpdart.dart';
+import 'package:dartz/dartz.dart';
 import 'package:spacemate/core/error/exceptions.dart';
 import 'package:spacemate/core/error/failures.dart';
 import 'package:spacemate/core/network/network_info.dart';
 import 'package:spacemate/features/menu/domain/repositories/menu_local_data_source.dart';
 import 'package:spacemate/features/menu/data/datasources/menu_remote_data_source.dart';
 import 'package:flutter/foundation.dart';
+import 'package:spacemate/features/menu/data/models/menu_item_model.dart';
 import 'package:spacemate/features/menu/domain/entities/menu_item_entity.dart';
 import 'package:spacemate/features/menu/domain/repositories/menu_repository.dart';
+import 'dart:developer' as developer;
 
 class MenuRepositoryImpl implements MenuRepository {
   final MenuRemoteDataSource remoteDataSource;
@@ -20,73 +22,64 @@ class MenuRepositoryImpl implements MenuRepository {
   });
 
   @override
-  TaskEither<Failure, List<MenuItemEntity>> getMenuItems({
-    required String slug,
-    bool forceRefresh = false,
-    String? locale,
-  }) {
-    return TaskEither.tryCatch(
-      () async {
-        if (!forceRefresh) {
-          final isCacheValid = await localDataSource.isCacheValid(slug);
-          if (isCacheValid) {
-            try {
-              final localItems = await localDataSource.getCachedMenuItems(slug);
-              if (localItems.isNotEmpty) {
-                return localItems;
-              }
-            } on CacheException {
-              // Fall through to fetch from remote
-            }
-          }
-        }
-        // Fetch from remote if cache is invalid, empty, or refresh is forced
-        return await _fetchAndCache(slug: slug, locale: locale);
-      },
-      (error, stackTrace) {
-        if (error is Failure) {
-          return error;
-        }
-        if (error is ServerException) {
-          return ServerFailure(error.message);
-        }
-        if (error is NetworkException) {
-          return NetworkFailure(error.message);
-        }
-        if (error is CacheException) {
-          return CacheFailure(error.message);
-        }
-        return ServerFailure('An unexpected error occurred: $error');
-      },
-    );
-  }
-
-  Future<List<MenuItemEntity>> _fetchAndCache({
-    required String slug,
-    String? locale,
+  Future<Either<Failure, List<MenuItemEntity>>> getMenuItems({
+    String? placeId,
   }) async {
-    if (kIsWeb || await networkInfo.isConnected) {
-      try {
-        final remoteScreens = await remoteDataSource.getMenuItems(slug: slug, locale: locale);
-        final screen = remoteScreens.firstWhere(
-          (s) => s.slug == slug,
-          orElse: () => throw ServerException('Screen with slug "$slug" not found in API response.'),
+    try {
+      if (await networkInfo.isConnected) {
+        developer.log('MenuRepositoryImpl: Fetching menu items for placeId: $placeId');
+        final result = await remoteDataSource.getMenuItems(placeId: placeId);
+        return result.fold(
+          (failure) => Left(failure),
+          (screenModels) {
+            developer.log('MenuRepositoryImpl: Received ${screenModels.length} screen models');
+            
+            // Since we're filtering by slug, we should only get one screen
+            // But handle the case where we might get multiple screens
+            if (screenModels.isEmpty) {
+              developer.log('MenuRepositoryImpl: No screen models found');
+              return Right(<MenuItemEntity>[]);
+            }
+            
+            // Get the first screen (should be the only one when filtering by slug)
+            final screen = screenModels.first;
+            developer.log('MenuRepositoryImpl: Processing screen: ${screen.name} (slug: ${screen.slug})');
+            developer.log('MenuRepositoryImpl: Screen has ${screen.menuGrid.length} menu items');
+            
+            // Log all menu items for debugging
+            for (int i = 0; i < screen.menuGrid.length; i++) {
+              final item = screen.menuGrid[i];
+              developer.log('MenuRepositoryImpl: Menu item $i - Label: "${item.label}", Icon: "${item.icon}", NavigationTarget: "${item.navigationTarget}"');
+            }
+            
+            // Convert only this screen's menu grid to MenuItemEntity
+            final menuItems = screen.menuGrid
+                .map((item) => MenuItemModel.fromJson(item.toJson()))
+                .toList();
+            
+            developer.log('MenuRepositoryImpl: Converted to ${menuItems.length} menu item entities');
+            return Right(menuItems);
+          },
         );
-        final itemsToCache = screen.menuGrid;
-        await localDataSource.cacheMenuItems(itemsToCache, slug);
-        return itemsToCache;
-      } on ServerException {
-        rethrow; // Re-throw ServerException to be caught by TaskEither.tryCatch
+      } else {
+        // Try to get from local cache
+        final cachedItems = await localDataSource.getMenuItems(placeId: placeId);
+        if (cachedItems.isNotEmpty) {
+          return Right(cachedItems);
+        } else {
+          return Left(NetworkFailure('No internet connection and no cached data'));
+        }
       }
-    } else {
-      throw NetworkException('You are offline. Please check your connection.'); // Throw NetworkException
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
     }
   }
 
   @override
-  TaskEither<Failure, List<String>> getSupportedLocales({
-    required String placeId,
-  }) {
-    return TaskEither.left(const ServerFailure('This feature is no longer supported.'));
+  Future<Either<Failure, List<String>>> getSupportedLocales({
+    String? placeId,
+  }) async {
+    // This feature is no longer supported
+    return Left(ServerFailure('This feature is no longer supported.'));
   }
 }

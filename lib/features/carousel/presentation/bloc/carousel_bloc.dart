@@ -1,6 +1,6 @@
 library carousel_bloc;
 
-import 'package:bloc/bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:spacemate/core/error/failures.dart';
 import 'package:spacemate/features/carousel/domain/entities/carousel_item_entity.dart';
@@ -24,9 +24,9 @@ class CarouselBloc extends Bloc<CarouselEvent, CarouselState> {
 
     final result = await getCarouselItems(
       GetCarouselItemsParams(placeId: event.placeId),
-    ).run();
+    );
 
-    result.match(
+    result.fold(
       (failure) {
         emit(CarouselError(message: _mapFailureToMessage(failure)));
       },

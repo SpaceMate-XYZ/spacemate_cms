@@ -21,6 +21,7 @@ class MenuGrid extends StatelessWidget {
   final ScrollController? controller;
   final String? emptyMessage;
   final Function(BuildContext, MenuItemEntity)? onItemTapped;
+  final String? category;
 
   const MenuGrid({
     super.key,
@@ -37,6 +38,7 @@ class MenuGrid extends StatelessWidget {
     this.controller,
     this.emptyMessage = 'No items found',
     this.onItemTapped,
+    this.category,
   });
 
   @override
@@ -81,6 +83,7 @@ class MenuGrid extends StatelessWidget {
               final item = items[index];
               return FeatureCardWithOnboarding(
                 item: item,
+                category: category,
               );
             },
           ),

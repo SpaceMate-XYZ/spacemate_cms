@@ -11,11 +11,11 @@ _$OnboardingSlideImpl _$$OnboardingSlideImplFromJson(
     _$OnboardingSlideImpl(
       id: (json['id'] as num).toInt(),
       feature: json['feature'] as String,
-      screen: (json['screen'] as num).toInt(),
+      screen: json['screen'] as String,
       title: json['title'] as String,
       imageUrl: json['imageURL'] as String,
       header: json['header'] as String,
-      body: json['body'] as String,
+      body: json['body'] as String?,
       buttonLabel: json['button_label'] as String?,
     );
 

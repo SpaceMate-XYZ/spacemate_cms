@@ -1,6 +1,7 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 // Added import
 import 'package:get_it/get_it.dart';
+import 'package:spacemate/core/config/app_config.dart';
 import 'package:spacemate/core/database/database_helper.dart';
 import 'package:spacemate/core/network/dio_client.dart';
 import 'package:spacemate/core/network/network_info.dart';
@@ -23,7 +24,7 @@ final sl = GetIt.instance;
 Future<void> init({required String baseUrl}) async {
   //! Features
   _initMenuFeature();
-  initCarouselFeature();
+  await initCarouselDependencies();
   initOnboardingFeature();
 
   //! External
@@ -80,7 +81,7 @@ Future<void> _initExternalDependencies({required String baseUrl}) async {
   // Dio
   final dioClient = DioClient(
     baseUrl: baseUrl,
-    // No auth token needed since Strapi is publicly accessible
+    authToken: AppConfig.apiToken, // Use API token from config if available
   );
   await dioClient.init();
   sl.registerLazySingleton<DioClient>(() => dioClient);

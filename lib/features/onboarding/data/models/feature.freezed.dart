@@ -14,17 +14,10 @@ T _$identity<T>(T value) => value;
 final _privateConstructorUsedError = UnsupportedError(
     'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
-Feature _$FeatureFromJson(Map<String, dynamic> json) {
-  return _Feature.fromJson(json);
-}
-
 /// @nodoc
 mixin _$Feature {
   int get id => throw _privateConstructorUsedError;
   FeatureAttributes get attributes => throw _privateConstructorUsedError;
-
-  /// Serializes this Feature to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
 
   /// Create a copy of Feature
   /// with the given fields replaced by the non-null parameter values.
@@ -126,12 +119,9 @@ class __$$FeatureImplCopyWithImpl<$Res>
 }
 
 /// @nodoc
-@JsonSerializable()
+
 class _$FeatureImpl with DiagnosticableTreeMixin implements _Feature {
   const _$FeatureImpl({required this.id, required this.attributes});
-
-  factory _$FeatureImpl.fromJson(Map<String, dynamic> json) =>
-      _$$FeatureImplFromJson(json);
 
   @override
   final int id;
@@ -162,7 +152,6 @@ class _$FeatureImpl with DiagnosticableTreeMixin implements _Feature {
                 other.attributes == attributes));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, id, attributes);
 
@@ -173,21 +162,12 @@ class _$FeatureImpl with DiagnosticableTreeMixin implements _Feature {
   @pragma('vm:prefer-inline')
   _$$FeatureImplCopyWith<_$FeatureImpl> get copyWith =>
       __$$FeatureImplCopyWithImpl<_$FeatureImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$FeatureImplToJson(
-      this,
-    );
-  }
 }
 
 abstract class _Feature implements Feature {
   const factory _Feature(
       {required final int id,
       required final FeatureAttributes attributes}) = _$FeatureImpl;
-
-  factory _Feature.fromJson(Map<String, dynamic> json) = _$FeatureImpl.fromJson;
 
   @override
   int get id;
@@ -202,10 +182,6 @@ abstract class _Feature implements Feature {
       throw _privateConstructorUsedError;
 }
 
-FeatureAttributes _$FeatureAttributesFromJson(Map<String, dynamic> json) {
-  return _FeatureAttributes.fromJson(json);
-}
-
 /// @nodoc
 mixin _$FeatureAttributes {
   @JsonKey(name: 'feature_name')
@@ -213,9 +189,6 @@ mixin _$FeatureAttributes {
   @JsonKey(name: 'onboarding_carousel')
   List<OnboardingSlide>? get onboardingCarousel =>
       throw _privateConstructorUsedError;
-
-  /// Serializes this FeatureAttributes to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
 
   /// Create a copy of FeatureAttributes
   /// with the given fields replaced by the non-null parameter values.
@@ -311,7 +284,7 @@ class __$$FeatureAttributesImplCopyWithImpl<$Res>
 }
 
 /// @nodoc
-@JsonSerializable()
+
 class _$FeatureAttributesImpl
     with DiagnosticableTreeMixin
     implements _FeatureAttributes {
@@ -320,9 +293,6 @@ class _$FeatureAttributesImpl
       @JsonKey(name: 'onboarding_carousel')
       final List<OnboardingSlide>? onboardingCarousel})
       : _onboardingCarousel = onboardingCarousel;
-
-  factory _$FeatureAttributesImpl.fromJson(Map<String, dynamic> json) =>
-      _$$FeatureAttributesImplFromJson(json);
 
   @override
   @JsonKey(name: 'feature_name')
@@ -363,7 +333,6 @@ class _$FeatureAttributesImpl
                 .equals(other._onboardingCarousel, _onboardingCarousel));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, name,
       const DeepCollectionEquality().hash(_onboardingCarousel));
@@ -376,13 +345,6 @@ class _$FeatureAttributesImpl
   _$$FeatureAttributesImplCopyWith<_$FeatureAttributesImpl> get copyWith =>
       __$$FeatureAttributesImplCopyWithImpl<_$FeatureAttributesImpl>(
           this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$FeatureAttributesImplToJson(
-      this,
-    );
-  }
 }
 
 abstract class _FeatureAttributes implements FeatureAttributes {
@@ -391,9 +353,6 @@ abstract class _FeatureAttributes implements FeatureAttributes {
           @JsonKey(name: 'onboarding_carousel')
           final List<OnboardingSlide>? onboardingCarousel}) =
       _$FeatureAttributesImpl;
-
-  factory _FeatureAttributes.fromJson(Map<String, dynamic> json) =
-      _$FeatureAttributesImpl.fromJson;
 
   @override
   @JsonKey(name: 'feature_name')

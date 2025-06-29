@@ -1,127 +1,160 @@
-# Spacemate CMS
+# SpaceMate CMS Flutter App
 
-A Flutter application for managing and displaying menu content with Strapi backend integration.
-
-## 🚨 CRITICAL SECURITY WARNING 🚨
-
-**This project is temporarily configured to commit the `.env` file to version control.**
-
-This is for development convenience ONLY. Before making this repository public or sharing it, you **MUST** add the `.env` file back to your `.gitignore` to prevent leaking sensitive information like API keys and configuration secrets.
-
-To secure your project, add the following lines back to your `.gitignore` file:
-
-```gitignore
-# Local development secrets - DO NOT COMMIT
-.env
-.env.*
-!.env.example
-```
-
-## Table of Contents
-
-- [Features](#features)
-- [Prerequisites](#prerequisites)
-- [Getting Started](#getting-started)
-- [Project Structure](#project-structure)
-- [Documentation](#documentation)
-- [Development](#development)
-- [Testing](#testing)
-- [Deployment](#deployment)
-- [Troubleshooting](#troubleshooting)
+A Flutter superapp that loads data for onboarding carousels from Strapi CMS. The app features multiple screens with features represented as card buttons, each leading to an onboarding carousel of 4 slides.
 
 ## Features
 
-- Dynamic menu content management
-- Strapi CMS integration
-- Offline-first functionality
-- Responsive design for multiple platforms
-- Clean Architecture implementation
-- BLoC state management
-
-## Prerequisites
-
-- Flutter SDK (latest stable version)
-- Dart SDK (as per Flutter requirements)
-- Strapi backend server
-- Android Studio / Xcode (for mobile development)
-- VS Code or Android Studio (recommended IDEs)
-
-## Getting Started
-
-1. Clone the repository
-2. Run `flutter pub get` to install dependencies
-3. Copy `.env.example` to `.env` and update with your configuration
-4. Run `flutter run` to start the development server
+- **5 Main Screens**: Home, Transport, Access, Facilities, Discover
+- **Feature Cards**: Each screen has 3-12 features arranged in a grid
+- **Onboarding Carousels**: 4-slide carousels for each feature
+- **Strapi Integration**: Dynamic content loading from Strapi CMS
+- **Multi-Platform**: Supports Android, iOS, Web, Windows, and macOS
 
 ## Project Structure
 
 ```
 lib/
-├── core/
+├── core/                 # Core functionality
+│   ├── config/          # App configuration
 │   ├── di/              # Dependency injection
 │   ├── error/           # Error handling
 │   ├── network/         # Network layer
-│   └── utils/           # Utilities and helpers
+│   ├── theme/           # App theming
+│   └── utils/           # Utility functions
 ├── features/            # Feature modules
-│   └── menu/            # Menu feature
-│       ├── data/        # Data layer
-│       ├── domain/      # Business logic
-│       └── presentation/ # UI layer
-└── main.dart           # Application entry point
+│   ├── carousel/        # Carousel functionality
+│   ├── menu/            # Menu and navigation
+│   └── onboarding/      # Onboarding carousels
+└── main.dart           # App entry point
 ```
 
-## Documentation
+## Setup
 
-Detailed documentation is available in the `docs/` directory:
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/SpaceMate-XYZ/spacemate_cms.git
+   cd spacemate_cms
+   ```
 
-- [Architecture](docs/architecture.md) - System design and architecture decisions
-- [How to Use](docs/how_to_use.md) - User guide and API documentation
-- [Test Plan](docs/test_plan.md) - Testing strategy and coverage
-- [Failing Tests](docs/failing_tests.md) - Currently failing tests and known issues
-- [Bugs](docs/bugs.md) - Known bugs and workarounds
+2. **Install dependencies**
+   ```bash
+   flutter pub get
+   ```
 
-## Development
+3. **Configure environment variables**
+   Create a `.env` file in the root directory:
+   ```env
+   MAIN_STRAPI_BASE_URL=https://strapi.dev.spacemate.xyz
+   CAROUSEL_STRAPI_BASE_URL=https://strapi.dev.spacemate.xyz
+   API_KEY=your_api_key_here
+   ```
 
-### Code Style
+4. **Generate code**
+   ```bash
+   flutter packages pub run build_runner build --delete-conflicting-outputs
+   ```
 
-This project follows the [Dart Style Guide](https://dart.dev/guides/language/effective-dart/style) and uses `dart format` for code formatting.
+5. **Run the app**
+   ```bash
+   flutter run
+   ```
 
-### Git Workflow
+## API Endpoints
 
-1. Create a new branch for your feature/bugfix
-2. Write tests for your changes
-3. Ensure all tests pass
-4. Open a pull request for review
+The app uses two main Strapi endpoints:
 
-## Testing
+1. **Menu Data**: `/api/screens?populate=*`
+   - Fetches all menu categories and features
+   - Used for the main menu grid
 
-Run tests using:
+2. **Onboarding Data**: `/api/spacemate-placeid-features?filters[feature_name][$eq]=FeatureName&populate=*`
+   - Fetches onboarding carousel data for specific features
+   - Example: `filters[feature_name][$eq]=parking` for parking feature
+   - Returns 4 slides per feature with images, text, and button labels
 
-```bash
-flutter test
+## Example API Calls
+
+**Parking Onboarding:**
+```
+https://strapi.dev.spacemate.xyz/api/spacemate-placeid-features?filters[feature_name][$eq]=parking&populate=*
 ```
 
-For test coverage:
-
-```bash
-flutter test --coverage
+**Valet Parking Onboarding:**
+```
+https://strapi.dev.spacemate.xyz/api/spacemate-placeid-features?filters[feature_name][$eq]=valetparking&populate=*
 ```
 
-## Deployment
+## Architecture
 
-### Web
+- **State Management**: BLoC pattern with dartz for functional programming
+- **Dependency Injection**: GetIt for service locator pattern
+- **Network Layer**: Dio with interceptors for authentication and logging
+- **Local Storage**: SQLite for caching menu data
+- **Testing**: Comprehensive test suite with unit, widget, and integration tests
 
-```bash
-flutter build web
-```
+## Key Components
 
-### Mobile
+### Menu System
+- **MenuBloc**: Manages menu state and data fetching
+- **MenuGrid**: Displays feature cards in a responsive grid
+- **FeatureCard**: Individual feature card with navigation to onboarding
 
-```bash
-flutter build apk --release  # Android
-flutter build ios --release  # iOS
-```
+### Onboarding System
+- **OnboardingBloc**: Manages onboarding carousel state
+- **OnboardingPage**: Displays 4-slide carousel with navigation
+- **OnboardingSlide**: Individual slide with image, text, and button
+
+### Data Models
+- **Feature**: Represents a feature with onboarding data
+- **OnboardingSlide**: Individual slide data
+- **MenuItemModel**: Menu item with navigation properties
+
+## Configuration
+
+### Strapi URLs
+- **Main Strapi URL**: `https://strapi.dev.spacemate.xyz`
+- **Carousel Strapi URL**: `https://strapi.dev.spacemate.xyz`
+
+### Collections
+- **screens**: Menu data and feature categories
+- **spacemate-placeid-features**: Onboarding carousel data
 
 ## Troubleshooting
 
-Common issues and solutions are documented in the relevant `docs/` files. For additional help, please open an issue.
+### Common Issues
+- **CORS Errors**: The app uses a proxy for development. Check `cors_config.dart` for configuration.
+- **Image Loading**: Images are hosted on CDN. Check network connectivity and image URLs.
+- **API Errors**: Verify Strapi endpoints and authentication tokens.
+- **Build Errors**: Run `flutter clean` and `flutter pub get` before rebuilding.
+
+### Debug Tips
+- Check the console logs for API response details
+- Verify environment variables are correctly set
+- Ensure Strapi is running and accessible
+- Check network connectivity for image loading
+
+## Testing
+
+Run the test suite:
+```bash
+# Unit tests
+flutter test
+
+# Integration tests
+flutter test integration_test/
+
+# Coverage report
+flutter test --coverage
+```
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests for new functionality
+5. Submit a pull request
+
+## License
+
+All rights reserved.

@@ -14,17 +14,9 @@ T _$identity<T>(T value) => value;
 final _privateConstructorUsedError = UnsupportedError(
     'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
-SpacematePlaceidFeaturesResponse _$SpacematePlaceidFeaturesResponseFromJson(
-    Map<String, dynamic> json) {
-  return _SpacematePlaceidFeaturesResponse.fromJson(json);
-}
-
 /// @nodoc
 mixin _$SpacematePlaceidFeaturesResponse {
   List<Feature> get data => throw _privateConstructorUsedError;
-
-  /// Serializes this SpacematePlaceidFeaturesResponse to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
 
   /// Create a copy of SpacematePlaceidFeaturesResponse
   /// with the given fields replaced by the non-null parameter values.
@@ -110,17 +102,13 @@ class __$$SpacematePlaceidFeaturesResponseImplCopyWithImpl<$Res>
 }
 
 /// @nodoc
-@JsonSerializable()
+
 class _$SpacematePlaceidFeaturesResponseImpl
     with DiagnosticableTreeMixin
     implements _SpacematePlaceidFeaturesResponse {
   const _$SpacematePlaceidFeaturesResponseImpl(
       {required final List<Feature> data})
       : _data = data;
-
-  factory _$SpacematePlaceidFeaturesResponseImpl.fromJson(
-          Map<String, dynamic> json) =>
-      _$$SpacematePlaceidFeaturesResponseImplFromJson(json);
 
   final List<Feature> _data;
   @override
@@ -151,7 +139,6 @@ class _$SpacematePlaceidFeaturesResponseImpl
             const DeepCollectionEquality().equals(other._data, _data));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode =>
       Object.hash(runtimeType, const DeepCollectionEquality().hash(_data));
@@ -165,13 +152,6 @@ class _$SpacematePlaceidFeaturesResponseImpl
           _$SpacematePlaceidFeaturesResponseImpl>
       get copyWith => __$$SpacematePlaceidFeaturesResponseImplCopyWithImpl<
           _$SpacematePlaceidFeaturesResponseImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$SpacematePlaceidFeaturesResponseImplToJson(
-      this,
-    );
-  }
 }
 
 abstract class _SpacematePlaceidFeaturesResponse
@@ -179,10 +159,6 @@ abstract class _SpacematePlaceidFeaturesResponse
   const factory _SpacematePlaceidFeaturesResponse(
           {required final List<Feature> data}) =
       _$SpacematePlaceidFeaturesResponseImpl;
-
-  factory _SpacematePlaceidFeaturesResponse.fromJson(
-          Map<String, dynamic> json) =
-      _$SpacematePlaceidFeaturesResponseImpl.fromJson;
 
   @override
   List<Feature> get data;

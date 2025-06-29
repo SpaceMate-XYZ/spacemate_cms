@@ -8,6 +8,11 @@ abstract class MenuLocalDataSource {
   /// Throws [CacheException] if no cached data is present.
   Future<List<MenuItemEntity>> getCachedMenuItems(String slug);
 
+  /// Gets menu items by placeId (returns empty list if not found).
+  ///
+  /// Returns an empty list if no cached data is present.
+  Future<List<MenuItemEntity>> getMenuItems({String? placeId});
+
   /// Caches the provided [List<MenuItemEntity>] to be retrieved later.
   ///
   /// Throws [CacheException] if the data cannot be cached.

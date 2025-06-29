@@ -22,12 +22,13 @@ OnboardingSlide _$OnboardingSlideFromJson(Map<String, dynamic> json) {
 mixin _$OnboardingSlide {
   int get id => throw _privateConstructorUsedError;
   String get feature => throw _privateConstructorUsedError;
-  int get screen => throw _privateConstructorUsedError;
+  @JsonKey(name: 'screen')
+  String get screen => throw _privateConstructorUsedError;
   String get title => throw _privateConstructorUsedError;
   @JsonKey(name: 'imageURL')
   String get imageUrl => throw _privateConstructorUsedError;
   String get header => throw _privateConstructorUsedError;
-  String get body => throw _privateConstructorUsedError;
+  String? get body => throw _privateConstructorUsedError;
   @JsonKey(name: 'button_label')
   String? get buttonLabel => throw _privateConstructorUsedError;
 
@@ -50,11 +51,11 @@ abstract class $OnboardingSlideCopyWith<$Res> {
   $Res call(
       {int id,
       String feature,
-      int screen,
+      @JsonKey(name: 'screen') String screen,
       String title,
       @JsonKey(name: 'imageURL') String imageUrl,
       String header,
-      String body,
+      String? body,
       @JsonKey(name: 'button_label') String? buttonLabel});
 }
 
@@ -79,7 +80,7 @@ class _$OnboardingSlideCopyWithImpl<$Res, $Val extends OnboardingSlide>
     Object? title = null,
     Object? imageUrl = null,
     Object? header = null,
-    Object? body = null,
+    Object? body = freezed,
     Object? buttonLabel = freezed,
   }) {
     return _then(_value.copyWith(
@@ -94,7 +95,7 @@ class _$OnboardingSlideCopyWithImpl<$Res, $Val extends OnboardingSlide>
       screen: null == screen
           ? _value.screen
           : screen // ignore: cast_nullable_to_non_nullable
-              as int,
+              as String,
       title: null == title
           ? _value.title
           : title // ignore: cast_nullable_to_non_nullable
@@ -107,10 +108,10 @@ class _$OnboardingSlideCopyWithImpl<$Res, $Val extends OnboardingSlide>
           ? _value.header
           : header // ignore: cast_nullable_to_non_nullable
               as String,
-      body: null == body
+      body: freezed == body
           ? _value.body
           : body // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       buttonLabel: freezed == buttonLabel
           ? _value.buttonLabel
           : buttonLabel // ignore: cast_nullable_to_non_nullable
@@ -130,11 +131,11 @@ abstract class _$$OnboardingSlideImplCopyWith<$Res>
   $Res call(
       {int id,
       String feature,
-      int screen,
+      @JsonKey(name: 'screen') String screen,
       String title,
       @JsonKey(name: 'imageURL') String imageUrl,
       String header,
-      String body,
+      String? body,
       @JsonKey(name: 'button_label') String? buttonLabel});
 }
 
@@ -157,7 +158,7 @@ class __$$OnboardingSlideImplCopyWithImpl<$Res>
     Object? title = null,
     Object? imageUrl = null,
     Object? header = null,
-    Object? body = null,
+    Object? body = freezed,
     Object? buttonLabel = freezed,
   }) {
     return _then(_$OnboardingSlideImpl(
@@ -172,7 +173,7 @@ class __$$OnboardingSlideImplCopyWithImpl<$Res>
       screen: null == screen
           ? _value.screen
           : screen // ignore: cast_nullable_to_non_nullable
-              as int,
+              as String,
       title: null == title
           ? _value.title
           : title // ignore: cast_nullable_to_non_nullable
@@ -185,10 +186,10 @@ class __$$OnboardingSlideImplCopyWithImpl<$Res>
           ? _value.header
           : header // ignore: cast_nullable_to_non_nullable
               as String,
-      body: null == body
+      body: freezed == body
           ? _value.body
           : body // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       buttonLabel: freezed == buttonLabel
           ? _value.buttonLabel
           : buttonLabel // ignore: cast_nullable_to_non_nullable
@@ -205,11 +206,11 @@ class _$OnboardingSlideImpl
   const _$OnboardingSlideImpl(
       {required this.id,
       required this.feature,
-      required this.screen,
+      @JsonKey(name: 'screen') required this.screen,
       required this.title,
       @JsonKey(name: 'imageURL') required this.imageUrl,
       required this.header,
-      required this.body,
+      this.body,
       @JsonKey(name: 'button_label') this.buttonLabel});
 
   factory _$OnboardingSlideImpl.fromJson(Map<String, dynamic> json) =>
@@ -220,7 +221,8 @@ class _$OnboardingSlideImpl
   @override
   final String feature;
   @override
-  final int screen;
+  @JsonKey(name: 'screen')
+  final String screen;
   @override
   final String title;
   @override
@@ -229,7 +231,7 @@ class _$OnboardingSlideImpl
   @override
   final String header;
   @override
-  final String body;
+  final String? body;
   @override
   @JsonKey(name: 'button_label')
   final String? buttonLabel;
@@ -297,11 +299,11 @@ abstract class _OnboardingSlide implements OnboardingSlide {
   const factory _OnboardingSlide(
           {required final int id,
           required final String feature,
-          required final int screen,
+          @JsonKey(name: 'screen') required final String screen,
           required final String title,
           @JsonKey(name: 'imageURL') required final String imageUrl,
           required final String header,
-          required final String body,
+          final String? body,
           @JsonKey(name: 'button_label') final String? buttonLabel}) =
       _$OnboardingSlideImpl;
 
@@ -313,7 +315,8 @@ abstract class _OnboardingSlide implements OnboardingSlide {
   @override
   String get feature;
   @override
-  int get screen;
+  @JsonKey(name: 'screen')
+  String get screen;
   @override
   String get title;
   @override
@@ -322,7 +325,7 @@ abstract class _OnboardingSlide implements OnboardingSlide {
   @override
   String get header;
   @override
-  String get body;
+  String? get body;
   @override
   @JsonKey(name: 'button_label')
   String? get buttonLabel;

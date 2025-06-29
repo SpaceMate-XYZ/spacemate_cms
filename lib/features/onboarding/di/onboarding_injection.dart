@@ -18,7 +18,6 @@ void initOnboardingFeature() {
   sl.registerLazySingleton<OnboardingRepository>(
     () => OnboardingRepositoryImpl(
       remoteDataSource: sl(),
-      networkInfo: sl(),
     ),
   );
 

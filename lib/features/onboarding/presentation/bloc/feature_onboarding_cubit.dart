@@ -1,4 +1,4 @@
-import 'package:bloc/bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spacemate/core/usecases/usecase.dart';
@@ -24,6 +24,7 @@ class FeatureOnboardingCubit extends Cubit<FeatureOnboardingState> {
 
   Future<void> checkOnboardingStatus(String menuLabel, String? navigationTarget) async {
     developer.log('FeatureOnboardingCubit: Checking onboarding status for menu label: $menuLabel');
+    developer.log('FeatureOnboardingCubit: Navigation target: $navigationTarget');
     emit(const FeatureOnboardingState.loading());
     
     // Map the menu label to the feature name
@@ -32,6 +33,7 @@ class FeatureOnboardingCubit extends Cubit<FeatureOnboardingState> {
     
     if (featureName == null) {
       developer.log('FeatureOnboardingCubit: No feature mapping found for menu label: $menuLabel');
+      developer.log('FeatureOnboardingCubit: This will cause navigation to default behavior');
       emit(FeatureOnboardingState.onboardingNotNeeded(navigationTarget: navigationTarget));
       return;
     }
@@ -45,29 +47,37 @@ class FeatureOnboardingCubit extends Cubit<FeatureOnboardingState> {
     } else {
       developer.log('FeatureOnboardingCubit: User has not seen onboarding, fetching data for $featureName');
       // Use the specific feature API call for better performance
-      final result = await getFeatureByName(featureName).run();
-      result.match(
-        (failure) {
-          developer.log('FeatureOnboardingCubit: API call failed: ${failure.message}');
-          emit(FeatureOnboardingState.error(message: failure.message));
-        },
-        (response) {
-          final onboardingSlides = response.data
-              .where((feature) => feature.attributes.onboardingCarousel != null)
-              .expand((feature) => feature.attributes.onboardingCarousel!)
-              .toList();
-          
-          developer.log('FeatureOnboardingCubit: Found ${onboardingSlides.length} slides for feature: $featureName');
-          
-          if (onboardingSlides.isNotEmpty) {
-            developer.log('FeatureOnboardingCubit: Emitting onboardingNeeded state');
-            emit(FeatureOnboardingState.onboardingNeeded(slides: onboardingSlides));
-          } else {
-            developer.log('FeatureOnboardingCubit: No slides found, navigating to target');
-            emit(FeatureOnboardingState.onboardingNotNeeded(navigationTarget: navigationTarget));
-          }
-        },
-      );
+      try {
+        final result = await getFeatureByName(GetFeatureByNameParams(featureName: featureName));
+        result.fold(
+          (failure) {
+            developer.log('FeatureOnboardingCubit: API call failed: ${failure.message}');
+            emit(FeatureOnboardingState.error(message: failure.message));
+          },
+          (feature) {
+            try {
+              developer.log('FeatureOnboardingCubit: API call successful, processing response');
+              developer.log('FeatureOnboardingCubit: Feature name from API: ${feature.attributes.name}');
+              developer.log('FeatureOnboardingCubit: Feature has ${feature.attributes.onboardingCarousel?.length ?? 0} slides');
+              
+              if (feature.attributes.onboardingCarousel != null && feature.attributes.onboardingCarousel!.isNotEmpty) {
+                developer.log('FeatureOnboardingCubit: Found ${feature.attributes.onboardingCarousel!.length} slides for feature: $featureName');
+                developer.log('FeatureOnboardingCubit: Emitting onboardingNeeded state');
+                emit(FeatureOnboardingState.onboardingNeeded(slides: feature.attributes.onboardingCarousel!));
+              } else {
+                developer.log('FeatureOnboardingCubit: No slides found, navigating to target');
+                emit(FeatureOnboardingState.onboardingNotNeeded(navigationTarget: navigationTarget));
+              }
+            } catch (e) {
+              developer.log('FeatureOnboardingCubit: Error processing response: $e');
+              emit(FeatureOnboardingState.error(message: 'Error processing response: $e'));
+            }
+          },
+        );
+      } catch (e) {
+        developer.log('FeatureOnboardingCubit: Unexpected error: $e');
+        emit(FeatureOnboardingState.error(message: 'Unexpected error: $e'));
+      }
     }
   }
 

@@ -1,4 +1,4 @@
-import 'package:fpdart/fpdart.dart';
+import 'package:dartz/dartz.dart';
 import 'package:spacemate/core/error/failures.dart';
 import 'package:spacemate/core/usecases/usecase.dart';
 import 'package:spacemate/features/menu/domain/entities/menu_item_entity.dart';
@@ -11,29 +11,15 @@ class GetMenuItems implements UseCase<List<MenuItemEntity>, GetMenuItemsParams> 
   const GetMenuItems(this.repository);
 
   @override
-  TaskEither<Failure, List<MenuItemEntity>> call(GetMenuItemsParams params) {
-    return repository.getMenuItems(
-      slug: params.slug,
-      forceRefresh: params.forceRefresh,
-      locale: params.locale,
-    );
+  Future<Either<Failure, List<MenuItemEntity>>> call(GetMenuItemsParams params) async {
+    return await repository.getMenuItems(placeId: params.placeId);
   }
 }
 
 /// Parameters for the [GetMenuItems] use case.
 class GetMenuItemsParams {
   /// The slug of the screen to fetch menu items for.
-  final String slug;
+  final String? placeId;
 
-  /// Whether to force a refresh from the remote data source.
-  final bool forceRefresh;
-
-  /// Optional locale for localized content.
-  final String? locale;
-
-  const GetMenuItemsParams({
-    required this.slug,
-    this.forceRefresh = false,
-    this.locale,
-  });
+  const GetMenuItemsParams({this.placeId});
 }

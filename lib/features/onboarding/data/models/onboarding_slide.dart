@@ -9,11 +9,11 @@ class OnboardingSlide with _$OnboardingSlide {
   const factory OnboardingSlide({
     required int id,
     required String feature,
-    required int screen,
+    @JsonKey(name: 'screen') required String screen,
     required String title,
     @JsonKey(name: 'imageURL') required String imageUrl,
     required String header,
-    required String body,
+    String? body,
     @JsonKey(name: 'button_label') String? buttonLabel,
   }) = _OnboardingSlide;
 

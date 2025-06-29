@@ -32,9 +32,9 @@ Notes
 
 You can use the payload from these API calls 
 
-Parking: https://strapi.apps.rredu.in/api/spacemate-placeid-features?filters[feature_name][$eq]=parking&populate=*
+Parking: https://strapi.dev.spacemate.xyz/api/spacemate-placeid-features?filters[feature_name][$eq]=parking&populate=*
 
-Valet Parking: https://strapi.apps.rredu.in/api/spacemate-placeid-features?filters[feature_name][$eq]=valetparking&populate=*: 
+Valet Parking: https://strapi.dev.spacemate.xyz/api/spacemate-placeid-features?filters[feature_name][$eq]=valetparking&populate=*: 
 
 ...and so on
 
@@ -90,7 +90,7 @@ Specifically, you need to parse the JSON data and create the slides for each car
 * **Coder:**
     * **Modularity & Reusability:** Develop components and modules that are highly reusable across the application to minimize code duplication and improve maintainability.
     * **Clean Code Principles:** Write readable, maintainable, and self-documenting code. Use meaningful variable names, adhere to Flutter/Dart style guides, and add comments for complex logic.
-    * **Tests:** 3 main categories of tests you MUST have in your repo - Unit, Integration, End to End. You also MUST run static analysis and lints and target at least 80% code coverage. 100% doesn’t make sense because some code is already extensively tested previously and it is better to ask the LLM to "identify the most critical code to analyze and run lints on". For UI (Flutter apps) you should also do UI, widget, model (data model), BLOC (state management), platform (will it work on all platforms or fail gracefully) & performance tests.
+    * **Tests:** 3 main categories of tests you MUST have in your repo - Unit, Integration, End to End. You also MUST run static analysis and lints and target at least 80% code coverage. 100% doesn't make sense because some code is already extensively tested previously and it is better to ask the LLM to "identify the most critical code to analyze and run lints on". For UI (Flutter apps) you should also do UI, widget, model (data model), BLOC (state management), platform (will it work on all platforms or fail gracefully) & performance tests.
 
     * **Robust Error Handling:** Implement appropriate error handling for UI interactions, state management, and any simulated API calls to ensure app stability.
     * **Performance Awareness:** Consider performance implications when writing UI logic, especially for lists and animations. Optimize renders where possible.
@@ -156,7 +156,7 @@ Specifically, you need to parse the JSON data and create the slides for each car
 ### Multi-Platform Deployment:
 
 * **Requirement:** Ensure the code you generate is compatible with and can be built for, run and deployed on Mobile (Android, iOS), Web, Desktop (Windows/macOS) platforms.
-* **Platform limitations:** If some platforms don’t support some features then let me know about them so I can decide what to do.
+* **Platform limitations:** If some platforms don't support some features then let me know about them so I can decide what to do.
 
 
 ### Navigation Definition:

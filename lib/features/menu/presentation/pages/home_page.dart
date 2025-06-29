@@ -188,6 +188,7 @@ class _CategoryPage extends StatelessWidget {
                   items: state.items,
                   isLoading: state.status == MenuStatus.loading,
                   errorMessage: state.errorMessage,
+                  category: category.name,
                 ),
               ),
             ],
@@ -199,6 +200,7 @@ class _CategoryPage extends StatelessWidget {
           items: state.items,
           isLoading: state.status == MenuStatus.loading,
           errorMessage: state.errorMessage,
+          category: category.name,
         );
       },
     );

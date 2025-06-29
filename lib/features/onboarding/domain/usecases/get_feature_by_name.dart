@@ -1,22 +1,22 @@
-import 'package:fpdart/fpdart.dart';
+import 'package:dartz/dartz.dart';
 import 'package:spacemate/core/error/failures.dart';
 import 'package:spacemate/core/usecases/usecase.dart';
-import 'package:spacemate/features/onboarding/data/models/spacemate_placeid_features_response.dart';
+import 'package:spacemate/features/onboarding/data/models/feature.dart';
 import 'package:spacemate/features/onboarding/domain/repositories/onboarding_repository.dart';
 
-class GetFeatureByName implements UseCase<SpacematePlaceidFeaturesResponse, String> {
+class GetFeatureByName implements UseCase<Feature, GetFeatureByNameParams> {
   final OnboardingRepository repository;
 
-  GetFeatureByName(this.repository);
+  const GetFeatureByName(this.repository);
 
   @override
-  TaskEither<Failure, SpacematePlaceidFeaturesResponse> call(String featureName) {
-    return TaskEither.tryCatch(
-      () async => (await repository.getFeatureByName(featureName)).fold(
-        (failure) => throw failure,
-        (success) => success,
-      ),
-      (error, stackTrace) => error is Failure ? error : ServerFailure(error.toString()),
-    );
+  Future<Either<Failure, Feature>> call(GetFeatureByNameParams params) async {
+    return await repository.getFeatureByName(params.featureName);
   }
+}
+
+class GetFeatureByNameParams {
+  final String featureName;
+
+  GetFeatureByNameParams({required this.featureName});
 } 

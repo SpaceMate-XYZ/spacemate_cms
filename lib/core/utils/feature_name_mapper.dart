@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+
 class FeatureNameMapper {
   static const Map<String, String> _labelToFeatureName = {
     'Parking': 'parking',
@@ -29,16 +31,29 @@ class FeatureNameMapper {
 
   /// Maps a menu label to its corresponding feature name
   static String? getFeatureNameFromLabel(String label) {
-    return _labelToFeatureName[label];
+    developer.log('FeatureNameMapper: Mapping label: "$label"');
+    developer.log('FeatureNameMapper: Available labels: ${_labelToFeatureName.keys.toList()}');
+    final result = _labelToFeatureName[label];
+    developer.log('FeatureNameMapper: Mapped to: $result');
+    
+    if (result == null) {
+      developer.log('FeatureNameMapper: WARNING - No mapping found for label: "$label"');
+      developer.log('FeatureNameMapper: This might cause navigation to default to "requests"');
+    }
+    
+    return result;
   }
 
   /// Maps a feature name to its corresponding menu label
   static String? getLabelFromFeatureName(String featureName) {
+    developer.log('FeatureNameMapper: Reverse mapping feature name: "$featureName"');
     for (final entry in _labelToFeatureName.entries) {
       if (entry.value == featureName) {
+        developer.log('FeatureNameMapper: Reverse mapped to: ${entry.key}');
         return entry.key;
       }
     }
+    developer.log('FeatureNameMapper: WARNING - No reverse mapping found for feature name: "$featureName"');
     return null;
   }
 

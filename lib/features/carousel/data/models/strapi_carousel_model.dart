@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:spacemate/features/carousel/domain/entities/carousel_item_entity.dart';
+import 'package:spacemate/core/config/app_config.dart';
 
 class StrapiCarouselResponse extends Equatable {
   final List<StrapiCarouselItem> data;
@@ -69,8 +70,8 @@ class StrapiCarouselItem extends Equatable {
       return url;
     }
 
-    // Otherwise, construct the full URL
-    const baseUrl = 'https://strapi.apps.rredu.in';
+    // Otherwise, construct the full URL using config
+    final baseUrl = AppConfig.carouselStrapiBaseUrl;
     return url.startsWith('/') ? '$baseUrl$url' : '$baseUrl/$url';
   }
 }

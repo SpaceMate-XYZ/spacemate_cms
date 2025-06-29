@@ -6,24 +6,26 @@ import 'package:spacemate/features/carousel/domain/repositories/carousel_reposit
 import 'package:spacemate/features/carousel/domain/usecases/get_carousel_items.dart';
 import 'package:spacemate/features/carousel/presentation/bloc/carousel_bloc.dart';
 
-final getIt = GetIt.instance;
+final sl = GetIt.instance;
 
-void initCarouselFeature() {
-  // Bloc
-  getIt.registerFactory<CarouselBloc>(
-    () => CarouselBloc(getCarouselItems: getIt<GetCarouselItems>()),
+Future<void> initCarouselDependencies() async {
+  // Repository
+  sl.registerLazySingleton<CarouselRepository>(
+    () => StrapiCarouselRepositoryImpl(
+      dioClient: sl<DioClient>(),
+      networkInfo: sl<NetworkInfo>(),
+    ),
   );
 
   // Use cases
-  getIt.registerLazySingleton<GetCarouselItems>(
-    () => GetCarouselItems(getIt<CarouselRepository>()),
+  sl.registerLazySingleton<GetCarouselItems>(
+    () => GetCarouselItems(sl<CarouselRepository>()),
   );
 
-  // Repository
-  getIt.registerLazySingleton<CarouselRepository>(
-    () => StrapiCarouselRepository(
-      httpClient: getIt<DioClient>(),
-      networkInfo: getIt<NetworkInfo>(),
+  // BLoC
+  sl.registerFactory(
+    () => CarouselBloc(
+      getCarouselItems: sl<GetCarouselItems>(),
     ),
   );
 }

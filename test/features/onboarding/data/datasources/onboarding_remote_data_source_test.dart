@@ -36,7 +36,7 @@ void main() {
         // Arrange
         when(mockDioClient.get(any)).thenAnswer(
           (_) async => Response(
-            requestOptions: RequestOptions(path: '/api/spacemate-placeid-features?populate=*'),
+            requestOptions: RequestOptions(path: '/api/screens?filters[feature_name][$eqi]=parking&populate=*'),
             statusCode: 200,
             data: json.decode(fixture('spacemate_placeid_features_response.json')) as Map<String, dynamic>,
           ),

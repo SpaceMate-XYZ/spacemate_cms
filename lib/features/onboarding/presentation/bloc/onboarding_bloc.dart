@@ -1,6 +1,7 @@
-import 'package:bloc/bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:spacemate/core/usecases/usecase.dart';
+import 'package:spacemate/features/onboarding/data/models/feature.dart';
 import 'package:spacemate/features/onboarding/data/models/onboarding_slide.dart';
 import 'package:spacemate/features/onboarding/domain/usecases/get_features_with_onboarding.dart';
 
@@ -23,12 +24,12 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
     Emitter<OnboardingState> emit,
   ) async {
     emit(const OnboardingState.loading());
-    final result = await getFeaturesWithOnboarding(const NoParams()).run();
-    result.match(
+    final result = await getFeaturesWithOnboarding(const NoParams());
+    result.fold(
       (failure) => emit(OnboardingState.error(message: failure.message)),
-      (response) {
+      (features) {
         // Filter out features without onboarding carousels and sort them by name
-        final sortedFeatures = response.data
+        final sortedFeatures = features
             .where((feature) => feature.attributes.onboardingCarousel != null)
             .toList()
             // Sort features by name in ascending order

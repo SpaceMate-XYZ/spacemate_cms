@@ -51,6 +51,7 @@ class FacilitiesPage extends StatelessWidget {
           items: state.items,
           isLoading: state.status == MenuStatus.loading,
           errorMessage: state.errorMessage,
+          category: MenuCategory.facilities.name,
         );
       },
     );

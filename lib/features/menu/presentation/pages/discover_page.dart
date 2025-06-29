@@ -51,6 +51,7 @@ class DiscoverPage extends StatelessWidget {
           items: state.items,
           isLoading: state.status == MenuStatus.loading,
           errorMessage: state.errorMessage,
+          category: MenuCategory.discover.name,
         );
       },
     );

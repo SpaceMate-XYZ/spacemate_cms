@@ -1,4 +1,4 @@
-import 'package:fpdart/fpdart.dart';
+import 'package:dartz/dartz.dart';
 import 'package:spacemate/core/error/failures.dart';
 import 'package:spacemate/core/usecases/usecase.dart';
 import 'package:spacemate/features/carousel/domain/entities/carousel_item_entity.dart';
@@ -10,8 +10,8 @@ class GetCarouselItems implements UseCase<List<CarouselItemEntity>, GetCarouselI
   const GetCarouselItems(this.repository);
 
   @override
-  TaskEither<Failure, List<CarouselItemEntity>> call(GetCarouselItemsParams params) {
-    return repository.getCarouselItems(placeId: params.placeId);
+  Future<Either<Failure, List<CarouselItemEntity>>> call(GetCarouselItemsParams params) async {
+    return await repository.getCarouselItems(placeId: params.placeId);
   }
 }
 

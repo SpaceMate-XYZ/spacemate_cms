@@ -1,161 +1,100 @@
-# Strapi Integration & Multi-Tenancy Architecture Guide
+# Strapi Configuration
 
-This document outlines the architectural decisions and implementation details for integrating the Flutter application with Strapi, focusing on the strategy for multi-tenancy.
+## Overview
 
----
+This document describes the Strapi CMS configuration for the SpaceMate Flutter app. The app uses Strapi to manage menu data and onboarding carousel content.
 
-## 1. Multi-Tenancy Strategy: Subdomain vs. Subfolder
+## Base URLs
 
-To support multiple places or tenants, we considered two primary URL structures:
+- **Main Strapi URL**: `https://strapi.dev.spacemate.xyz`
+- **API Prefix**: `/api`
 
-- **Subdomain Approach**: `https://{placeId}.spacemate.xyz/api/...`
-- **Subfolder Approach**: `https://spacemate.xyz/api/{placeId}/...`
+## Collections
 
-### Recommendation: Subfolder Approach
+### 1. screens
+- **Purpose**: Menu data and feature categories
+- **Content**: Menu screens with their associated features
+- **Usage**: Main menu grid display
 
-We have chosen the **subfolder approach** (`/api/{placeId}/...`) as the target architecture. It offers the best balance of simplicity, scalability, and operational ease.
+### 2. spacemate-placeid-features
+- **Purpose**: Onboarding carousel data
+- **Content**: Feature-specific onboarding slides
+- **Usage**: 4-slide carousels for each feature
 
-**Advantages:**
-- **Simplified SSL/TLS Management**: Avoids the complexity and cost of provisioning wildcard SSL certificates or individual certificates for each subdomain.
-- **Easier DNS Configuration**: Does not require programmatic updates to DNS records for each new tenant.
-- **Gateway-Friendly**: This pattern is idiomatic for API Gateways like Apache APISIX or Nginx, allowing for straightforward path-based routing and policy enforcement.
-- **RESTful and Clean**: It provides a clean, hierarchical structure that is easy for developers to understand and work with.
+## API Endpoints
 
----
+### Menu Data
+- **Endpoint**: `/api/screens`
+- **Method**: GET
+- **Query Parameters**: `populate=*`
+- **Description**: Fetches all menu items with their features
 
-## 2. Backend Setup: Strapi with a Reverse Proxy
+### Onboarding/Carousel Data
+- **Endpoint**: `/api/spacemate-placeid-features`
+- **Method**: GET
+- **Query Parameters**: 
+  - `filters[feature_name][$eq]=FeatureName` (where FeatureName is the specific feature like "parking", "valetparking", etc.)
+  - `populate=*`
+- **Description**: Fetches onboarding carousel data for a specific feature
 
-To implement the subfolder strategy, a reverse proxy (e.g., Apache APISIX, Nginx) should be placed in front of your Strapi/NestJS backend.
+## Example API Calls
 
-### Conceptual Workflow
-
-1.  **Incoming Request**: The Flutter app sends a request to `https://spacemate.xyz/api/a-real-place-id/menu-screens`.
-2.  **API Gateway / Reverse Proxy**: The gateway receives the request.
-3.  **Path-Based Routing**: It uses the `/api/{placeId}/` path to identify the target tenant.
-4.  **URL Rewriting**: The gateway can rewrite the URL before forwarding it to the appropriate backend service. For instance, it could forward the request to a specific Strapi instance or a NestJS service responsible for that `placeId`.
-
-**Example Nginx Configuration Snippet:**
-
-```nginx
-location ~ ^/api/([a-zA-Z0-9_-]+)/(.*)$ {
-    # The first capture group ($1) is the placeId
-    # The second capture group ($2) is the rest of the path
-    
-    # Example: Proxy to a NestJS service, passing placeId as a header
-    set $placeId $1;
-    proxy_set_header X-Place-ID $placeId;
-    proxy_pass http://your-nestjs-backend-service/$2$is_args$args;
-}
+### Menu Data
+```
+GET https://strapi.dev.spacemate.xyz/api/screens?populate=*
 ```
 
-This setup keeps the Strapi instance itself simple, while the gateway handles the complexity of routing and tenancy.
-
----
-
-## 3. Flutter Implementation Details
-
-To align with this architecture, the Flutter application's data layer must construct the correct URL.
-
-### Current (Simplified) Implementation
-
-For initial development, we have temporarily removed the `placeId` to simplify the integration. The API call is currently hardcoded:
-
-```dart
-// in lib/features/menu/data/datasources/menu_remote_data_source_impl.dart
-
-Future<List<MenuItemModel>> getMenuItems(...) async {
-  // ...
-  final response = await _dioClient.get(
-    '/api/menu-screens', // No placeId
-    queryParameters: queryParams,
-  );
-  // ...
-}
+### Onboarding Data for Parking
+```
+GET https://strapi.dev.spacemate.xyz/api/spacemate-placeid-features?filters[feature_name][$eq]=parking&populate=*
 ```
 
-### Target (Place-Aware) Implementation
-
-To re-enable multi-tenancy in the future, the `getMenuItems` method should be updated to accept a `placeId` and construct the URL dynamically:
-
-```dart
-// in lib/features/menu/data/datasources/menu_remote_data_source_impl.dart
-
-Future<List<MenuItemModel>> getMenuItems({
-  required String placeId, // Re-introduce placeId
-  // ...
-}) async {
-  // ...
-  final response = await _dioClient.get(
-    '/api/$placeId/menu-screens', // Use placeId as a subfolder
-    queryParameters: queryParams,
-  );
-  // ...
-}
+### Onboarding Data for Valet Parking
+```
+GET https://strapi.dev.spacemate.xyz/api/spacemate-placeid-features?filters[feature_name][$eq]=valetparking&populate=*
 ```
 
-This change will need to be propagated up through the repository, BLoC, and UI layers by re-introducing the `placeId` parameter where it was removed.
+## Data Structure
 
----
+### Menu Response (screens collection)
+The `/api/screens` endpoint returns menu categories and their features.
 
-## 4. Strapi CMS Configuration
+### Onboarding Response (spacemate-placeid-features collection)
+The `/api/spacemate-placeid-features` endpoint returns onboarding carousel data with:
+- Feature information
+- Onboarding slides (title, imageURL, header, body, button_label)
+- Each slide has 4 screens (slides 1-4)
 
-To make the Flutter app work, you must configure your Strapi backend to match the data structure the app now expects. Follow these steps precisely.
+## Authentication
 
-### Step 1: Create the 'Menu Grid' Component
+The app supports optional API token authentication:
+- Set `STRAPI_API_TOKEN` in environment variables
+- Token is automatically included in request headers
 
-First, we will create a reusable Component that defines the structure of a single menu item.
+## CORS Configuration
 
-1.  **Go to the Content-Type Builder**: In your Strapi admin panel, navigate to `Plugins` > `Content-Type Builder`.
-2.  **Create a New Component**:
-    *   Click on **+ Create new component**.
-    *   **Component name**: `MenuGrid`
-    *   **Category**: `menu` (or a category of your choice)
-    *   Leave the icon as the default.
-3.  **Add Fields to the Component**:
-    *   **`label`**: `Text` field (Short text).
-    *   **`icon`**: `Text` field (Short text). This will store the icon name (e.g., "home", "settings").
-    *   **`order`**: `Number` field (integer).
-    *   **`isVisible`**: `Boolean` field (default to `true`).
-    *   **`isAvailable`**: `Boolean` field (default to `true`).
-4.  **Save** the component.
+For development, the app uses a proxy to handle CORS issues:
+- Proxy URL: `https://api.allorigins.win/raw?url=`
+- Automatically prepended to image URLs in development mode
 
-### Step 2: Create the 'Screen' Collection Type
+## Error Handling
 
-Next, we will create the main Collection Type that will hold the screen data and use our new component.
+Common error responses and their meanings:
+- 200: Success
+- 400: Bad request (check filter parameters)
+- 401: Unauthorized (check API token)
+- 404: Not found (check endpoint and feature name)
+- 500: Server error
 
-1.  **Create a New Collection Type**:
-    *   In the Content-Type Builder, click on **+ Create new collection type**.
-    *   **Display name**: `Screen`
-    *   The `API ID (Plural)` will be `screens` (e.g., `/api/screens`). This is critical.
-2.  **Add Fields to the Collection Type**:
-    *   **`name`**: `Text` field (Short text). This is for internal reference (e.g., "Home Screen").
-    *   **`slug`**: `Text` field. **This is the most important field.**
-        *   Go to the `Advanced` tab for this field and check **`Required field`** and **`Unique field`**.
-        *   This `slug` will be used to fetch the screen (e.g., `home`, `settings-menu`).
-    *   **`MenuGrid`**: `Component` field.
-        *   Select **`Repeatable component`**.
-        *   Under `Use an existing component`, select the `menu` category and choose the **`MenuGrid`** component you created.
-3.  **Save** the Collection Type.
+## Configuration
 
-### Step 3: Add Content and Set Permissions
+The app uses environment variables for the Strapi base URL:
+- `STRAPI_BASE_URL`: Base URL for Strapi API
+- `CAROUSEL_STRAPI_BASE_URL`: Base URL for carousel-specific API calls
 
-1.  **Create a 'Home' Screen Entry**:
-    *   Go to `Content Manager` > `Screen`.
-    *   Click **+ Create new entry**.
-    *   Set **`name`** to `Home Screen`.
-    *   Set **`slug`** to **`home`**. (This must match what the Flutter app requests initially).
-    *   Click **`Add new MenuGrid`** to add your first menu item.
-        *   **label**: `Explore`
-        *   **icon**: `explore`
-        *   **order**: `1`
-        *   **isVisible**: `true`
-        *   **isAvailable**: `true`
-    *   Add a few more items as needed.
-2.  **Save and Publish** the entry.
-3.  **Set Public Permissions**:
-    *   Go to `Settings` > `Roles` > `Public`.
-    *   Under `Permissions`, find **`Screen`**.
-    *   Check the boxes for **`find`** and **`findOne`**. This allows the public (your Flutter app) to read the screen data.
-    *   **Save** the permissions.
+## Development Notes
 
-Your Strapi backend is now fully configured. When you run the Flutter app, it will make a request to `/api/screens?filters[slug][$eq]=home`, and Strapi will return the menu items you just created.
+- All API calls include `populate=*` to fetch related data
+- Feature names are case-sensitive in filter parameters
+- Images are hosted on CDN and referenced by URL
+- The app caches menu data locally for offline functionality
