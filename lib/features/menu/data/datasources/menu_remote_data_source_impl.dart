@@ -8,6 +8,7 @@ import 'package:spacemate/features/menu/data/models/screen_model.dart';
 import 'package:flutter/foundation.dart';
 import 'dart:developer' as developer;
 import 'menu_remote_data_source.dart';
+import 'package:spacemate/core/utils/strapi_url_builder.dart';
 
 class MenuRemoteDataSourceImpl implements MenuRemoteDataSource {
   final DioClient dioClient;
@@ -17,23 +18,18 @@ class MenuRemoteDataSourceImpl implements MenuRemoteDataSource {
   @override
   Future<Either<Failure, List<ScreenModel>>> getMenuItems({String? placeId}) async {
     try {
-      final queryParams = <String, dynamic>{
-        'populate': '*',
-      };
-      
-      // If placeId (slug) is provided, filter by it
-      if (placeId != null && placeId.isNotEmpty) {
-        // Try different filter approaches
-        queryParams['filters[slug][$eq]'] = placeId;
-        developer.log('MenuRemoteDataSourceImpl: Filtering by slug: $placeId');
-        developer.log('MenuRemoteDataSourceImpl: Query params: $queryParams');
-      } else {
-        developer.log('MenuRemoteDataSourceImpl: No slug provided, fetching all screens');
-      }
-      
+      // Build the Strapi URL using the new utility
+      final url = StrapiUrlBuilder.build(
+        resource: 'screens',
+        filters: placeId != null && placeId.isNotEmpty
+            ? {'slug': {'\$eq': placeId}}
+            : null,
+        populate: ['*'],
+      );
+      developer.log('MenuRemoteDataSourceImpl: Built URL: $url');
+
       final response = await dioClient.get(
-        '/api/screens',
-        queryParameters: queryParams,
+        url,
       );
       
       developer.log('MenuRemoteDataSourceImpl: API response status: ${response.statusCode}');

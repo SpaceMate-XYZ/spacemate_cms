@@ -17,7 +17,20 @@ class AppRouter {
     initialLocation: '/',
     debugLogDiagnostics: true,
     redirect: (context, state) {
-      developer.log('AppRouter: Redirect called for path: ${state.uri.path}');
+      final path = state.uri.path;
+      // Redirect /onboarding/:featureName to /onboarding/:featureName/1
+      final onboardingMatch = RegExp(r'^/onboarding/([^/]+)$').firstMatch(path);
+      if (onboardingMatch != null) {
+        final featureName = onboardingMatch.group(1);
+        return '/onboarding/$featureName/1';
+      }
+      // Redirect /category/:category/onboarding/:featureName to /category/:category/onboarding/:featureName/1
+      final categoryOnboardingMatch = RegExp(r'^/category/([^/]+)/onboarding/([^/]+)$').firstMatch(path);
+      if (categoryOnboardingMatch != null) {
+        final category = categoryOnboardingMatch.group(1);
+        final featureName = categoryOnboardingMatch.group(2);
+        return '/category/$category/onboarding/$featureName/1';
+      }
       return null;
     },
     routes: [
@@ -414,19 +427,32 @@ class OnboardingLoaderPage extends StatefulWidget {
 
 class _OnboardingLoaderPageState extends State<OnboardingLoaderPage> {
   late Future<List<OnboardingSlide>> _slidesFuture;
+  int _retryCount = 0;
+  static const int _maxRetries = 3;
+  static const Duration _retryDelay = Duration(seconds: 2);
+  bool _loading = true;
+  String? _errorMessage;
 
   @override
   void initState() {
     super.initState();
-    _slidesFuture = _loadOnboardingSlides();
+    _startLoadingSlides();
+  }
+
+  void _startLoadingSlides() {
+    setState(() {
+      _loading = true;
+      _errorMessage = null;
+      _slidesFuture = _loadOnboardingSlides();
+    });
   }
 
   Future<List<OnboardingSlide>> _loadOnboardingSlides() async {
+    developer.log('OnboardingLoaderPage: _loadOnboardingSlides called. Retry count: $_retryCount');
     try {
       developer.log('OnboardingLoaderPage: Loading slides for feature: ${widget.featureName}');
       final getFeatureByName = sl<GetFeatureByName>();
       final result = await getFeatureByName(GetFeatureByNameParams(featureName: widget.featureName));
-      
       return result.fold(
         (failure) {
           developer.log('OnboardingLoaderPage: API call failed: ${failure.message}');
@@ -435,17 +461,38 @@ class _OnboardingLoaderPageState extends State<OnboardingLoaderPage> {
         (feature) {
           developer.log('OnboardingLoaderPage: API call successful for feature: ${widget.featureName}');
           developer.log('OnboardingLoaderPage: Feature has ${feature.attributes.onboardingCarousel?.length ?? 0} slides');
-          
           if (feature.attributes.onboardingCarousel == null || feature.attributes.onboardingCarousel!.isEmpty) {
             throw Exception('No onboarding slides found for ${widget.featureName}');
           }
-          
           return feature.attributes.onboardingCarousel!;
         },
       );
     } catch (e) {
-      developer.log('OnboardingLoaderPage: Failed to load onboarding slides: $e');
-      throw Exception('Failed to load onboarding slides: $e');
+      developer.log('OnboardingLoaderPage: Failed to load onboarding slides: ${e.toString()}');
+      throw Exception('Failed to load onboarding slides: ${e.toString()}');
+    }
+  }
+
+  void _retryLoad() {
+    developer.log('OnboardingLoaderPage: _retryLoad called. Resetting retry count and reloading slides.');
+    setState(() {
+      _retryCount = 0;
+      _errorMessage = null;
+      _loading = true;
+      _slidesFuture = _loadOnboardingSlides();
+    });
+  }
+
+  void _autoRetry() async {
+    if (_retryCount < _maxRetries) {
+      await Future.delayed(_retryDelay);
+      if (!mounted) return;
+      setState(() {
+        _retryCount++;
+        _errorMessage = null;
+        _loading = true;
+        _slidesFuture = _loadOnboardingSlides();
+      });
     }
   }
 
@@ -462,6 +509,7 @@ class _OnboardingLoaderPageState extends State<OnboardingLoaderPage> {
       body: FutureBuilder<List<OnboardingSlide>>(
         future: _slidesFuture,
         builder: (context, snapshot) {
+          developer.log('OnboardingLoaderPage: FutureBuilder builder called. Connection state: ${snapshot.connectionState}, Has error: ${snapshot.hasError}, Retry count: $_retryCount');
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
               child: Column(
@@ -474,38 +522,54 @@ class _OnboardingLoaderPageState extends State<OnboardingLoaderPage> {
               ),
             );
           }
-          
           if (snapshot.hasError) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.error_outline, size: 64, color: Colors.red),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Error loading onboarding',
-                    style: Theme.of(context).textTheme.headlineSmall,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    snapshot.error.toString(),
-                    style: Theme.of(context).textTheme.bodyMedium,
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () => context.pop(),
-                    child: const Text('Go Back'),
-                  ),
-                ],
-              ),
-            );
+            if (_retryCount < _maxRetries) {
+              // Automatic background retry
+              WidgetsBinding.instance.addPostFrameCallback((_) => _autoRetry());
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const CircularProgressIndicator(),
+                    const SizedBox(height: 16),
+                    Text('Retrying to load onboarding... ($_retryCount/$_maxRetries)'),
+                  ],
+                ),
+              );
+            } else {
+              // Show error after max retries
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.error_outline, size: 64, color: Colors.red),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Error loading onboarding',
+                      style: Theme.of(context).textTheme.headlineSmall,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      snapshot.error.toString(),
+                      style: Theme.of(context).textTheme.bodyMedium,
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: _retryLoad,
+                      child: const Text('Retry'),
+                    ),
+                  ],
+                ),
+              );
+            }
           }
-          
           final slides = snapshot.data!;
           return OnboardingScreen(
             slides: slides,
             initialSlideIndex: widget.initialSlideIndex,
+            featureName: widget.featureName,
+            category: widget.category,
           );
         },
       ),

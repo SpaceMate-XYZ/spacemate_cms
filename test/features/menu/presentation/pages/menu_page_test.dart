@@ -8,11 +8,22 @@ import 'package:spacemate/features/menu/presentation/bloc/menu_bloc.dart';
 import 'package:spacemate/features/menu/presentation/bloc/menu_event.dart';
 import 'package:spacemate/features/menu/presentation/bloc/menu_state.dart';
 import 'package:spacemate/features/menu/presentation/pages/home_page.dart';
+import 'package:spacemate/features/carousel/presentation/bloc/carousel_bloc.dart';
+import 'package:spacemate/features/onboarding/presentation/bloc/feature_onboarding_cubit.dart';
+import 'package:spacemate/features/onboarding/presentation/bloc/onboarding_bloc.dart';
+// import 'package:spacemate/test/helpers/test_setup.dart';
 
-class MockMenuBloc extends MockBloc<MenuEvent, MenuState> implements MenuBloc {}
+class MockMenuBloc extends Mock implements MenuBloc {}
+class MockCarouselBloc extends Mock implements CarouselBloc {}
+class MockFeatureOnboardingCubit extends Mock implements FeatureOnboardingCubit {}
+class MockOnboardingBloc extends Mock implements OnboardingBloc {}
 
 void main() {
   late MockMenuBloc mockMenuBloc;
+  late MockCarouselBloc mockCarouselBloc;
+  late MockFeatureOnboardingCubit mockFeatureOnboardingCubit;
+  late MockOnboardingBloc mockOnboardingBloc;
+  
   final mockMenuItems = [
     const MenuItemEntity(
       id: 1,
@@ -34,17 +45,30 @@ void main() {
     ),
   ];
 
+  setUpAll(() async {
+    // await TestSetup.initializeTestDI();
+  });
+
   setUp(() {
     mockMenuBloc = MockMenuBloc();
+    mockCarouselBloc = MockCarouselBloc();
+    mockFeatureOnboardingCubit = MockFeatureOnboardingCubit();
+    mockOnboardingBloc = MockOnboardingBloc();
+    
     registerFallbackValue(const LoadMenuEvent(slug: 'home'));
   });
 
+  tearDown(() {
+    // TestSetup.tearDown();
+  });
+
   Widget createTestWidget() {
-    return MaterialApp(
-      home: BlocProvider<MenuBloc>(
-        create: (context) => mockMenuBloc,
-        child: const HomePage(),
-      ),
+    return TestSetup.createTestApp(
+      child: const HomePage(),
+      menuBloc: mockMenuBloc,
+      carouselBloc: mockCarouselBloc,
+      featureOnboardingCubit: mockFeatureOnboardingCubit,
+      onboardingBloc: mockOnboardingBloc,
     );
   }
 

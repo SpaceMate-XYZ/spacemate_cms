@@ -11,7 +11,7 @@ void main() {
   const tOnboardingSlideModel = OnboardingSlide(
     id: 1,
     feature: 'Parking',
-    screen: 1,
+    screen: '1',
     title: 'Welcome to Parking',
     imageUrl: 'https://example.com/image1.png',
     header: 'Find your perfect spot',
@@ -19,15 +19,9 @@ void main() {
     buttonLabel: null,
   );
 
-  const tOnboardingCarouselModel = OnboardingCarousel(
-    slides: [
-      tOnboardingSlideModel,
-    ],
-  );
-
   const tFeatureAttributes = FeatureAttributes(
     name: 'Parking',
-    onboardingCarousel: tOnboardingCarouselModel,
+    onboardingCarousel: [tOnboardingSlideModel],
   );
 
   const tFeatureModel = Feature(

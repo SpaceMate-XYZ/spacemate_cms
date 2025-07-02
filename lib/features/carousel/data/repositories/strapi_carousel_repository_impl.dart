@@ -8,6 +8,8 @@ import 'package:spacemate/features/carousel/data/models/strapi_carousel_model.da
 import 'package:spacemate/features/carousel/domain/entities/carousel_item_entity.dart';
 import 'package:spacemate/features/carousel/domain/repositories/carousel_repository.dart';
 import 'dart:developer' as developer;
+import 'package:spacemate/core/config/cors_proxy.dart';
+import 'package:spacemate/core/utils/strapi_url_builder.dart';
 
 class StrapiCarouselRepositoryImpl implements CarouselRepository {
   final DioClient dioClient;
@@ -28,18 +30,14 @@ class StrapiCarouselRepositoryImpl implements CarouselRepository {
       developer.log('StrapiCarouselRepositoryImpl: Fetching carousel items for placeId: $placeId');
       
       if (await networkInfo.isConnected) {
-        final queryParams = <String, dynamic>{
-          'populate': '*',
-        };
-        
-        if (placeId != null && placeId.isNotEmpty) {
-          queryParams['filters[feature_name][$eq]'] = placeId;
-        }
-
-        final response = await dioClient.get(
-          '/api/spacemate-placeid-features',
-          queryParameters: queryParams,
+        final url = StrapiUrlBuilder.build(
+          resource: 'spacemate-placeid-features',
+          filters: placeId != null && placeId.isNotEmpty
+              ? {'feature_name': {'\$eq': placeId}}
+              : null,
+          populate: ['*'],
         );
+        final response = await dioClient.get(url);
 
         if (response.statusCode == 200) {
           developer.log('StrapiCarouselRepositoryImpl: Successfully fetched carousel items');
@@ -71,7 +69,10 @@ class StrapiCarouselRepositoryImpl implements CarouselRepository {
       developer.log('StrapiCarouselRepositoryImpl: Fetching carousel item by id: $id');
       
       if (await networkInfo.isConnected) {
-        final response = await dioClient.get('/api/screens/$id');
+        final url = StrapiUrlBuilder.build(
+          resource: 'screens/$id',
+        );
+        final response = await dioClient.get(url);
 
         if (response.statusCode == 200) {
           developer.log('StrapiCarouselRepositoryImpl: Successfully fetched carousel item');

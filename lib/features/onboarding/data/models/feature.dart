@@ -83,21 +83,17 @@ class FeatureAttributes with _$FeatureAttributes {
       } else if (raw is List) {
         developer.log('FeatureAttributes: Processing onboarding_carousel list with ${raw.length} elements');
         onboardingCarousel = <OnboardingSlide>[];
-        
         for (int i = 0; i < raw.length; i++) {
           final element = raw[i];
           developer.log('FeatureAttributes: Processing onboarding element $i: $element (type: ${element.runtimeType})');
-          
           if (element == null) {
             developer.log('FeatureAttributes: Skipping null onboarding element at index $i');
             continue;
           }
-          
           if (element is! Map<String, dynamic>) {
             developer.log('FeatureAttributes: Skipping non-Map onboarding element at index $i: ${element.runtimeType}');
             continue;
           }
-          
           try {
             final slide = OnboardingSlide.fromJson(element);
             onboardingCarousel.add(slide);
@@ -108,9 +104,23 @@ class FeatureAttributes with _$FeatureAttributes {
           }
         }
       } else if (raw is Map) {
-        // Sometimes Strapi returns an empty object instead of a list
-        developer.log('FeatureAttributes: onboarding_carousel is a Map, treating as empty list');
-        onboardingCarousel = [];
+        // Handle the case where onboarding_carousel is an object with a 'slides' key
+        if (raw.containsKey('slides') && raw['slides'] is List) {
+          final slides = raw['slides'] as List;
+          onboardingCarousel = <OnboardingSlide>[];
+          for (int i = 0; i < slides.length; i++) {
+            final element = slides[i];
+            if (element == null || element is! Map<String, dynamic>) continue;
+            try {
+              final slide = OnboardingSlide.fromJson(element);
+              onboardingCarousel.add(slide);
+            } catch (_) {}
+          }
+        } else {
+          // Sometimes Strapi returns an empty object instead of a list
+          developer.log('FeatureAttributes: onboarding_carousel is a Map, treating as empty list');
+          onboardingCarousel = [];
+        }
       } else {
         // Unexpected type, log and treat as empty
         developer.log('FeatureAttributes: Unexpected onboarding_carousel type: ${raw.runtimeType}');

@@ -1,4 +1,5 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:spacemate/core/config/cors_proxy.dart';
 
 class StrapiConfig {
   // Load environment variables
@@ -20,6 +21,7 @@ class StrapiConfig {
   
   // Helper method to get the full API URL
   static String getApiUrl(String endpoint) {
-    return '$baseUrl$apiPrefix$endpoint';
+    final url = '$baseUrl$apiPrefix$endpoint';
+    return CorsProxy.wrap(url);
   }
 }

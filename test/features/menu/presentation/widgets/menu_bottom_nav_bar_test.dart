@@ -2,32 +2,42 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:spacemate/features/menu/presentation/widgets/menu_bottom_nav_bar.dart';
 import 'package:spacemate/features/menu/domain/entities/menu_category.dart';
+import 'package:provider/provider.dart';
+import 'package:spacemate/core/theme/theme_service.dart';
+import 'package:spacemate/core/theme/theme_toggle.dart';
 
 void main() {
   testWidgets('renders ThemeToggle and BottomNavigationBar', (WidgetTester tester) async {
     await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: MenuBottomNavBar(
-            currentIndex: 0,
-            onTap: (_) {},
+      ChangeNotifierProvider<ThemeService>(
+        create: (_) => ThemeService(),
+        child: MaterialApp(
+          home: Scaffold(
+            body: MenuBottomNavBar(
+              currentIndex: 0,
+              onTap: (_) {},
+            ),
           ),
         ),
       ),
     );
 
     // ThemeToggle should be present
-    expect(find.byType(Column), findsOneWidget);
+    expect(find.byType(Column), findsAtLeastNWidgets(1));
+    expect(find.byType(ThemeToggleButton), findsOneWidget);
     expect(find.byType(BottomNavigationBar), findsOneWidget);
   });
 
   testWidgets('renders correct number of BottomNavigationBar items', (WidgetTester tester) async {
     await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: MenuBottomNavBar(
-            currentIndex: 0,
-            onTap: (_) {},
+      ChangeNotifierProvider<ThemeService>(
+        create: (_) => ThemeService(),
+        child: MaterialApp(
+          home: Scaffold(
+            body: MenuBottomNavBar(
+              currentIndex: 0,
+              onTap: (_) {},
+            ),
           ),
         ),
       ),
@@ -41,11 +51,14 @@ void main() {
   testWidgets('highlights the correct item based on currentIndex', (WidgetTester tester) async {
     const testIndex = 1;
     await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: MenuBottomNavBar(
-            currentIndex: testIndex,
-            onTap: (_) {},
+      ChangeNotifierProvider<ThemeService>(
+        create: (_) => ThemeService(),
+        child: MaterialApp(
+          home: Scaffold(
+            body: MenuBottomNavBar(
+              currentIndex: testIndex,
+              onTap: (_) {},
+            ),
           ),
         ),
       ),
@@ -58,13 +71,16 @@ void main() {
   testWidgets('calls onTap with correct index when tapped', (WidgetTester tester) async {
     int? tappedIndex;
     await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: MenuBottomNavBar(
-            currentIndex: 0,
-            onTap: (index) {
-              tappedIndex = index;
-            },
+      ChangeNotifierProvider<ThemeService>(
+        create: (_) => ThemeService(),
+        child: MaterialApp(
+          home: Scaffold(
+            body: MenuBottomNavBar(
+              currentIndex: 0,
+              onTap: (index) {
+                tappedIndex = index;
+              },
+            ),
           ),
         ),
       ),

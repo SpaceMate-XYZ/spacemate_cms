@@ -10,7 +10,7 @@ void main() {
   const tOnboardingSlideModel = OnboardingSlide(
     id: 1,
     feature: 'Parking',
-    screen: 1,
+    screen: '1',
     title: 'Welcome to Parking',
     imageUrl: 'https://example.com/image1.png',
     header: 'Find your perfect spot',
@@ -21,7 +21,7 @@ void main() {
   const tOnboardingSlideModel2 = OnboardingSlide(
     id: 2,
     feature: 'Parking',
-    screen: 2,
+    screen: '2',
     title: 'Secure and Convenient',
     imageUrl: 'https://example.com/image2.png',
     header: 'Your vehicle is safe with us',

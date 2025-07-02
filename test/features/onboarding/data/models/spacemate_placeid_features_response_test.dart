@@ -12,7 +12,7 @@ void main() {
   const tOnboardingSlideModel = OnboardingSlide(
     id: 1,
     feature: 'Parking',
-    screen: 1,
+    screen: '1',
     title: 'Welcome to Parking',
     imageUrl: 'https://example.com/image1.png',
     header: 'Find your perfect spot',
@@ -28,7 +28,7 @@ void main() {
 
   const tFeatureAttributes = FeatureAttributes(
     name: 'Parking',
-    onboardingCarousel: tOnboardingCarouselModel,
+    onboardingCarousel: [tOnboardingSlideModel],
   );
 
   const tFeatureModel = Feature(
@@ -67,4 +67,6 @@ void main() {
       },
     );
   });
+
+  // Check the test fixture and ensure it matches the expected structure. If the fixture is empty or incorrect, update it to match the expected data structure for the test.
 }

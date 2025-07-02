@@ -6,6 +6,7 @@ import 'package:spacemate/features/onboarding/data/models/onboarding_carousel.da
 import 'package:spacemate/features/onboarding/data/models/onboarding_slide.dart';
 import 'package:spacemate/features/onboarding/data/models/spacemate_placeid_features_response.dart';
 import 'dart:developer' as developer;
+import 'package:spacemate/core/utils/strapi_url_builder.dart';
 
 abstract class OnboardingRemoteDataSource {
   Future<Either<Failure, List<Feature>>> getFeatures();
@@ -23,12 +24,11 @@ class OnboardingRemoteDataSourceImpl implements OnboardingRemoteDataSource {
   Future<Either<Failure, List<Feature>>> getFeatures() async {
     try {
       developer.log('OnboardingRemoteDataSource: Fetching all features');
-      final response = await dioClient.get(
-        '/api/screens',
-        queryParameters: {
-          'populate': '*',
-        },
+      final url = StrapiUrlBuilder.build(
+        resource: 'screens',
+        populate: ['*'],
       );
+      final response = await dioClient.get(url);
       
       developer.log('OnboardingRemoteDataSource: Response status: ${response.statusCode}');
       developer.log('OnboardingRemoteDataSource: Response data: ${response.data}');
@@ -53,13 +53,12 @@ class OnboardingRemoteDataSourceImpl implements OnboardingRemoteDataSource {
   Future<Either<Failure, Feature>> getFeatureByName(String featureName) async {
     try {
       developer.log('OnboardingRemoteDataSource: Getting feature by name: $featureName');
-      final response = await dioClient.get(
-        '/api/spacemate-placeid-features',
-        queryParameters: {
-          'filters[feature_name][\$eq]': featureName,
-          'populate': '*',
-        },
+      final url = StrapiUrlBuilder.build(
+        resource: 'spacemate-placeid-features',
+        filters: {'feature_name': {'\$eq': featureName}},
+        populate: ['*'],
       );
+      final response = await dioClient.get(url);
 
       developer.log('OnboardingRemoteDataSource: Response status: ${response.statusCode}');
       developer.log('OnboardingRemoteDataSource: Response data: ${response.data}');
@@ -90,13 +89,12 @@ class OnboardingRemoteDataSourceImpl implements OnboardingRemoteDataSource {
   Future<Either<Failure, List<OnboardingSlide>>> getOnboardingCarousel(String featureName) async {
     try {
       developer.log('OnboardingRemoteDataSource: Getting onboarding carousel for: $featureName');
-      final response = await dioClient.get(
-        '/api/spacemate-placeid-features',
-        queryParameters: {
-          'filters[feature_name][\$eq]': featureName,
-          'populate': '*',
-        },
+      final url = StrapiUrlBuilder.build(
+        resource: 'spacemate-placeid-features',
+        filters: {'feature_name': {'\$eq': featureName}},
+        populate: ['*'],
       );
+      final response = await dioClient.get(url);
 
       developer.log('OnboardingRemoteDataSource: Response status: ${response.statusCode}');
 
@@ -131,12 +129,11 @@ class OnboardingRemoteDataSourceImpl implements OnboardingRemoteDataSource {
   @override
   Future<Either<Failure, SpacematePlaceidFeaturesResponse>> fetchFeaturesWithOnboarding() async {
     try {
-      final response = await dioClient.get(
-        '/api/screens',
-        queryParameters: {
-          'populate': '*',
-        },
+      final url = StrapiUrlBuilder.build(
+        resource: 'screens',
+        populate: ['*'],
       );
+      final response = await dioClient.get(url);
       
       if (response.statusCode == 200) {
         final featuresResponse = SpacematePlaceidFeaturesResponse.fromJson(response.data);

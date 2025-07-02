@@ -6,10 +6,21 @@ import 'package:spacemate/features/onboarding/data/models/onboarding_slide.dart'
 import '../../../../fixtures/fixture_reader.dart';
 
 void main() {
-  const tOnboardingSlideModel = OnboardingSlide(
+  final Map<String, dynamic> tOnboardingSlideJson = {
+    'id': 1,
+    'feature': 'Parking',
+    'screen': '1',
+    'title': 'Welcome to Parking',
+    'imageUrl': 'https://example.com/image1.png',
+    'header': 'Find your perfect spot',
+    'body': 'Easily locate and reserve parking spaces.',
+    'buttonLabel': null,
+  };
+
+  const tOnboardingSlide = OnboardingSlide(
     id: 1,
     feature: 'Parking',
-    screen: 1,
+    screen: '1',
     title: 'Welcome to Parking',
     imageUrl: 'https://example.com/image1.png',
     header: 'Find your perfect spot',
@@ -21,7 +32,7 @@ void main() {
     test(
       'should be a subclass of OnboardingSlide entity',
       () async {
-        expect(tOnboardingSlideModel, isA<OnboardingSlide>());
+        expect(tOnboardingSlide, isA<OnboardingSlide>());
       },
     );
 
@@ -33,7 +44,7 @@ void main() {
         // Act
         final result = OnboardingSlide.fromJson(jsonMap);
         // Assert
-        expect(result, tOnboardingSlideModel);
+        expect(result, tOnboardingSlide);
       },
     );
   });

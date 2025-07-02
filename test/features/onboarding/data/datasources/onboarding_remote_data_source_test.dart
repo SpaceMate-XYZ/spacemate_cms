@@ -1,19 +1,18 @@
 import 'dart:convert';
-import 'package:mockito/annotations.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/mockito.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:spacemate/core/error/exceptions.dart';
 import 'package:spacemate/core/error/failures.dart';
 import 'package:spacemate/core/network/dio_client.dart';
 import 'package:spacemate/features/onboarding/data/datasources/onboarding_remote_data_source.dart';
 import 'package:spacemate/features/onboarding/data/models/spacemate_placeid_features_response.dart';
+import 'package:dartz/dartz.dart';
 
 // Import the fixture_reader from the correct path
 import '../../../../fixtures/fixture_reader.dart';
 
-@GenerateMocks([DioClient])
-import 'onboarding_remote_data_source_test.mocks.dart';
+class MockDioClient extends Mock implements DioClient {}
 
 void main() {
   late OnboardingRemoteDataSourceImpl dataSource;
@@ -34,9 +33,9 @@ void main() {
       'should return SpacematePlaceidFeaturesResponse when the response code is 200',
       () async {
         // Arrange
-        when(mockDioClient.get(any)).thenAnswer(
+        when(() => mockDioClient.get(any())).thenAnswer(
           (_) async => Response(
-            requestOptions: RequestOptions(path: '/api/screens?filters[feature_name][$eqi]=parking&populate=*'),
+            requestOptions: RequestOptions(path: '/api/screens?filters[feature_name][\$eq]=parking&populate=*'),
             statusCode: 200,
             data: json.decode(fixture('spacemate_placeid_features_response.json')) as Map<String, dynamic>,
           ),
@@ -56,7 +55,7 @@ void main() {
       'should throw a ServerException when the response code is 404 or other error',
       () async {
         // Arrange
-        when(mockDioClient.get(any)).thenThrow(
+        when(() => mockDioClient.get(any())).thenThrow(
           ServerException('Not Found', statusCode: 404),
         );
         // Act
@@ -69,5 +68,21 @@ void main() {
         );
       },
     );
+  });
+
+  group('OnboardingRemoteDataSourceImpl', () {
+    test('builds correct URL for getFeatureByName', () async {
+      when(() => mockDioClient.get(any())).thenAnswer((_) async =>
+        Response(data: {'data': []}, statusCode: 200, requestOptions: RequestOptions(path: '')));
+      await dataSource.getFeatureByName('parking');
+      verify(() => mockDioClient.get(any())).called(1);
+    });
+
+    test('builds correct URL for getFeatures', () async {
+      when(() => mockDioClient.get(any())).thenAnswer((_) async =>
+        Response(data: {'data': []}, statusCode: 200, requestOptions: RequestOptions(path: '')));
+      await dataSource.getFeatures();
+      verify(() => mockDioClient.get(any())).called(1);
+    });
   });
 }

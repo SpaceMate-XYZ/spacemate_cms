@@ -3,9 +3,18 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:spacemate/main.dart' as app;
 import 'package:spacemate/features/menu/presentation/pages/home_page.dart';
+import 'package:get_it/get_it.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:shared_preferences_mocks/shared_preferences_mocks.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+
+  setUpAll(() async {
+    sqfliteFfiInit();
+    databaseFactory = databaseFactoryFfi;
+    SharedPreferences.setMockInitialValues({});
+  });
 
   group('Menu Integration Tests', () {
     testWidgets('Menu loads and displays items', (tester) async {
@@ -87,5 +96,9 @@ void main() {
       debugPrint('Menu scrolled in ${stopwatch.elapsedMilliseconds}ms');
       expect(stopwatch.elapsedMilliseconds, lessThan(1000));
     });
+  });
+
+  tearDownAll(() async {
+    await GetIt.I.reset();
   });
 }
