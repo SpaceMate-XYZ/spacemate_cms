@@ -81,6 +81,35 @@ flutter test integration_test/
 flutter test --coverage
 ```
 
+## Documentation
+
+### Core Documentation
+- **[Architecture](architecture.md)**: Overview of the system architecture, data flow, and design patterns
+- **[How to Use](HOW_TO_USE.md)**: Comprehensive guide for developers including setup, development workflow, and testing
+- **[Project Tasks](docs/project_tasks.md)**: Current and upcoming project tasks and milestones
+- **[Top Priority Tasks](docs/top_priority_tasks.md)**: High-priority tasks that need immediate attention
+
+### Development Guides
+- **[Functional Programming Guidelines](docs/functional_programming_guidelines.md)**: Best practices for functional programming in the project
+- **[Content Schemas](docs/content_schemas.md)**: Documentation of content schemas and data models
+- **[Offline-First Content](docs/offline_first_content.md)**: Guide to implementing offline-first functionality
+
+### Testing & Quality
+- **[Test Plan](docs/test_plan.md)**: Testing strategy and test coverage goals
+- **[Failing Tests](docs/failing_tests.md)**: List of currently failing tests that need attention
+- **[Bugs](bugs.md)**: Known issues and bug tracking
+
+### API & Integration
+- **[Strapi Configuration](strapi_config.md)**: Configuration details for the Strapi CMS integration
+- **[API Documentation](docs/GEMINI.md)**: API specifications and integration details
+
+### Project Management
+- **[Backlog](docs/backlog.md)**: Product backlog and feature requests
+- **[Coder Tasks](docs/coder_tasks.md)**: Technical tasks for developers
+- **[Image Issue Tracking](docs/image_issue.md)**: Known issues with image assets
+
+---
+
 4. **Generate code**
    ```bash
    flutter packages pub run build_runner build --delete-conflicting-outputs
