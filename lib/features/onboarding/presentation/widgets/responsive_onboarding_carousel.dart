@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:spacemate/features/onboarding/data/models/onboarding_slide.dart';
 import 'package:spacemate/features/onboarding/presentation/widgets/responsive_onboarding_slide.dart';
-import 'package:spacemate/core/utils/app_router.dart';
 import 'dart:developer' as developer;
 
 class ResponsiveOnboardingCarousel extends StatefulWidget {

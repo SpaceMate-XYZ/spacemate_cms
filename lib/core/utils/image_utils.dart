@@ -275,7 +275,7 @@ class ImageUtils {
     final processedUrl = _processImageUrl(imageUrl);
     
     developer.log('ImageUtils: Loading image from $imageUrl (processed: $processedUrl)');
-    developer.log('ImageUtils: Is Web: ${kIsWeb}');
+    developer.log('ImageUtils: Is Web: $kIsWeb');
     developer.log('ImageUtils: HTTP Headers: $httpHeaders');
     
     // Try different header combinations for CDN authentication
@@ -564,7 +564,7 @@ class ImageUtils {
       developer.log('ImageUtils: Testing image accessibility for: $url');
       
       // Use a simple HTTP request to test accessibility
-      final response = await CachedNetworkImageProvider(url).resolve(const ImageConfiguration());
+      final response = CachedNetworkImageProvider(url).resolve(const ImageConfiguration());
       
       developer.log('ImageUtils: Image accessibility test successful for: $url');
       return true;
@@ -606,7 +606,7 @@ class ImageUtils {
     
     // Test 1: No headers
     try {
-      final response = await CachedNetworkImageProvider(imageUrl).resolve(const ImageConfiguration());
+      final response = CachedNetworkImageProvider(imageUrl).resolve(const ImageConfiguration());
       results['no_headers'] = true;
       developer.log('ImageUtils: CDN image accessible without headers');
     } catch (e) {
@@ -648,7 +648,7 @@ class ImageUtils {
       try {
         final proxyUrl = CorsConfig.processUrl(imageUrl);
         if (proxyUrl != imageUrl) {
-          final response = await CachedNetworkImageProvider(proxyUrl).resolve(const ImageConfiguration());
+          final response = CachedNetworkImageProvider(proxyUrl).resolve(const ImageConfiguration());
           results['cors_proxy'] = true;
           developer.log('ImageUtils: CDN image accessible via CORS proxy');
         } else {

@@ -1,8 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:spacemate/features/menu/domain/entities/menu_item_entity.dart';
 
-import 'package:flutter/foundation.dart';
-import 'package:spacemate/features/menu/domain/entities/menu_item_entity.dart';
 
 class MenuItemModel extends MenuItemEntity {
   const MenuItemModel({

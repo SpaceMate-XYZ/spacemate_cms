@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:bloc_test/bloc_test.dart';
+import 'package:spacemate/features/carousel/presentation/bloc/carousel_bloc.dart';
 import 'package:spacemate/features/menu/domain/entities/menu_item_entity.dart';
 import 'package:spacemate/features/menu/presentation/bloc/menu_bloc.dart';
 import 'package:spacemate/features/menu/presentation/bloc/menu_event.dart';
 import 'package:spacemate/features/menu/presentation/bloc/menu_state.dart';
 import 'package:spacemate/features/menu/presentation/pages/home_page.dart';
-import 'package:spacemate/features/carousel/presentation/bloc/carousel_bloc.dart';
 import 'package:spacemate/features/onboarding/presentation/bloc/feature_onboarding_cubit.dart';
 import 'package:spacemate/features/onboarding/presentation/bloc/onboarding_bloc.dart';
-// import 'package:spacemate/test/helpers/test_setup.dart';
+import '../../../../../test/helpers/test_setup.dart';
 
 class MockMenuBloc extends Mock implements MenuBloc {}
 class MockCarouselBloc extends Mock implements CarouselBloc {}

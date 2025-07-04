@@ -2,7 +2,6 @@ import 'package:dartz/dartz.dart';
 import 'package:spacemate/core/error/failures.dart';
 import 'package:spacemate/core/network/dio_client.dart';
 import 'package:spacemate/features/onboarding/data/models/feature.dart';
-import 'package:spacemate/features/onboarding/data/models/onboarding_carousel.dart';
 import 'package:spacemate/features/onboarding/data/models/onboarding_slide.dart';
 import 'package:spacemate/features/onboarding/data/models/spacemate_placeid_features_response.dart';
 import 'dart:developer' as developer;
@@ -41,7 +40,7 @@ class OnboardingRemoteDataSourceImpl implements OnboardingRemoteDataSource {
         }
         return Right(featuresResponse.data);
       } else {
-        return Left(ServerFailure('Failed to load features'));
+        return const Left(ServerFailure('Failed to load features'));
       }
     } catch (e) {
       developer.log('OnboardingRemoteDataSource: Error in getFeatures: $e');
@@ -73,11 +72,11 @@ class OnboardingRemoteDataSourceImpl implements OnboardingRemoteDataSource {
           return Right(feature);
         } else {
           developer.log('OnboardingRemoteDataSource: No feature found for: $featureName');
-          return Left(NotFoundFailure('Feature not found'));
+          return const Left(NotFoundFailure('Feature not found'));
         }
       } else {
         developer.log('OnboardingRemoteDataSource: API call failed with status: ${response.statusCode}');
-        return Left(ServerFailure('Failed to load feature'));
+        return const Left(ServerFailure('Failed to load feature'));
       }
     } catch (e) {
       developer.log('OnboardingRemoteDataSource: Error in getFeatureByName: $e');
@@ -110,15 +109,15 @@ class OnboardingRemoteDataSourceImpl implements OnboardingRemoteDataSource {
             return Right(feature.attributes.onboardingCarousel!);
           } else {
             developer.log('OnboardingRemoteDataSource: No onboarding carousel found for feature');
-            return Left(NotFoundFailure('Onboarding carousel not found for feature'));
+            return const Left(NotFoundFailure('Onboarding carousel not found for feature'));
           }
         } else {
           developer.log('OnboardingRemoteDataSource: No feature found for: $featureName');
-          return Left(NotFoundFailure('Feature not found'));
+          return const Left(NotFoundFailure('Feature not found'));
         }
       } else {
         developer.log('OnboardingRemoteDataSource: API call failed with status: ${response.statusCode}');
-        return Left(ServerFailure('Failed to load onboarding carousel'));
+        return const Left(ServerFailure('Failed to load onboarding carousel'));
       }
     } catch (e) {
       developer.log('OnboardingRemoteDataSource: Error in getOnboardingCarousel: $e');
@@ -139,7 +138,7 @@ class OnboardingRemoteDataSourceImpl implements OnboardingRemoteDataSource {
         final featuresResponse = SpacematePlaceidFeaturesResponse.fromJson(response.data);
         return Right(featuresResponse);
       } else {
-        return Left(ServerFailure('Failed to load features with onboarding'));
+        return const Left(ServerFailure('Failed to load features with onboarding'));
       }
     } catch (e) {
       return Left(ServerFailure(e.toString()));

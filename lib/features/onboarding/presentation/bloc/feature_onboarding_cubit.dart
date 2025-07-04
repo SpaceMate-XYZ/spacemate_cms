@@ -1,7 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:spacemate/core/usecases/usecase.dart';
 import 'package:spacemate/core/utils/feature_name_mapper.dart';
 import 'package:spacemate/features/onboarding/data/models/onboarding_slide.dart';
 import 'package:spacemate/features/onboarding/domain/usecases/get_features_with_onboarding.dart';
@@ -45,32 +44,22 @@ class FeatureOnboardingCubit extends Cubit<FeatureOnboardingState> {
       developer.log('FeatureOnboardingCubit: User has already seen onboarding, navigating to target');
       emit(FeatureOnboardingState.onboardingNotNeeded(navigationTarget: navigationTarget));
     } else {
-      developer.log('FeatureOnboardingCubit: User has not seen onboarding, fetching data for $featureName');
-      // Use the specific feature API call for better performance
+      developer.log('FeatureOnboardingCubit: User has not seen onboarding, fetching onboarding carousel for $featureName');
       try {
-        final result = await getFeatureByName(GetFeatureByNameParams(featureName: featureName));
+        // Use the repository's caching logic for onboarding slides
+        final result = await getFeaturesWithOnboarding.repository.getOnboardingCarousel(featureName);
         result.fold(
           (failure) {
-            developer.log('FeatureOnboardingCubit: API call failed: ${failure.message}');
+            developer.log('FeatureOnboardingCubit: Failed to load onboarding carousel: ${failure.message}');
             emit(FeatureOnboardingState.error(message: failure.message));
           },
-          (feature) {
-            try {
-              developer.log('FeatureOnboardingCubit: API call successful, processing response');
-              developer.log('FeatureOnboardingCubit: Feature name from API: ${feature.attributes.name}');
-              developer.log('FeatureOnboardingCubit: Feature has ${feature.attributes.onboardingCarousel?.length ?? 0} slides');
-              
-              if (feature.attributes.onboardingCarousel != null && feature.attributes.onboardingCarousel!.isNotEmpty) {
-                developer.log('FeatureOnboardingCubit: Found ${feature.attributes.onboardingCarousel!.length} slides for feature: $featureName');
-                developer.log('FeatureOnboardingCubit: Emitting onboardingNeeded state');
-                emit(FeatureOnboardingState.onboardingNeeded(slides: feature.attributes.onboardingCarousel!));
-              } else {
-                developer.log('FeatureOnboardingCubit: No slides found, navigating to target');
-                emit(FeatureOnboardingState.onboardingNotNeeded(navigationTarget: navigationTarget));
-              }
-            } catch (e) {
-              developer.log('FeatureOnboardingCubit: Error processing response: $e');
-              emit(FeatureOnboardingState.error(message: 'Error processing response: $e'));
+          (slides) {
+            if (slides.isNotEmpty) {
+              developer.log('FeatureOnboardingCubit: Loaded ${slides.length} onboarding slides for $featureName');
+              emit(FeatureOnboardingState.onboardingNeeded(slides: slides));
+            } else {
+              developer.log('FeatureOnboardingCubit: No onboarding slides found, navigating to target');
+              emit(FeatureOnboardingState.onboardingNotNeeded(navigationTarget: navigationTarget));
             }
           },
         );

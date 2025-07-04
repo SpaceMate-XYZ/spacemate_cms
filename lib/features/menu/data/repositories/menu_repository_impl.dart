@@ -1,10 +1,8 @@
 import 'package:dartz/dartz.dart';
-import 'package:spacemate/core/error/exceptions.dart';
 import 'package:spacemate/core/error/failures.dart';
 import 'package:spacemate/core/network/network_info.dart';
 import 'package:spacemate/features/menu/domain/repositories/menu_local_data_source.dart';
 import 'package:spacemate/features/menu/data/datasources/menu_remote_data_source.dart';
-import 'package:flutter/foundation.dart';
 import 'package:spacemate/features/menu/data/models/menu_item_model.dart';
 import 'package:spacemate/features/menu/domain/entities/menu_item_entity.dart';
 import 'package:spacemate/features/menu/domain/repositories/menu_repository.dart';
@@ -38,7 +36,7 @@ class MenuRepositoryImpl implements MenuRepository {
             // But handle the case where we might get multiple screens
             if (screenModels.isEmpty) {
               developer.log('MenuRepositoryImpl: No screen models found');
-              return Right(<MenuItemEntity>[]);
+              return const Right(<MenuItemEntity>[]);
             }
             
             // Get the first screen (should be the only one when filtering by slug)
@@ -67,7 +65,7 @@ class MenuRepositoryImpl implements MenuRepository {
         if (cachedItems.isNotEmpty) {
           return Right(cachedItems);
         } else {
-          return Left(NetworkFailure('No internet connection and no cached data'));
+          return const Left(NetworkFailure('No internet connection and no cached data'));
         }
       }
     } catch (e) {
@@ -80,6 +78,6 @@ class MenuRepositoryImpl implements MenuRepository {
     String? placeId,
   }) async {
     // This feature is no longer supported
-    return Left(ServerFailure('This feature is no longer supported.'));
+    return const Left(ServerFailure('This feature is no longer supported.'));
   }
 }

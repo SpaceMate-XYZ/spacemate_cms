@@ -2,32 +2,95 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:spacemate/core/di/injection_container.dart' as di;
+
+// Core
 import 'package:spacemate/core/network/dio_client.dart';
 import 'package:spacemate/core/network/network_info.dart';
 import 'package:spacemate/core/theme/theme_service.dart';
+
+// Features - Carousel
 import 'package:spacemate/features/carousel/presentation/bloc/carousel_bloc.dart';
-import 'package:spacemate/features/carousel/presentation/bloc/carousel_event.dart';
-import 'package:spacemate/features/carousel/presentation/bloc/carousel_state.dart';
+
+// Features - Menu
 import 'package:spacemate/features/menu/presentation/bloc/menu_bloc.dart';
-import 'package:spacemate/features/menu/presentation/bloc/menu_event.dart';
 import 'package:spacemate/features/menu/presentation/bloc/menu_state.dart';
-import 'package:spacemate/features/onboarding/presentation/bloc/feature_onboarding_cubit.dart';
-import 'package:spacemate/features/onboarding/presentation/bloc/feature_onboarding_state.dart';
+
+// Features - Onboarding
 import 'package:spacemate/features/onboarding/presentation/bloc/onboarding_bloc.dart';
-import 'package:spacemate/features/onboarding/presentation/bloc/onboarding_event.dart';
-import 'package:spacemate/features/onboarding/presentation/bloc/onboarding_state.dart';
+import 'package:spacemate/features/onboarding/presentation/bloc/feature_onboarding_cubit.dart';
 
 class MockDioClient extends Mock implements DioClient {}
 class MockNetworkInfo extends Mock implements NetworkInfo {}
 class MockThemeService extends Mock implements ThemeService {}
-class MockSharedPreferences extends Mock implements SharedPreferences {}
 
-class MockMenuBloc extends MockBloc<MenuEvent, MenuState> implements MenuBloc {}
-class MockCarouselBloc extends MockBloc<CarouselEvent, CarouselState> implements CarouselBloc {}
-class MockOnboardingBloc extends MockBloc<OnboardingEvent, OnboardingState> implements OnboardingBloc {}
-class MockFeatureOnboardingCubit extends MockCubit<FeatureOnboardingState> implements FeatureOnboardingCubit {}
+class MockMenuBloc extends Mock implements MenuBloc {
+  @override
+  MenuState get state => const MenuState();
+}
+class MockCarouselBloc extends Mock implements CarouselBloc {
+  @override
+  CarouselState get state => CarouselInitial();
+}
+class MockOnboardingBloc extends Mock implements OnboardingBloc {
+  final _state = const OnboardingState.initial();
+  
+  @override
+  OnboardingState get state => _state;
+  
+  @override
+  Stream<OnboardingState> get stream => Stream.value(_state);
+  
+  @override
+  bool get isClosed => false;
+  
+  @override
+  void add(OnboardingEvent event) {}
+  
+  @override
+  void emit(OnboardingState state) {}
+  
+  @override
+  Future<void> close() async {}
+  
+  // Helper method to set the state for testing
+  void setState(OnboardingState state) {
+    when(() => this.state).thenReturn(state);
+  }
+}
+class MockFeatureOnboardingCubit extends Mock implements FeatureOnboardingCubit {
+  final _state = const FeatureOnboardingState.initial();
+  
+  @override
+  FeatureOnboardingState get state => _state;
+  
+  @override
+  Stream<FeatureOnboardingState> get stream => Stream.value(_state);
+  
+  @override
+  bool get isClosed => false;
+  
+  @override
+  void emit(FeatureOnboardingState state) {
+    when(() => this.state).thenReturn(state);
+  }
+  
+  @override
+  void addError(Object error, [StackTrace? stackTrace]) {}
+  
+  @override
+  void onError(Object error, StackTrace stackTrace) {}
+  
+  @override
+  void onChange(Change<FeatureOnboardingState> change) {}
+  
+  @override
+  Future<void> close() async {}
+  
+  // Helper method to set the state for testing
+  void setState(FeatureOnboardingState state) {
+    when(() => this.state).thenReturn(state);
+  }
+}
 
 class TestSetup {
   static Future<void> initializeTestDI() async {
@@ -38,7 +101,6 @@ class TestSetup {
     GetIt.instance.registerLazySingleton<DioClient>(() => MockDioClient());
     GetIt.instance.registerLazySingleton<NetworkInfo>(() => MockNetworkInfo());
     GetIt.instance.registerLazySingleton<ThemeService>(() => MockThemeService());
-    GetIt.instance.registerLazySingleton<SharedPreferences>(() => MockSharedPreferences());
     
     // Register mock BLoCs
     GetIt.instance.registerFactory<MenuBloc>(() => MockMenuBloc());

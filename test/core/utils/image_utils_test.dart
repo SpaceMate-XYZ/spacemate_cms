@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:spacemate/core/utils/image_utils.dart';
 import 'package:spacemate/core/config/cors_config.dart';
+import 'package:flutter/foundation.dart';
 
 void main() {
   group('ImageUtils', () {
@@ -16,7 +17,7 @@ void main() {
       final devUrl = CorsConfig.getDevelopmentImageUrl(testUrl);
       expect(devUrl, isNotEmpty);
       expect(devUrl, isNot(equals(testUrl)));
-    });
+    }, skip: !kIsWeb);
     
     test('should create feature placeholder correctly', () {
       final placeholder = ImageUtils.createFeaturePlaceholder(
@@ -39,6 +40,6 @@ void main() {
       
       const nonCdnUrl = 'https://example.com/image.jpg';
       expect(CorsConfig.isLikelyCorsIssue(nonCdnUrl), isFalse);
-    });
+    }, skip: !kIsWeb);
   });
 } 

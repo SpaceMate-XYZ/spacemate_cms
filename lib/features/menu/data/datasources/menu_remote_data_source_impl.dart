@@ -1,11 +1,9 @@
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
-import 'package:spacemate/core/error/exceptions.dart';
 import 'package:spacemate/core/error/failures.dart';
 import 'package:spacemate/core/network/dio_client.dart';
 import 'package:spacemate/features/menu/data/models/screen_api_response.dart';
 import 'package:spacemate/features/menu/data/models/screen_model.dart';
-import 'package:flutter/foundation.dart';
 import 'dart:developer' as developer;
 import 'menu_remote_data_source.dart';
 import 'package:spacemate/core/utils/strapi_url_builder.dart';
@@ -35,7 +33,7 @@ class MenuRemoteDataSourceImpl implements MenuRemoteDataSource {
       developer.log('MenuRemoteDataSourceImpl: API response status: ${response.statusCode}');
       
       if (response.data == null) {
-        return Left(ServerFailure('No data received from server'));
+        return const Left(ServerFailure('No data received from server'));
       }
       
       final screenResponse = ScreenApiResponse.fromJson(response.data);

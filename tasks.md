@@ -63,7 +63,16 @@ This document outlines the detailed tasks and sub-tasks for the SpaceMate Supera
 
 # Tasks
 
-## Completed Tasks
+## Completed
+- Integrate onboarding carousel with main menu feature cards
+- Implement 'Don't show again' logic per feature
+- Fetch onboarding data from Strapi dynamically
+- Modular navigation and error handling
+
+## Next Steps
+- Add/Update integration tests for onboarding and 'Don't show again' logic
+- Manual QA for onboarding flows and edge cases
+- Polish UI/UX as per latest designs
 
 ### ✅ Project Setup
 *   Flutter project structure with clean architecture

@@ -18,7 +18,7 @@ class ResponsiveImageWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     developer.log('ResponsiveImageWidget: Attempting to load image: $imageUrl');
-    return Container(
+    return SizedBox(
       height: containerHeight,
       width: double.infinity,
       child: ClipRect(

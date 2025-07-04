@@ -1,14 +1,16 @@
 # SpaceMate CMS Flutter App
 
-A Flutter superapp that loads data for onboarding carousels from Strapi CMS. The app features multiple screens with features represented as card buttons, each leading to an onboarding carousel of 4 slides.
+A Flutter superapp that manages onboarding carousels with a local-first approach using SQLite. The app features multiple screens with features represented as card buttons, each leading to an onboarding carousel of 4 slides.
 
 ## Features
 
 - **5 Main Screens**: Home, Transport, Access, Facilities, Discover
 - **Feature Cards**: Each screen has 3-12 features arranged in a grid
 - **Onboarding Carousels**: 4-slide carousels for each feature
-- **Strapi Integration**: Dynamic content loading from Strapi CMS
+- **Local-First Architecture**: SQLite for offline-first functionality
 - **Multi-Platform**: Supports Android, iOS, Web, Windows, and macOS
+- **State Management**: BLoC pattern for predictable state management
+- **Dependency Injection**: GetIt for service location and dependency injection
 
 ## Project Structure
 
@@ -41,13 +43,43 @@ lib/
    flutter pub get
    ```
 
-3. **Configure environment variables**
-   Create a `.env` file in the root directory:
-   ```env
-   MAIN_STRAPI_BASE_URL=https://strapi.dev.spacemate.xyz
-   CAROUSEL_STRAPI_BASE_URL=https://strapi.dev.spacemate.xyz
-   API_KEY=your_api_key_here
+3. **Run the app**
+   ```bash
+   # For development
+   flutter run -d windows
+   
+   # For web
+   flutter run -d chrome
    ```
+
+## Database Setup
+
+The app uses SQLite for local data storage. The database is automatically created and migrated when the app first runs.
+
+### Database Schema
+- **onboarding_carousel**: Stores onboarding slides for each feature
+  - id: String (primary key)
+  - feature_name: String
+  - screen: String
+  - title: String
+  - image_url: String
+  - header: String
+  - body: String
+  - button_label: String
+  - cached_at: Integer (timestamp)
+
+## Running Tests
+
+```bash
+# Run all tests
+flutter test
+
+# Run integration tests
+flutter test integration_test/
+
+# Run with coverage
+flutter test --coverage
+```
 
 4. **Generate code**
    ```bash

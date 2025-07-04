@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:spacemate/features/onboarding/data/models/onboarding_slide.dart';
 import 'package:spacemate/core/utils/image_utils.dart';
 import 'package:spacemate/core/config/cors_config.dart';
@@ -61,7 +60,7 @@ class ResponsiveOnboardingSlide extends StatelessWidget {
   }
 
   Widget _buildImageContainer(BuildContext context, double imageHeight) {
-    return Container(
+    return SizedBox(
       height: imageHeight,
       width: double.infinity,
       child: ClipRect(
@@ -128,7 +127,7 @@ class ResponsiveOnboardingSlide extends StatelessWidget {
   }
 
   Widget _buildFallbackImage(double containerHeight) {
-    return Container(
+    return SizedBox(
       height: containerHeight,
       child: ImageUtils.createFeaturePlaceholder(
         icon: _getFeatureIcon(slide.feature),

@@ -57,21 +57,19 @@ void main() {
         build: () {
           when(() => mockRepository.getMenuItems(
                 placeId: any(named: 'placeId'),
-                forceRefresh: any(named: 'forceRefresh'),
-                locale: any(named: 'locale'),
-              )).thenAnswer((_) => Right(mockMenuItems));
+              )).thenAnswer((_) async => Right(mockMenuItems));
           return menuBloc;
         },
-        act: (bloc) => bloc.add(const LoadMenuEvent('home')),
+        act: (bloc) => bloc.add(const LoadMenuEvent(slug: 'home')),
         expect: () => [
           const MenuState(
             status: MenuStatus.loading,
-            placeId: 'home',
+            slug: 'home',
             items: [],
           ),
           MenuState(
             status: MenuStatus.success,
-            placeId: 'home',
+            slug: 'home',
             items: mockMenuItems,
           ),
         ],
@@ -82,21 +80,19 @@ void main() {
         build: () {
           when(() => mockRepository.getMenuItems(
                 placeId: any(named: 'placeId'),
-                forceRefresh: any(named: 'forceRefresh'),
-                locale: any(named: 'locale'),
-              )).thenAnswer((_) => Left(ServerFailure('Failed to load menu')));
+              )).thenAnswer((_) async => const Left(ServerFailure('Failed to load menu')));
           return menuBloc;
         },
-        act: (bloc) => bloc.add(const LoadMenuEvent('home')),
+        act: (bloc) => bloc.add(const LoadMenuEvent(slug: 'home')),
         expect: () => [
           const MenuState(
             status: MenuStatus.loading,
-            placeId: 'home',
+            slug: 'home',
             items: [],
           ),
           const MenuState(
             status: MenuStatus.failure,
-            placeId: 'home',
+            slug: 'home',
             items: [],
             errorMessage: 'Failed to load menu',
           ),
@@ -108,21 +104,17 @@ void main() {
         build: () {
           when(() => mockRepository.getMenuItems(
                 placeId: any(named: 'placeId'),
-                forceRefresh: any(named: 'forceRefresh'),
-                locale: any(named: 'locale'),
-              )).thenAnswer((_) => Right(mockMenuItems));
+              )).thenAnswer((_) async => Right(mockMenuItems));
           return menuBloc;
         },
         act: (bloc) async {
-          bloc.add(const LoadMenuEvent('home'));
+          bloc.add(const LoadMenuEvent(slug: 'home'));
           await Future.delayed(const Duration(milliseconds: 100));
-          bloc.add(const LoadMenuEvent('home')); // Should use cache
+          bloc.add(const LoadMenuEvent(slug: 'home')); // Should use cache
         },
         verify: (bloc) {
           verify(() => mockRepository.getMenuItems(
                 placeId: 'home',
-                forceRefresh: false,
-                locale: null,
               )).called(1); // Should only be called once due to caching
         },
       );
@@ -132,27 +124,18 @@ void main() {
         build: () {
           when(() => mockRepository.getMenuItems(
                 placeId: any(named: 'placeId'),
-                forceRefresh: any(named: 'forceRefresh'),
-                locale: any(named: 'locale'),
-              )).thenAnswer((_) => Right(mockMenuItems));
+              )).thenAnswer((_) async => Right(mockMenuItems));
           return menuBloc;
         },
         act: (bloc) async {
-          bloc.add(const LoadMenuEvent('home'));
+          bloc.add(const LoadMenuEvent(slug: 'home'));
           await Future.delayed(const Duration(milliseconds: 100));
-          bloc.add(const LoadMenuEvent('home', forceRefresh: true));
+          bloc.add(const LoadMenuEvent(slug: 'home', forceRefresh: true));
         },
         verify: (bloc) {
           verify(() => mockRepository.getMenuItems(
                 placeId: 'home',
-                forceRefresh: false,
-                locale: null,
-              )).called(1);
-          verify(() => mockRepository.getMenuItems(
-                placeId: 'home',
-                forceRefresh: true,
-                locale: null,
-              )).called(1);
+              )).called(2);
         },
       );
     });
@@ -163,29 +146,25 @@ void main() {
         build: () {
           when(() => mockRepository.getMenuItems(
                 placeId: any(named: 'placeId'),
-                forceRefresh: any(named: 'forceRefresh'),
-                locale: any(named: 'locale'),
-              )).thenAnswer((_) => Right(mockMenuItems));
+              )).thenAnswer((_) async => Right(mockMenuItems));
           return menuBloc;
         },
-        act: (bloc) => bloc.add(const RefreshMenuEvent('home')),
+        act: (bloc) => bloc.add(const RefreshMenuEvent(slug: 'home')),
         expect: () => [
           const MenuState(
             status: MenuStatus.loading,
-            placeId: 'home',
+            slug: 'home',
             items: [],
           ),
           MenuState(
             status: MenuStatus.success,
-            placeId: 'home',
+            slug: 'home',
             items: mockMenuItems,
           ),
         ],
         verify: (bloc) {
           verify(() => mockRepository.getMenuItems(
                 placeId: 'home',
-                forceRefresh: true,
-                locale: null,
               )).called(1);
         },
       );
@@ -195,11 +174,9 @@ void main() {
       test('returns correct state for cached category', () async {
         when(() => mockRepository.getMenuItems(
               placeId: any(named: 'placeId'),
-              forceRefresh: any(named: 'forceRefresh'),
-              locale: any(named: 'locale'),
-            )).thenAnswer((_) => Right(mockMenuItems));
+            )).thenAnswer((_) async => Right(mockMenuItems));
 
-        menuBloc.add(const LoadMenuEvent('home'));
+        menuBloc.add(const LoadMenuEvent(slug: 'home'));
         await Future.delayed(const Duration(milliseconds: 100));
 
         final state = menuBloc.getStateForCategory('home');

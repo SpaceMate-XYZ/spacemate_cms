@@ -92,6 +92,22 @@ class DatabaseHelper {
     await db.execute('CREATE INDEX IF NOT EXISTS idx_menu_items_order ON menu_items("order")');
 
     await db.execute('''
+      CREATE TABLE IF NOT EXISTS onboarding_carousel (
+        id INTEGER PRIMARY KEY,
+        feature_name TEXT NOT NULL,
+        screen TEXT,
+        title TEXT,
+        image_url TEXT,
+        header TEXT,
+        body TEXT,
+        button_label TEXT,
+        cached_at INTEGER NOT NULL
+      )
+    ''');
+    await db.execute('CREATE INDEX IF NOT EXISTS idx_onboarding_carousel_feature_name ON onboarding_carousel(feature_name)');
+    await db.execute('CREATE INDEX IF NOT EXISTS idx_onboarding_carousel_screen ON onboarding_carousel(screen)');
+
+    await db.execute('''
       CREATE TABLE IF NOT EXISTS cache_metadata (
         slug TEXT PRIMARY KEY,
         timestamp INTEGER NOT NULL

@@ -50,27 +50,18 @@ This document outlines the testing strategy for the Spacemate CMS Flutter applic
     *   Verify that tapping the card correctly triggers `FeatureOnboardingCubit`'s `checkOnboardingStatus`.
     *   Verify that it correctly listens to `FeatureOnboardingState` and navigates accordingly (to `/onboarding` or `navigationTarget`).
 
-### 3. Integration Tests
-**Purpose:** To verify end-to-end user flows and interactions between different parts of the application, including API calls and navigation.
-**Tools:** `integration_test`
-**Coverage Focus:**
-*   **Menu Loading and Navigation:**
-    *   App starts, menu loads and displays correctly.
-    *   Tapping a menu item navigates to the expected screen.
-    *   Menu updates correctly when permissions or data change (if applicable).
-    *   Theme changes are reflected across the app.
-*   **Onboarding Flow (NEW):**
-    *   **Scenario 1: First-time user:**
-        *   Tapping a feature card triggers the onboarding screen.
-        *   User completes the onboarding carousel.
-        *   "Don't show again" checkbox state is persisted.
-        *   User is navigated to the feature's main page.
-    *   **Scenario 2: Returning user (onboarding seen):**
-        *   Tapping a feature card directly navigates to the feature's main page (bypassing onboarding).
-    *   **Scenario 3: Feature with no onboarding:**
-        *   Tapping a feature card with no associated onboarding directly navigates to the feature's main page.
-    *   **Error Scenario:**
-        *   Simulate API failure during onboarding data fetch and verify appropriate error display/fallback.
+## Integration Tests
+
+### Onboarding Flow
+- Tap a feature card in the main menu
+- Verify onboarding carousel is shown with correct slides from Strapi
+- On last slide, check 'Don't show again' and complete onboarding
+- Tap the same feature card again: onboarding should be skipped, and navigation should go directly to the feature
+
+### Edge Cases
+- If onboarding data is missing, fallback navigation is triggered
+- If onboarding is not completed, carousel is always shown
+- If onboarding is completed, carousel is never shown for that feature
 
 ## How to Run Tests
 *   **Unit and Widget Tests:**

@@ -15,7 +15,6 @@ import 'package:spacemate/features/menu/presentation/bloc/menu_event.dart';
 import 'package:spacemate/features/onboarding/presentation/bloc/feature_onboarding_cubit.dart';
 import 'package:spacemate/features/onboarding/presentation/bloc/onboarding_bloc.dart';
 import 'package:dynamic_color/dynamic_color.dart';
-import 'dart:developer' as developer;
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 void main() async {

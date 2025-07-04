@@ -5,7 +5,7 @@ import 'package:spacemate/main.dart' as app;
 import 'package:spacemate/features/menu/presentation/pages/home_page.dart';
 import 'package:get_it/get_it.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-import 'package:shared_preferences_mocks/shared_preferences_mocks.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();

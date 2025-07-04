@@ -3,9 +3,6 @@ import 'package:mocktail/mocktail.dart';
 import 'package:spacemate/features/carousel/data/repositories/strapi_carousel_repository_impl.dart';
 import 'package:spacemate/core/network/dio_client.dart';
 import 'package:spacemate/core/network/network_info.dart';
-import 'package:spacemate/features/carousel/data/models/strapi_carousel_model.dart';
-import 'package:dartz/dartz.dart';
-import 'package:spacemate/core/error/failures.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 

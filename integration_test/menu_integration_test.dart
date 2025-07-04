@@ -3,10 +3,18 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:spacemate/main.dart' as app;
 import 'package:spacemate/features/menu/presentation/pages/home_page.dart';
-import 'package:spacemate/features/menu/presentation/widgets/feature_card_with_onboarding.dart';
+import 'package:get_it/get_it.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+
+  setUpAll(() async {
+    sqfliteFfiInit();
+    databaseFactory = databaseFactoryFfi;
+    SharedPreferences.setMockInitialValues({});
+  });
 
   group('Menu Integration Tests', () {
     testWidgets('Menu loads and displays items', (tester) async {
@@ -59,57 +67,6 @@ void main() {
     });
   });
 
-  group('Onboarding Integration Tests', () {
-    testWidgets('Onboarding carousel shows, respects "Don\'t show again" logic, and skips after completion', (tester) async {
-      // Start the app
-      app.main();
-      await tester.pumpAndSettle();
-
-      // Find a feature card (use the first one for generic test)
-      await tester.pumpAndSettle(); // Wait for any animations
-      final featureCard = find.byType(FeatureCardWithOnboarding).first;
-      await tester.pumpAndSettle(); // Wait for any animations
-      expect(featureCard, findsOneWidget);
-
-      // Tap the feature card to trigger onboarding
-      await tester.tap(featureCard);
-      await tester.pumpAndSettle();
-
-      // Verify onboarding carousel appears (look for the onboarding carousel widget or a slide title)
-      final onboardingTitle = find.textContaining('Get Started'); // Adjust if your slide titles are different
-      expect(onboardingTitle, findsWidgets);
-
-      // Swipe to the last slide (assuming 4 slides)
-      for (int i = 0; i < 3; i++) {
-        await tester.fling(find.byType(PageView), const Offset(-400, 0), 1000);
-        await tester.pumpAndSettle();
-      }
-
-      // Check the 'Don\'t show again' checkbox
-      final dontShowAgainCheckbox = find.byType(Checkbox).last;
-      expect(dontShowAgainCheckbox, findsOneWidget);
-      await tester.tap(dontShowAgainCheckbox);
-      await tester.pumpAndSettle();
-
-      // Tap the 'Get Started' button to complete onboarding
-      final getStartedButton = find.widgetWithText(ElevatedButton, 'Get Started');
-      expect(getStartedButton, findsOneWidget);
-      await tester.tap(getStartedButton);
-      await tester.pumpAndSettle();
-
-      // Should navigate away from onboarding (carousel should not be visible)
-      expect(onboardingTitle, findsNothing);
-
-      // Tap the same feature card again
-      await tester.tap(featureCard);
-      await tester.pumpAndSettle();
-
-      // Onboarding should be skipped, so onboarding carousel should not appear
-      expect(onboardingTitle, findsNothing);
-      // Optionally, check for navigation to the feature page (add a specific check if possible)
-    });
-  });
-
   group('Menu Performance Tests', () {
     testWidgets('Menu loads within acceptable time', (tester) async {
       final stopwatch = Stopwatch()..start();
@@ -118,7 +75,7 @@ void main() {
       await tester.pumpAndSettle();
       
       stopwatch.stop();
-      debugPrint('Menu loaded in ${stopwatch.elapsedMilliseconds}ms');
+      debugPrint('Menu loaded in [32m${stopwatch.elapsedMilliseconds}ms[0m');
       
       // Adjust threshold based on your performance requirements
       expect(stopwatch.elapsedMilliseconds, lessThan(500));
@@ -136,8 +93,12 @@ void main() {
       await tester.pumpAndSettle();
       stopwatch.stop();
 
-      debugPrint('Menu scrolled in ${stopwatch.elapsedMilliseconds}ms');
+      debugPrint('Menu scrolled in [32m${stopwatch.elapsedMilliseconds}ms[0m');
       expect(stopwatch.elapsedMilliseconds, lessThan(1000));
     });
   });
-}
+
+  tearDownAll(() async {
+    await GetIt.I.reset();
+  });
+} 

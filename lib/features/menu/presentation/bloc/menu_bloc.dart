@@ -6,7 +6,6 @@ import 'package:spacemate/features/menu/domain/entities/menu_item_entity.dart';
 import 'package:spacemate/features/menu/domain/usecases/get_menu_items.dart';
 import 'package:spacemate/features/menu/presentation/bloc/menu_event.dart';
 import 'package:spacemate/features/menu/presentation/bloc/menu_state.dart';
-import 'package:flutter/foundation.dart';
 import 'dart:developer' as developer;
 
 class MenuBloc extends Bloc<MenuEvent, MenuState> {
@@ -68,7 +67,7 @@ class MenuBloc extends Bloc<MenuEvent, MenuState> {
         },
         (items) {
           try {
-            developer.log('MenuBloc: Successfully loaded ${items?.length ?? 0} items for $slug');
+            developer.log('MenuBloc: Successfully loaded ${items.length ?? 0} items for $slug');
             // Update cache
             _menuCache[slug] = items ?? [];
             emit(state.copyWith(

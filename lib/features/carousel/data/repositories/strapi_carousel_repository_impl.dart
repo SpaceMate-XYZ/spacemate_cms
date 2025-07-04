@@ -8,7 +8,6 @@ import 'package:spacemate/features/carousel/data/models/strapi_carousel_model.da
 import 'package:spacemate/features/carousel/domain/entities/carousel_item_entity.dart';
 import 'package:spacemate/features/carousel/domain/repositories/carousel_repository.dart';
 import 'dart:developer' as developer;
-import 'package:spacemate/core/config/cors_proxy.dart';
 import 'package:spacemate/core/utils/strapi_url_builder.dart';
 
 class StrapiCarouselRepositoryImpl implements CarouselRepository {
@@ -45,11 +44,11 @@ class StrapiCarouselRepositoryImpl implements CarouselRepository {
           return Right(carouselResponse.data.map((item) => item.toEntity()).toList());
         } else {
           developer.log('StrapiCarouselRepositoryImpl: Failed to fetch carousel items. Status: ${response.statusCode}');
-          return Left(ServerFailure('Failed to load carousel items'));
+          return const Left(ServerFailure('Failed to load carousel items'));
         }
       } else {
         developer.log('StrapiCarouselRepositoryImpl: No internet connection');
-        return Left(NetworkFailure('No internet connection'));
+        return const Left(NetworkFailure('No internet connection'));
       }
     } on ServerException catch (e) {
       developer.log('StrapiCarouselRepositoryImpl: Server exception: ${e.message}');
@@ -80,15 +79,15 @@ class StrapiCarouselRepositoryImpl implements CarouselRepository {
           if (carouselResponse.data.isNotEmpty) {
             return Right(carouselResponse.data.first.toEntity());
           } else {
-            return Left(NotFoundFailure('Carousel item not found'));
+            return const Left(NotFoundFailure('Carousel item not found'));
           }
         } else {
           developer.log('StrapiCarouselRepositoryImpl: Failed to fetch carousel item. Status: ${response.statusCode}');
-          return Left(ServerFailure('Failed to load carousel item'));
+          return const Left(ServerFailure('Failed to load carousel item'));
         }
       } else {
         developer.log('StrapiCarouselRepositoryImpl: No internet connection');
-        return Left(NetworkFailure('No internet connection'));
+        return const Left(NetworkFailure('No internet connection'));
       }
     } on ServerException catch (e) {
       developer.log('StrapiCarouselRepositoryImpl: Server exception: ${e.message}');

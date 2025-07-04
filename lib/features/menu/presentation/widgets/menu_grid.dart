@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:spacemate/features/menu/domain/entities/menu_item_entity.dart';
 import 'package:spacemate/features/menu/presentation/bloc/menu_bloc.dart';
 import 'package:spacemate/features/menu/presentation/bloc/menu_event.dart';
-import 'package:spacemate/features/menu/presentation/widgets/menu_grid_item.dart';
 import 'package:spacemate/features/menu/presentation/widgets/feature_card_with_onboarding.dart';
 
 class MenuGrid extends StatelessWidget {

@@ -27,13 +27,18 @@ class StrapiUrlBuilder {
         }
       });
     }
-    if (populate != null && populate.isNotEmpty) {
-      params['populate'] = populate.join(',');
-    }
     if (extraParams != null) {
       extraParams.forEach((k, v) => params[k] = v.toString());
     }
-    final query = params.isNotEmpty ? '?${Uri(queryParameters: params).query}' : '';
+    // Build the query string
+    final queryParts = <String>[];
+    if (populate != null && populate.isNotEmpty) {
+      queryParts.add('populate=${populate.join(",")}');
+    }
+    if (params.isNotEmpty) {
+      queryParts.add(Uri(queryParameters: params).query);
+    }
+    final query = queryParts.isNotEmpty ? '?${queryParts.join("&")}' : '';
     return '/api/$resource$query';
   }
 } 

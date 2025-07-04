@@ -1,7 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:spacemate/core/usecases/usecase.dart';
-import 'package:spacemate/features/onboarding/data/models/feature.dart';
 import 'package:spacemate/features/onboarding/data/models/onboarding_slide.dart';
 import 'package:spacemate/features/onboarding/domain/usecases/get_features_with_onboarding.dart';
 

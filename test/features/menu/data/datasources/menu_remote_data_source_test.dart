@@ -3,12 +3,9 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:spacemate/core/error/exceptions.dart';
 import 'package:spacemate/core/error/failures.dart';
 import 'package:spacemate/core/network/dio_client.dart';
 import 'package:spacemate/features/menu/data/datasources/menu_remote_data_source_impl.dart';
-import 'package:spacemate/features/menu/data/models/screen_model.dart';
-import 'package:dartz/dartz.dart';
 
 import '../../../../fixtures/fixture_reader.dart';
 
