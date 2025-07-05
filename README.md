@@ -1,202 +1,241 @@
-# SpaceMate CMS Flutter App
+# SpaceMate CMS
 
-A Flutter superapp that manages onboarding carousels with a local-first approach using SQLite. The app features multiple screens with features represented as card buttons, each leading to an onboarding carousel of 4 slides.
+A Flutter superapp that provides an offline-first content management system for place-specific menus and onboarding carousels. Built with modern architecture using NestJS backend, MinIO storage, Refine.dev administration, and Flutter for the mobile application.
 
-## Features
-
-- **5 Main Screens**: Home, Transport, Access, Facilities, Discover
-- **Feature Cards**: Each screen has 3-12 features arranged in a grid
-- **Onboarding Carousels**: 4-slide carousels for each feature
-- **Local-First Architecture**: SQLite for offline-first functionality
-- **Multi-Platform**: Supports Android, iOS, Web, Windows, and macOS
-- **State Management**: BLoC pattern for predictable state management
-- **Dependency Injection**: GetIt for service location and dependency injection
-
-## Project Structure
+## 🏗️ Architecture Overview
 
 ```
-lib/
-├── core/                 # Core functionality
-│   ├── config/          # App configuration
-│   ├── di/              # Dependency injection
-│   ├── error/           # Error handling
-│   ├── network/         # Network layer
-│   ├── theme/           # App theming
-│   └── utils/           # Utility functions
-├── features/            # Feature modules
-│   ├── carousel/        # Carousel functionality
-│   ├── menu/            # Menu and navigation
-│   └── onboarding/      # Onboarding carousels
-└── main.dart           # App entry point
+┌─────────────────────────────────────────────────────────────────┐
+│                    Flutter Mobile App                          │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐          │
+│  │   flutter_  │  │   file_     │  │   SQLite    │          │
+│  │ downloader  │  │   saver     │  │   Local DB  │          │
+│  └─────────────┘  └─────────────┘  └─────────────┘          │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                    NestJS Backend API                          │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐          │
+│  │ placeApp    │  │   MinIO     │  │  Cloudflare │          │
+│  │ Assets API  │  │   Storage   │  │     CDN     │          │
+│  └─────────────┘  └─────────────┘  └─────────────┘          │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                   Refine.dev Admin Panel                       │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐          │
+│  │   Content   │  │   Image     │  │   Place     │          │
+│  │   Editor    │  │  Uploader   │  │ Management  │          │
+│  └─────────────┘  └─────────────┘  └─────────────┘          │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
-## Setup
+## 🚀 Features
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/SpaceMate-XYZ/spacemate_cms.git
-   cd spacemate_cms
-   ```
+### ✅ Offline-First Content Management
+- **Local Storage**: Complete offline access to menus and onboarding content
+- **Background Sync**: Automatic content updates when online
+- **Multi-Level Fallback**: Local SQLite → Local JSON → Strapi → Default content
 
-2. **Install dependencies**
-   ```bash
-   flutter pub get
-   ```
+### ✅ Place-Specific Content
+- **Customized Experience**: Each place has its own menus and onboarding carousels
+- **Centralized Management**: Refine.dev admin panel for content creation
+- **Version Control**: Semantic versioning for content updates
 
-3. **Run the app**
-   ```bash
-   # For development
-   flutter run -d windows
-   
-   # For web
-   flutter run -d chrome
-   ```
+### ✅ Modern Tech Stack
+- **Flutter**: Cross-platform mobile app with BLoC state management
+- **NestJS**: TypeScript backend API for content delivery
+- **MinIO**: Object storage for place-specific assets
+- **Refine.dev**: React-based admin panel for content management
+- **Cloudflare CDN**: Global image hosting and delivery
 
-## Database Setup
+### ✅ Robust Infrastructure
+- **Docker Deployment**: Containerized services on Hetzner
+- **PostgreSQL**: Metadata storage and management
+- **Background Processing**: Non-blocking downloads and updates
+- **Error Recovery**: Comprehensive fallback strategies
 
-The app uses SQLite for local data storage. The database is automatically created and migrated when the app first runs.
-
-### Database Schema
-- **onboarding_carousel**: Stores onboarding slides for each feature
-  - id: String (primary key)
-  - feature_name: String
-  - screen: String
-  - title: String
-  - image_url: String
-  - header: String
-  - body: String
-  - button_label: String
-  - cached_at: Integer (timestamp)
-
-## Running Tests
-
-```bash
-# Run all tests
-flutter test
-
-# Run integration tests
-flutter test integration_test/
-
-# Run with coverage
-flutter test --coverage
-```
-
-## Documentation
-
-### Core Documentation
-- **[Architecture](architecture.md)**: Overview of the system architecture, data flow, and design patterns
-- **[How to Use](HOW_TO_USE.md)**: Comprehensive guide for developers including setup, development workflow, and testing
-- **[Project Tasks](docs/project_tasks.md)**: Current and upcoming project tasks and milestones
-- **[Top Priority Tasks](docs/top_priority_tasks.md)**: High-priority tasks that need immediate attention
-
-### Development Guides
-- **[Functional Programming Guidelines](docs/functional_programming_guidelines.md)**: Best practices for functional programming in the project
-- **[Content Schemas](docs/content_schemas.md)**: Documentation of content schemas and data models
-- **[Offline-First Content](docs/offline_first_content.md)**: Guide to implementing offline-first functionality
-
-### Testing & Quality
-- **[Test Plan](docs/test_plan.md)**: Testing strategy and test coverage goals
-- **[Failing Tests](docs/failing_tests.md)**: List of currently failing tests that need attention
-- **[Bugs](bugs.md)**: Known issues and bug tracking
-
-### API & Integration
-- **[Strapi Configuration](strapi_config.md)**: Configuration details for the Strapi CMS integration
-- **[API Documentation](docs/GEMINI.md)**: API specifications and integration details
-
-### Project Management
-- **[Backlog](docs/backlog.md)**: Product backlog and feature requests
-- **[Coder Tasks](docs/coder_tasks.md)**: Technical tasks for developers
-- **[Image Issue Tracking](docs/image_issue.md)**: Known issues with image assets
-
----
-
-4. **Generate code**
-   ```bash
-   flutter packages pub run build_runner build --delete-conflicting-outputs
-   ```
-
-5. **Run the app**
-   ```bash
-   flutter run
-   ```
-
-## API Endpoints
-
-The app uses two main Strapi endpoints:
-
-1. **Menu Data**: `/api/screens?populate=*`
-   - Fetches all menu categories and features
-   - Used for the main menu grid
-
-2. **Onboarding Data**: `/api/spacemate-placeid-features?filters[feature_name][$eq]=FeatureName&populate=*`
-   - Fetches onboarding carousel data for specific features
-   - Example: `filters[feature_name][$eq]=parking` for parking feature
-   - Returns 4 slides per feature with images, text, and button labels
-
-## Example API Calls
-
-**Parking Onboarding:**
-```
-https://strapi.dev.spacemate.xyz/api/spacemate-placeid-features?filters[feature_name][$eq]=parking&populate=*
-```
-
-**Valet Parking Onboarding:**
-```
-https://strapi.dev.spacemate.xyz/api/spacemate-placeid-features?filters[feature_name][$eq]=valetparking&populate=*
-```
-
-## Architecture
-
-- **State Management**: BLoC pattern with dartz for functional programming
-- **Dependency Injection**: GetIt for service locator pattern
-- **Network Layer**: Dio with interceptors for authentication and logging
-- **Local Storage**: SQLite for caching menu data
-- **Testing**: Comprehensive test suite with unit, widget, and integration tests
-
-## Key Components
+## 📱 App Features
 
 ### Menu System
-- **MenuBloc**: Manages menu state and data fetching
-- **MenuGrid**: Displays feature cards in a responsive grid
-- **FeatureCard**: Individual feature card with navigation to onboarding
+- **5 Main Screens**: Home, Transport, Access, Facilities, Discover
+- **Feature Cards**: Grid layout with material icons and labels
+- **Dynamic Content**: Place-specific menu items and features
+- **Offline Access**: Works completely offline with cached content
 
-### Onboarding System
-- **OnboardingBloc**: Manages onboarding carousel state
-- **OnboardingPage**: Displays 4-slide carousel with navigation
-- **OnboardingSlide**: Individual slide with image, text, and button
+### Onboarding Carousels
+- **4-Slide Carousels**: Each feature has a 4-slide onboarding experience
+- **Rich Content**: Images, headers, body text, and call-to-action buttons
+- **"Don't Show Again"**: User preference tracking for onboarding completion
+- **Place-Specific**: Custom onboarding content for each location
 
-### Data Models
-- **Feature**: Represents a feature with onboarding data
-- **OnboardingSlide**: Individual slide data
-- **MenuItemModel**: Menu item with navigation properties
+### Content Management
+- **Refine.dev Admin**: Web-based content management interface
+- **Image Upload**: Drag-and-drop image management
+- **Version Control**: Track content changes and updates
+- **Bulk Operations**: Efficient content management workflows
 
-## Configuration
+## 🛠️ Technology Stack
 
-### Strapi URLs
-- **Main Strapi URL**: `https://strapi.dev.spacemate.xyz`
-- **Carousel Strapi URL**: `https://strapi.dev.spacemate.xyz`
+### Frontend (Flutter)
+```yaml
+dependencies:
+  flutter_bloc: ^8.1.3
+  get_it: ^7.6.4
+  sqflite: ^2.3.0
+  flutter_downloader: ^1.11.6
+  file_saver: ^0.2.8
+  path_provider: ^2.1.1
+  dio: ^5.3.2
+  shared_preferences: ^2.2.2
+```
 
-### Collections
-- **screens**: Menu data and feature categories
-- **spacemate-placeid-features**: Onboarding carousel data
+### Backend (NestJS)
+```typescript
+// Core dependencies
+@nestjs/common: ^10.0.0
+@nestjs/core: ^10.0.0
+@nestjs/typeorm: ^10.0.0
+@nestjs/config: ^3.1.1
+@nestjs/swagger: ^7.1.16
 
-## Troubleshooting
+// Storage
+@aws-sdk/client-s3: ^3.450.0
+minio: ^7.1.3
 
-### Common Issues
-- **CORS Errors**: The app uses a proxy for development. Check `cors_config.dart` for configuration.
-- **Image Loading**: Images are hosted on CDN. Check network connectivity and image URLs.
-- **API Errors**: Verify Strapi endpoints and authentication tokens.
-- **Build Errors**: Run `flutter clean` and `flutter pub get` before rebuilding.
+// Database
+typeorm: ^0.3.17
+postgres: ^3.4.3
+```
 
-### Debug Tips
-- Check the console logs for API response details
-- Verify environment variables are correctly set
-- Ensure Strapi is running and accessible
-- Check network connectivity for image loading
+### Admin Panel (Refine.dev)
+```typescript
+// Core dependencies
+@refinedev/core: ^4.45.0
+@refinedev/react-hook-form: ^4.8.0
+@refinedev/antd: ^5.35.0
 
-## Testing
+// UI Components
+antd: ^5.12.8
+@ant-design/icons: ^5.2.6
+```
 
-Run the test suite:
+## 🚀 Quick Start
+
+### Prerequisites
+- Flutter SDK (3.16.0+)
+- Node.js (18+)
+- Docker & Docker Compose
+- PostgreSQL
+- MinIO
+
+### 1. Clone the Repository
+```bash
+git clone https://github.com/SpaceMate-XYZ/spacemate_cms.git
+cd spacemate_cms
+```
+
+### 2. Setup Backend Infrastructure
+```bash
+# Start Docker services
+docker-compose up -d
+
+# Initialize database
+docker-compose exec postgres psql -U spacemate -d spacemate -f /docker-entrypoint-initdb.d/init.sql
+```
+
+### 3. Configure Environment Variables
+```bash
+# Copy environment files
+cp .env.example .env
+cp backend/.env.example backend/.env
+cp admin/.env.example admin/.env
+
+# Update with your configuration
+nano .env
+```
+
+### 4. Start Flutter App
+```bash
+# Install dependencies
+flutter pub get
+
+# Run the app
+flutter run
+```
+
+## 📁 Project Structure
+
+```
+spacemate_cms/
+├── lib/
+│   ├── core/                 # Core utilities and configurations
+│   ├── features/             # Feature modules
+│   │   ├── menu/            # Menu system
+│   │   ├── onboarding/      # Onboarding carousels
+│   │   └── carousel/        # Carousel components
+│   └── main.dart
+├── backend/                  # NestJS API
+│   ├── src/
+│   │   ├── controllers/     # API endpoints
+│   │   ├── services/        # Business logic
+│   │   ├── entities/        # Database models
+│   │   └── config/          # Configuration
+│   └── docker/
+├── admin/                    # Refine.dev admin panel
+│   ├── src/
+│   │   ├── components/      # UI components
+│   │   ├── pages/           # Admin pages
+│   │   └── resources/       # API resources
+│   └── public/
+├── docs/                     # Documentation
+├── test/                     # Tests
+└── docker-compose.yml        # Infrastructure setup
+```
+
+## 🔧 Configuration
+
+### Environment Variables
+
+**Flutter App (.env)**
+```env
+# API Configuration
+API_BASE_URL=https://api.spacemate.xyz
+STRAPI_BASE_URL=https://strapi.dev.spacemate.xyz
+
+# Feature Flags
+ENABLE_OFFLINE_MODE=true
+ENABLE_BACKGROUND_SYNC=true
+```
+
+**Backend (.env)**
+```env
+# Database
+DATABASE_URL=postgresql://spacemate:password@localhost:5432/spacemate
+
+# MinIO
+MINIO_ENDPOINT=localhost
+MINIO_PORT=9000
+MINIO_ACCESS_KEY=your-access-key
+MINIO_SECRET_KEY=your-secret-key
+
+# Cloudflare
+CLOUDFLARE_API_TOKEN=your-api-token
+CLOUDFLARE_ZONE_ID=your-zone-id
+```
+
+**Admin Panel (.env)**
+```env
+# API Configuration
+REACT_APP_API_URL=http://localhost:3000
+REACT_APP_CLOUDINARY_CLOUD_NAME=your-cloud-name
+```
+
+## 🧪 Testing
+
+### Flutter Tests
 ```bash
 # Unit tests
 flutter test
@@ -204,18 +243,142 @@ flutter test
 # Integration tests
 flutter test integration_test/
 
-# Coverage report
-flutter test --coverage
+# Widget tests
+flutter test test/features/
 ```
 
-## Contributing
+### Backend Tests
+```bash
+cd backend
+npm test
+npm run test:e2e
+```
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests for new functionality
-5. Submit a pull request
+### Admin Panel Tests
+```bash
+cd admin
+npm test
+```
 
-## License
+## 📊 Monitoring & Analytics
 
-All rights reserved.
+### Health Checks
+- **API Health**: Monitor NestJS API availability
+- **Storage Health**: Monitor MinIO storage status
+- **Download Metrics**: Track download success rates
+- **Error Tracking**: Comprehensive error logging
+
+### Analytics
+- **Usage Metrics**: Track content usage patterns
+- **Performance Metrics**: Monitor load times and cache hit rates
+- **User Behavior**: Analyze user interaction patterns
+
+## 🔒 Security
+
+### Authentication & Authorization
+- **JWT Tokens**: Secure API authentication
+- **MinIO Access Control**: IAM-style permissions
+- **HTTPS**: All communications encrypted
+- **Input Validation**: Comprehensive validation on all inputs
+
+### Data Protection
+- **Local Encryption**: Sensitive data encrypted locally
+- **Secure Storage**: MinIO with access controls
+- **Audit Logging**: Comprehensive activity tracking
+
+## 🚀 Deployment
+
+### Docker Deployment
+```bash
+# Production deployment
+docker-compose -f docker-compose.prod.yml up -d
+
+# Scale services
+docker-compose up -d --scale nestjs-api=3
+```
+
+### Hetzner Cloud Setup
+```bash
+# Deploy to Hetzner
+docker-compose -f docker-compose.prod.yml up -d
+
+# Setup Cloudflare CDN
+# Configure DNS and SSL certificates
+# Setup monitoring and logging
+```
+
+## 🤝 Contributing
+
+1. **Fork** the repository
+2. **Create** a feature branch (`git checkout -b feature/amazing-feature`)
+3. **Commit** your changes (`git commit -m 'Add amazing feature'`)
+4. **Push** to the branch (`git push origin feature/amazing-feature`)
+5. **Open** a Pull Request
+
+### Development Guidelines
+- Follow **Clean Architecture** principles
+- Use **BLoC** for state management
+- Write **comprehensive tests**
+- Follow **Flutter style guide**
+- Document **all public APIs**
+
+## 📚 Documentation
+
+- **[Architecture Guide](docs/architecture.md)** - System architecture overview
+- **[Content Schemas](docs/content_schemas.md)** - Data structures and schemas
+- **[Offline Strategy](docs/offline_first_content.md)** - Offline-first implementation
+
+### CMS Components
+
+- **[Refine.dev CMS Admin Panel](docs/cms/refine_dev_cms.md)** - Content management interface
+- **[MinIO Object Storage](docs/cms/minio_cms.md)** - File storage and management
+- **[NestJS CMS API](docs/cms/nest_cms.md)** - Backend API and services
+- **[API Documentation](docs/api.md)** - Backend API reference
+- **[Admin Guide](docs/admin.md)** - Refine.dev admin panel guide
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+**Flutter App Issues**
+```bash
+# Clear cache
+flutter clean
+flutter pub get
+
+# Reset database
+flutter run --dart-define=RESET_DB=true
+```
+
+**Backend Issues**
+```bash
+# Check logs
+docker-compose logs nestjs-api
+
+# Restart services
+docker-compose restart nestjs-api
+```
+
+**Admin Panel Issues**
+```bash
+# Clear cache
+cd admin && npm run clean
+
+# Rebuild
+npm run build
+```
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- **Flutter Team** for the amazing framework
+- **NestJS Team** for the robust backend framework
+- **Refine.dev Team** for the excellent admin panel
+- **MinIO Team** for the object storage solution
+
+---
+
+**SpaceMate CMS provides a robust, scalable, and maintainable solution for offline-first content management with centralized administration and efficient asset delivery.**
