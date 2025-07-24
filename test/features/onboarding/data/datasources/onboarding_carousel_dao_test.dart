@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:spacemate/features/onboarding/data/datasources/onboarding_carousel_dao.dart';
 import 'package:spacemate/features/onboarding/data/models/onboarding_slide.dart';
@@ -43,7 +42,7 @@ void main() {
 
   test('caches and retrieves onboarding slides', () async {
     final slides = [
-      OnboardingSlide(
+      const OnboardingSlide(
         id: 1,
         feature: 'Parking',
         screen: '1',
@@ -53,7 +52,7 @@ void main() {
         body: 'Easily locate and reserve parking spaces.',
         buttonLabel: null,
       ),
-      OnboardingSlide(
+      const OnboardingSlide(
         id: 2,
         feature: 'Parking',
         screen: '2',
@@ -73,7 +72,7 @@ void main() {
 
   test('clears onboarding slides for a feature', () async {
     final slides = [
-      OnboardingSlide(
+      const OnboardingSlide(
         id: 1,
         feature: 'Parking',
         screen: '1',

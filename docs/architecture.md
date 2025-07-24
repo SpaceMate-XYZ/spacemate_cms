@@ -111,20 +111,85 @@ minio/
 
 **Documentation**: See [Refine.dev CMS Admin Panel](cms/refine_dev_cms.md) for detailed setup and usage.
 
-## Flutter App Architecture
+# Updated Architecture with NestJS API
 
-### Core Components
+## System Overview
 
-**Asset Download Service**:
+```mermaid
+graph TD
+    A[Flutter App] -->|API Calls| B[NestJS API]
+    B -->|Data Operations| C[Strapi CMS]
+    A -->|Local Storage| D[SQLite Database]
+    A -->|Asset Cache| E[File System]
+    B -->|Authentication| F[Auth Service]
+```
+
+## Core Components
+
+### 1. NestJS API Layer
+- Acts as middleware between Flutter app and Strapi CMS
+- Handles authentication, data transformation, and business logic
+- Provides optimized endpoints for mobile client needs
+- Manages caching and offline data synchronization
+
+### 2. Asset Download Service
+
+**Key Responsibilities**:
+- Download and cache assets (images, JSON) from NestJS API
+- Manage local storage of downloaded assets
+- Handle background downloads and progress updates
+- Maintain offline availability of assets
+
+**Implementation**:
 ```dart
+@injectable
 class AssetDownloadService {
+  final NestApiClient _apiClient;
+  final AssetLocalDataSource _localDataSource;
+  final FlutterDownloader _downloader;
+  final PermissionService _permissionService;
+
   Future<void> downloadPlaceAssets(String placeId) async {
-    // 1. Fetch from NestJS API
-    // 2. Download images with flutter_downloader
-    // 3. Store JSON with file_saver
-    // 4. Update SQLite database
+    // 1. Check and request storage permissions
+    if (!await _permissionService.requestStoragePermission()) {
+      throw PermissionDeniedException('Storage permission not granted');
+    }
+
+    // 2. Fetch asset metadata from NestJS API
+    final assets = await _apiClient.getPlaceAssets(placeId);
+
+    // 3. Download and save each asset
+    for (final asset in assets) {
+      final savedPath = await _downloadAndSaveAsset(asset);
+      await _localDataSource.cacheAsset(asset, savedPath);
+    }
+
+    // 4. Update local database with asset metadata
+    await _localDataSource.updatePlaceAssets(placeId, assets);
+  }
+
+  Future<String> _downloadAndSaveAsset(AssetModel asset) async {
+    // Implementation using flutter_downloader
+    // Returns path to downloaded file
   }
 }
+```
+
+### 3. Data Flow
+
+1. **Initial Sync**:
+   - App fetches place data from NestJS API
+   - Downloads and caches required assets
+   - Stores metadata in SQLite
+
+2. **Subsequent Updates**:
+   - Checks for updated assets via API
+   - Downloads only changed assets
+   - Updates local cache and database
+
+3. **Offline Access**:
+   - Serves cached assets when offline
+   - Queues sync operations when connection is restored
 ```
 
 **Content Loading Strategy**:
