@@ -19,12 +19,8 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 
   static void loadData(BuildContext context, {String? slug}) {
-    context.read<MenuBloc>().add(
-          LoadMenuEvent(
-            slug: slug ?? MenuCategory.home.name,
-            forceRefresh: true,
-          ),
-        );
+    // Prefer requesting menu grids which contain screen-level metadata for the requested slug/place.
+    context.read<MenuBloc>().add(LoadMenuGridsEvent(placeId: slug ?? MenuCategory.home.name, forceRefresh: true));
   }
 }
 
@@ -185,7 +181,9 @@ class _CategoryPage extends StatelessWidget {
               const SizedBox(height: 16),
               Expanded(
                 child: MenuGrid(
-                  items: state.items,
+                  items: (state.screens.isNotEmpty
+                          ? (state.screens.firstWhere((s) => s.slug == MenuCategory.home.name, orElse: () => state.screens.first)).menuGrid
+                          : state.items),
                   isLoading: state.status == MenuStatus.loading,
                   errorMessage: state.errorMessage,
                   category: category.name,
@@ -197,11 +195,13 @@ class _CategoryPage extends StatelessWidget {
         
         // For other categories, just show the grid
         return MenuGrid(
-          items: state.items,
-          isLoading: state.status == MenuStatus.loading,
-          errorMessage: state.errorMessage,
-          category: category.name,
-        );
+          items: (state.screens.isNotEmpty
+                  ? (state.screens.firstWhere((s) => s.slug == category.name, orElse: () => state.screens.first)).menuGrid
+                  : state.items),
+            isLoading: state.status == MenuStatus.loading,
+            errorMessage: state.errorMessage,
+            category: category.name,
+          );
       },
     );
   }

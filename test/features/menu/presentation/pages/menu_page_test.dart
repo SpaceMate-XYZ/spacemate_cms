@@ -44,7 +44,7 @@ void main() {
   ];
 
   setUpAll(() async {
-    // await TestSetup.initializeTestDI();
+  await TestSetup.initializeTestDI();
   });
 
   setUp(() {
@@ -53,8 +53,21 @@ void main() {
     mockFeatureOnboardingCubit = MockFeatureOnboardingCubit();
     mockOnboardingBloc = MockOnboardingBloc();
     
-    registerFallbackValue(const LoadMenuEvent(slug: 'home'));
+  // pages dispatch LoadMenuGridsEvent, register fallback for it
+  registerFallbackValue(const LoadMenuGridsEvent(placeId: 'home'));
+  // Provide non-null streams/state for other blocs used by the HomePage
+  when(() => mockCarouselBloc.state).thenReturn(CarouselInitial());
+  when(() => mockCarouselBloc.stream).thenAnswer((_) => Stream<CarouselState>.value(CarouselInitial()));
+
+  when(() => mockFeatureOnboardingCubit.state).thenReturn(const FeatureOnboardingState.initial());
+  when(() => mockFeatureOnboardingCubit.stream).thenAnswer((_) => Stream<FeatureOnboardingState>.value(const FeatureOnboardingState.initial()));
   });
+
+  // Helper to stub both the bloc state getter and the stream listener.
+  void stubMenuBlocState(MenuState state) {
+    when(() => mockMenuBloc.state).thenReturn(state);
+    when(() => mockMenuBloc.stream).thenAnswer((_) => Stream<MenuState>.value(state));
+  }
 
   tearDown(() {
     // TestSetup.tearDown();
@@ -71,92 +84,78 @@ void main() {
   }
 
   testWidgets('shows loading indicator when state is loading', (tester) async {
-    when(() => mockMenuBloc.state).thenReturn(
-      const MenuState.loading(slug: 'home'),
-    );
-    
+    stubMenuBlocState(const MenuState.loading(slug: 'home'));
+
     await tester.pumpWidget(createTestWidget());
-    
+
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
   });
 
   testWidgets('shows menu items when state is loaded', (tester) async {
-    when(() => mockMenuBloc.state).thenReturn(
-      MenuState.success(items: mockMenuItems),
-    );
-    
+    stubMenuBlocState(MenuState.success(items: mockMenuItems));
+
     await tester.pumpWidget(createTestWidget());
-    
+
     expect(find.text('Dashboard'), findsOneWidget);
     expect(find.text('Settings'), findsOneWidget);
   });
 
   testWidgets('shows error message when state is error', (tester) async {
-    when(() => mockMenuBloc.state).thenReturn(
-      const MenuState.failure(message: 'Failed to load menu'),
-    );
-    
+    stubMenuBlocState(const MenuState.failure(message: 'Failed to load menu'));
+
     await tester.pumpWidget(createTestWidget());
-    
+
     expect(find.text('Failed to load menu'), findsOneWidget);
   });
 
   testWidgets('calls LoadMenuEvent when retry is triggered', (tester) async {
-    when(() => mockMenuBloc.state).thenReturn(
-      const MenuState.failure(message: 'Failed to load menu'),
-    );
-    
+    stubMenuBlocState(const MenuState.failure(message: 'Failed to load menu'));
+
     await tester.pumpWidget(createTestWidget());
-    
+
     // Find and tap retry button if it exists
     final retryButton = find.text('Retry');
     if (retryButton.evaluate().isNotEmpty) {
       await tester.tap(retryButton);
-      verify(() => mockMenuBloc.add(any(that: isA<LoadMenuEvent>()))).called(1);
+      verify(() => mockMenuBloc.add(any(that: isA<LoadMenuGridsEvent>()))).called(1);
     }
   });
 
   testWidgets('displays home page correctly', (tester) async {
-    when(() => mockMenuBloc.state).thenReturn(
-      MenuState.success(items: mockMenuItems),
-    );
-    
+    stubMenuBlocState(MenuState.success(items: mockMenuItems));
+
     await tester.pumpWidget(createTestWidget());
-    
+
     // Verify HomePage is displayed
     expect(find.byType(HomePage), findsOneWidget);
-    
+
     // Verify AppBar exists
     expect(find.byType(AppBar), findsOneWidget);
-    
+
     // Verify bottom navigation exists
     expect(find.byType(NavigationBar), findsOneWidget);
   });
 
   testWidgets('bottom navigation has correct number of tabs', (tester) async {
-    when(() => mockMenuBloc.state).thenReturn(
-      MenuState.success(items: mockMenuItems),
-    );
-    
+    stubMenuBlocState(MenuState.success(items: mockMenuItems));
+
     await tester.pumpWidget(createTestWidget());
-    
+
     // Should have 5 navigation destinations (Home, Transport, Access, Facilities, Discover)
     expect(find.byType(NavigationDestination), findsNWidgets(5));
   });
 
   testWidgets('page view responds to navigation bar taps', (tester) async {
-    when(() => mockMenuBloc.state).thenReturn(
-      MenuState.success(items: mockMenuItems),
-    );
-    
+    stubMenuBlocState(MenuState.success(items: mockMenuItems));
+
     await tester.pumpWidget(createTestWidget());
-    
+
     // Find and tap the second navigation item (Transport)
     final transportTab = find.byType(NavigationDestination).at(1);
     await tester.tap(transportTab);
     await tester.pumpAndSettle();
-    
-    // Verify that LoadMenuEvent was called for transport
-    verify(() => mockMenuBloc.add(any(that: isA<LoadMenuEvent>()))).called(greaterThan(0));
+
+  // Verify that LoadMenuGridsEvent was called for transport
+  verify(() => mockMenuBloc.add(any(that: isA<LoadMenuGridsEvent>()))).called(greaterThan(0));
   });
 }

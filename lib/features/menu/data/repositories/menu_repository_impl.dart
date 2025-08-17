@@ -3,9 +3,11 @@ import 'package:spacemate/core/error/failures.dart';
 import 'package:spacemate/core/network/network_info.dart';
 import 'package:spacemate/features/menu/domain/repositories/menu_local_data_source.dart';
 import 'package:spacemate/features/menu/data/datasources/menu_remote_data_source.dart';
-import 'package:spacemate/features/menu/data/models/menu_item_model.dart';
 import 'package:spacemate/features/menu/domain/entities/menu_item_entity.dart';
+import 'package:spacemate/features/menu/domain/entities/screen_entity.dart';
 import 'package:spacemate/features/menu/domain/repositories/menu_repository.dart';
+// menu_item_model import removed; using domain entity types instead
+
 import 'dart:developer' as developer;
 
 class MenuRepositoryImpl implements MenuRepository {
@@ -51,8 +53,9 @@ class MenuRepositoryImpl implements MenuRepository {
             }
             
             // Convert only this screen's menu grid to MenuItemEntity
+            // screen.menuGrid already contains MenuItemModel which extends MenuItemEntity.
             final menuItems = screen.menuGrid
-                .map((item) => MenuItemModel.fromJson(item.toJson()))
+                .map((item) => item as MenuItemEntity)
                 .toList();
             
             developer.log('MenuRepositoryImpl: Converted to ${menuItems.length} menu item entities');
@@ -80,4 +83,42 @@ class MenuRepositoryImpl implements MenuRepository {
     // This feature is no longer supported
     return const Left(ServerFailure('This feature is no longer supported.'));
   }
+
+  /// Fetch menu grids tailored for a user and map to domain ScreenEntity
+  @override
+  Future<Either<Failure, List<ScreenEntity>>> getMenuGridsForUser({
+    String? placeId,
+    String? authToken,
+  }) async {
+    try {
+      if (await networkInfo.isConnected) {
+        developer.log('MenuRepositoryImpl: Fetching menu grids for placeId: $placeId');
+        final result = await remoteDataSource.getMenuGridsForUser(placeId: placeId, authToken: authToken);
+        return result.fold(
+          (failure) => Left(failure),
+          (screenModels) {
+            developer.log('MenuRepositoryImpl: Received ${screenModels.length} screen models for grids');
+            final screens = screenModels.map((s) {
+              // Convert MenuItemModel list to MenuItemEntity list
+              final menuItems = s.menuGrid.map((m) => m as MenuItemEntity).toList();
+              return ScreenEntity(
+                id: s.id,
+                name: s.name,
+                slug: s.slug,
+                title: s.title,
+                menuGrid: menuItems,
+              );
+            }).toList();
+            developer.log('MenuRepositoryImpl: Mapped to ${screens.length} ScreenEntity items');
+            return Right(screens);
+          },
+        );
+      } else {
+        return const Left(NetworkFailure('No internet connection'));
+      }
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
 }

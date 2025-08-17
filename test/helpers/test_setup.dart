@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:provider/provider.dart';
 
 // Core
 import 'package:spacemate/core/network/dio_client.dart';
@@ -98,9 +99,16 @@ class TestSetup {
     await GetIt.instance.reset();
     
     // Register mocks for external dependencies
-    GetIt.instance.registerLazySingleton<DioClient>(() => MockDioClient());
-    GetIt.instance.registerLazySingleton<NetworkInfo>(() => MockNetworkInfo());
-    GetIt.instance.registerLazySingleton<ThemeService>(() => MockThemeService());
+  GetIt.instance.registerLazySingleton<DioClient>(() => MockDioClient());
+  GetIt.instance.registerLazySingleton<NetworkInfo>(() => MockNetworkInfo());
+  // Create a MockThemeService instance so we can stub its properties
+  final mockThemeService = MockThemeService();
+  // Default themeMode must be non-null for ThemeToggleButton
+  when(() => mockThemeService.themeMode).thenReturn(ThemeMode.light);
+  when(() => mockThemeService.toggleTheme()).thenAnswer((_) async {});
+  if (!GetIt.instance.isRegistered<ThemeService>()) {
+    GetIt.instance.registerLazySingleton<ThemeService>(() => mockThemeService);
+  }
     
     // Register mock BLoCs
     GetIt.instance.registerFactory<MenuBloc>(() => MockMenuBloc());
@@ -117,23 +125,26 @@ class TestSetup {
     FeatureOnboardingCubit? featureOnboardingCubit,
   }) {
     return MaterialApp(
-      home: MultiBlocProvider(
-        providers: [
-          if (menuBloc != null)
-            BlocProvider<MenuBloc>.value(value: menuBloc),
-          if (carouselBloc != null)
-            BlocProvider<CarouselBloc>.value(value: carouselBloc),
-          if (onboardingBloc != null)
-            BlocProvider<OnboardingBloc>.value(value: onboardingBloc),
-          if (featureOnboardingCubit != null)
-            BlocProvider<FeatureOnboardingCubit>.value(value: featureOnboardingCubit),
-        ],
-        child: child,
+      home: ChangeNotifierProvider<ThemeService>.value(
+        value: GetIt.instance.get<ThemeService>(),
+        child: MultiBlocProvider(
+          providers: [
+            if (menuBloc != null)
+              BlocProvider<MenuBloc>.value(value: menuBloc),
+            if (carouselBloc != null)
+              BlocProvider<CarouselBloc>.value(value: carouselBloc),
+            if (onboardingBloc != null)
+              BlocProvider<OnboardingBloc>.value(value: onboardingBloc),
+            if (featureOnboardingCubit != null)
+              BlocProvider<FeatureOnboardingCubit>.value(value: featureOnboardingCubit),
+          ],
+          child: child,
+        ),
       ),
     );
   }
 
   static void tearDown() {
-    GetIt.instance.reset();
+  GetIt.instance.reset();
   }
 } 

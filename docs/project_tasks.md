@@ -13,19 +13,19 @@
 
 ### ✅ Menu System
 *   Menu data models and entities created
-*   Menu remote data source for Strapi integration implemented
+*   Menu remote data source for Refine.dev integration implemented
 *   Menu local data source for SQLite caching implemented
 *   Menu repository with caching logic implemented
 *   Menu BLoC for state management created
 *   Menu grid widget with responsive design implemented
 *   Menu bottom navigation bar implemented
 *   Menu pages for all 5 categories (Home, Transport, Access, Facilities, Discover) created
-*   Feature card widgets with navigation implemented
+*   Feature card widgets with Material Design icons and navigation implemented
 *   Menu integration tests written and passing
 
 ### ✅ Onboarding System
 *   Onboarding data models and entities created
-*   Onboarding remote data source for Strapi integration implemented
+*   Onboarding remote data source for Refine.dev integration implemented
 *   Onboarding repository with error handling implemented
 *   Onboarding BLoC for state management created
 *   Onboarding page with 4-slide carousel implemented
@@ -41,8 +41,7 @@
 *   Carousel integration with onboarding system completed
 
 ### ✅ API Integration
-*   Strapi API integration for menu data (`/api/screens?populate=*`) implemented
-*   Strapi API integration for onboarding data (`/api/spacemate-placeid-features?filters[feature_name][$eq]=FeatureName&populate=*`) implemented
+*   Refine.dev API integration for menu and onboarding data implemented
 *   API error handling and retry logic implemented
 *   API response parsing and model mapping implemented
 *   API authentication with tokens implemented
@@ -53,7 +52,8 @@
 *   Dynamic theming with light/dark mode support implemented
 *   Loading states and error handling in UI implemented
 *   Navigation between screens implemented
-*   Image loading with fallback placeholders implemented
+*   Image loading from Cloudflare CDN with local caching implemented
+*   Fallback placeholders for images implemented
 
 ### ✅ Testing
 *   Unit tests for all data models implemented
@@ -73,13 +73,13 @@
 ## Current Tasks
 
 ### 🔄 API Endpoint Verification
-*   Verify the Strapi API endpoint: https://strapi.dev.spacemate.xyz/api/spacemate-placeid-features?populate=*
+*   Verify Refine.dev API endpoints for menu and onboarding data
 *   Test onboarding data retrieval for different features
-*   Verify image loading from CDN URLs
+*   Verify image loading from Cloudflare CDN URLs
 *   Test error handling for invalid feature names
 
 ### 🔄 Performance Optimization
-*   Implement image caching for onboarding slides
+*   Implement image caching for onboarding slides and menu images from CDN
 *   Optimize API response parsing
 *   Implement lazy loading for menu items
 *   Add performance monitoring and metrics
@@ -120,6 +120,10 @@
 *   Some images may fail to load due to CORS issues in development
 *   Workaround: Using proxy for development environment
 
+### 🐛 CDN Image URLs
+*   Ensure all image URLs passed to clients are Cloudflare CDN URLs
+*   Workaround: Validate admin workflow and API output
+
 ### 🐛 API Response Parsing
 *   Some API responses may have inconsistent structure
 *   Workaround: Added robust error handling and fallback logic
@@ -130,12 +134,12 @@
 
 ## Success Criteria
 
-*   ✅ App loads menu data from Strapi successfully
-*   ✅ App displays feature cards in grid layout
+*   ✅ App loads menu and onboarding data from Refine.dev API successfully
+*   ✅ App displays feature cards in grid layout with Material Design icons
 *   ✅ App navigates to onboarding carousel on feature card tap
-*   ✅ App displays 4-slide onboarding carousel with images and text
+*   ✅ App displays 4-slide onboarding carousel with images and text from Cloudflare CDN
 *   ✅ App handles errors gracefully with user-friendly messages
 *   ✅ App works on all target platforms (Android, iOS, Web, Windows, macOS)
-*   ✅ App has comprehensive test coverage (>80%)
+*   ✅ App has comprehensive test coverage (>80% initially, >95% by Medium priority)
 *   ✅ App follows Material Design 3 guidelines
 *   ✅ App supports both light and dark themes

@@ -2,43 +2,55 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:isolate';
 import 'dart:ui';
+import 'package:flutter/foundation.dart';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:path_provider/path_provider.dart';
 
 class DownloadService {
-  static const String _tag = 'DownloadService';
   static final ReceivePort _port = ReceivePort();
-  
+
   static Future<void> initialize() async {
     try {
       WidgetsFlutterBinding.ensureInitialized();
-      
+
+      // FlutterDownloader and isolate callbacks are not supported on web.
+      // Avoid calling into platform-specific background APIs when running in browser.
+      if (kIsWeb) {
+        debugPrint('DownloadService: running on web  skipping FlutterDownloader initialization');
+        return;
+      }
+
       // Initialize FlutterDownloader
-      await FlutterDownloader.initialize(
-        debug: false, // Set to true for development
-        ignoreSsl: true, // Set to false in production
-      );
-      
-      // Register the callback
+      try {
+        await FlutterDownloader.initialize(
+          debug: false, // Set to true for development
+          ignoreSsl: true, // Set to false in production
+        );
+      } on MissingPluginException catch (e) {
+        // In test or other environments platform plugin may be missing.
+        debugPrint('DownloadService: FlutterDownloader plugin missing, skipping initialization: $e');
+        return;
+      }
+
+      // Register the callback once
       FlutterDownloader.registerCallback(downloadCallback);
-      
+
       // Listen to download progress
       IsolateNameServer.registerPortWithName(
         _port.sendPort,
         'downloader_send_port',
       );
-      
+
       _port.listen((dynamic data) {
         final taskId = data[0] as String;
         final status = data[1] as DownloadTaskStatus;
         final progress = data[2] as int;
-        
+
         debugPrint('Download task ($taskId) is in status $status and progress $progress');
       });
-      
-      FlutterDownloader.registerCallback(downloadCallback);
     } catch (e) {
       debugPrint('Error initializing DownloadService: $e');
       rethrow;

@@ -15,6 +15,7 @@ class StrapiUrlBuilder {
     List<String>? populate,
     Map<String, dynamic>? extraParams,
   }) {
+    // Build params in a deterministic order: filters -> populate -> extraParams
     final params = <String, String>{};
     if (filters != null) {
       filters.forEach((key, value) {
@@ -27,18 +28,18 @@ class StrapiUrlBuilder {
         }
       });
     }
+
+    // Add populate after filters so ordering is deterministic. Use comma-joined
+    // value and let Uri.encode the characters (e.g. '*' -> %2A, ',' -> %2C).
+    if (populate != null && populate.isNotEmpty) {
+      params['populate'] = populate.join(',');
+    }
+
     if (extraParams != null) {
       extraParams.forEach((k, v) => params[k] = v.toString());
     }
-    // Build the query string
-    final queryParts = <String>[];
-    if (populate != null && populate.isNotEmpty) {
-      queryParts.add('populate=${populate.join(",")}');
-    }
-    if (params.isNotEmpty) {
-      queryParts.add(Uri(queryParameters: params).query);
-    }
-    final query = queryParts.isNotEmpty ? '?${queryParts.join("&")}' : '';
+
+    final query = params.isNotEmpty ? '?${Uri(queryParameters: params).query}' : '';
     return '/api/$resource$query';
   }
 } 

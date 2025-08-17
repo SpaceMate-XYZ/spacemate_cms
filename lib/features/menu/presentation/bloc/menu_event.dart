@@ -70,3 +70,18 @@ class UpdateMenuItemsEvent extends MenuEvent {
   @override
   String toString() => 'UpdateMenuItemsEvent(slug: $slug, items: ${items.length})';
 }
+
+/// Event to load menu grids (screens) for a user/place.
+class LoadMenuGridsEvent extends MenuEvent {
+  final String? placeId;
+  final String? authToken;
+  final bool forceRefresh;
+
+  const LoadMenuGridsEvent({this.placeId, this.authToken, this.forceRefresh = false});
+
+  @override
+  List<Object?> get props => [placeId, authToken, forceRefresh];
+
+  @override
+  String toString() => 'LoadMenuGridsEvent(placeId: $placeId, forceRefresh: $forceRefresh)';
+}

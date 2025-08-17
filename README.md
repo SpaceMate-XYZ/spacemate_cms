@@ -1,6 +1,6 @@
 # SpaceMate CMS
 
-A Flutter superapp that provides an offline-first content management system for place-specific menus and onboarding carousels. Built with modern architecture using NestJS backend, MinIO storage, Refine.dev administration, and Flutter for the mobile application.
+A Flutter superapp that provides an offline-first content management system for place-specific menus and onboarding carousels. Built with modern architecture using NestJS backend, MinIO (for admin staging only), Cloudflare CDN (for all client-facing images), Refine.dev administration, and Flutter for the mobile application.
 
 ## 🏗️ Architecture Overview
 
@@ -35,7 +35,7 @@ A Flutter superapp that provides an offline-first content management system for 
 ## 🚀 Features
 
 ### ✅ Offline-First Content Management
-- **Local Storage**: Complete offline access to menus and onboarding content
+- **Local Storage**: Complete offline access to menus, onboarding content, and images
 - **Background Sync**: Automatic content updates when online
 - **Multi-Level Fallback**: Local SQLite → Local JSON → Strapi → Default content
 
@@ -47,9 +47,9 @@ A Flutter superapp that provides an offline-first content management system for 
 ### ✅ Modern Tech Stack
 - **Flutter**: Cross-platform mobile app with BLoC state management
 - **NestJS**: TypeScript backend API for content delivery
-- **MinIO**: Object storage for place-specific assets
+- **MinIO**: Temporary object storage for admin/editor workflows (staging area before images are pushed to Cloudflare CDN)
 - **Refine.dev**: React-based admin panel for content management
-- **Cloudflare CDN**: Global image hosting and delivery
+- **Cloudflare CDN**: Global image hosting and delivery (all client-facing images)
 
 ### ✅ Robust Infrastructure
 - **Docker Deployment**: Containerized services on Hetzner
@@ -61,7 +61,7 @@ A Flutter superapp that provides an offline-first content management system for 
 
 ### Menu System
 - **5 Main Screens**: Home, Transport, Access, Facilities, Discover
-- **Feature Cards**: Grid layout with material icons and labels
+- **Feature Cards**: Grid layout with Material Design icons and labels
 - **Dynamic Content**: Place-specific menu items and features
 - **Offline Access**: Works completely offline with cached content
 
@@ -73,7 +73,7 @@ A Flutter superapp that provides an offline-first content management system for 
 
 ### Content Management
 - **Refine.dev Admin**: Web-based content management interface
-- **Image Upload**: Drag-and-drop image management
+- **Image Upload**: Admin workflow uploads images to MinIO for staging, then pushes to Cloudflare CDN. Only CDN URLs are stored and passed to clients.
 - **Version Control**: Track content changes and updates
 - **Bulk Operations**: Efficient content management workflows
 
@@ -259,6 +259,10 @@ npm run test:e2e
 cd admin
 npm test
 ```
+
+### Coverage Goals
+- **Initial phase:** >80% code coverage
+- **Medium priority:** >95% code coverage across all modules
 
 ## 📊 Monitoring & Analytics
 

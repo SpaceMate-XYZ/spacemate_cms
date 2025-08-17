@@ -11,9 +11,9 @@ void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   setUpAll(() async {
-    sqfliteFfiInit();
-    databaseFactory = databaseFactoryFfi;
-    SharedPreferences.setMockInitialValues({});
+  sqfliteFfiInit();
+  databaseFactory = databaseFactoryFfi;
+  SharedPreferences.setMockInitialValues({});
   });
 
   group('Menu Integration Tests', () {
@@ -99,6 +99,6 @@ void main() {
   });
 
   tearDownAll(() async {
-    await GetIt.I.reset();
+  await GetIt.I.reset();
   });
 }

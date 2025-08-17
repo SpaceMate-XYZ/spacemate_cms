@@ -10,22 +10,28 @@ final sl = GetIt.instance;
 
 Future<void> initCarouselDependencies() async {
   // Repository
-  sl.registerLazySingleton<CarouselRepository>(
-    () => StrapiCarouselRepositoryImpl(
-      dioClient: sl<DioClient>(),
-      networkInfo: sl<NetworkInfo>(),
-    ),
-  );
+  if (!sl.isRegistered<CarouselRepository>()) {
+    sl.registerLazySingleton<CarouselRepository>(
+      () => StrapiCarouselRepositoryImpl(
+        dioClient: sl<DioClient>(),
+        networkInfo: sl<NetworkInfo>(),
+      ),
+    );
+  }
 
   // Use cases
-  sl.registerLazySingleton<GetCarouselItems>(
-    () => GetCarouselItems(sl<CarouselRepository>()),
-  );
+  if (!sl.isRegistered<GetCarouselItems>()) {
+    sl.registerLazySingleton<GetCarouselItems>(
+      () => GetCarouselItems(sl<CarouselRepository>()),
+    );
+  }
 
   // BLoC
-  sl.registerFactory(
-    () => CarouselBloc(
-      getCarouselItems: sl<GetCarouselItems>(),
-    ),
-  );
+  if (!sl.isRegistered<CarouselBloc>()) {
+    sl.registerFactory(
+      () => CarouselBloc(
+        getCarouselItems: sl<GetCarouselItems>(),
+      ),
+    );
+  }
 }

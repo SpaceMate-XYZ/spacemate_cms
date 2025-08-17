@@ -1,9 +1,9 @@
 {
   "id": 1,
   "feature": "Parking",
-  "screen": 1,
+  "screen": "1",
   "title": "Welcome to Parking",
-  "imageUrl": "https://example.com/image1.png",
+  "imageURL": "https://example.com/image1.png",
   "header": "Find your perfect spot",
   "body": "Easily locate and reserve parking spaces.",
   "button_label": null

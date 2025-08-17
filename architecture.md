@@ -7,6 +7,10 @@
 ```mermaid
 graph TD
     A[UI Layer] -->|Events| B[BLoC/Cubit]
+```mermaid
+```mermaid
+  graph TD
+    A[UI Layer] -->|Events| B[BLoC/Cubit]
     B -->|States| A
     B -->|Calls| C[Use Cases]
     C -->|Uses| D[Repositories]
@@ -16,13 +20,31 @@ graph TD
     G -->|Provides| C
     G -->|Provides| D
 ```
+1. **Menu Feature Cards**
+   - Each feature card is rendered using `FeatureCardWithOnboarding`
+   - Tapping a card triggers `FeatureOnboardingCubit.checkOnboardingStatus`
+
+2. **Onboarding Status Check**
+   - Cubit checks local SQLite database for cached onboarding data
+   - If not available, falls back to checking completion status in SharedPreferences
+   - If onboarding completed, navigates directly to feature
+
+3. **Data Fetching**
+   - If data not in SQLite, repository fetches from Strapi API
+   - Data is then cached in SQLite for offline access
+   - Uses `dartz` for functional error handling with `Either` and `TaskEither`
+
+4. **Onboarding Carousel**
+   - Displays using `OnboardingScreen` with `ResponsiveOnboardingCarousel`
+   - Last slide includes "Don't show again" option
+   - On completion, updates both SQLite cache and SharedPreferences
 
 ## Onboarding Flow Integration
 
 ### Component Diagram
 
 ```mermaid
-graph LR
+  graph LR
     A[FeatureCard] -->|On Tap| B[FeatureOnboardingCubit]
     B -->|Check Status| C[OnboardingRepository]
     C -->|Local First| D[SQLite Database]
@@ -52,11 +74,15 @@ graph LR
    - Displays using `OnboardingScreen` with `ResponsiveOnboardingCarousel`
    - Last slide includes "Don't show again" option
    - On completion, updates both SQLite cache and SharedPreferences
-
 ## Data Layer
 
 ### SQLite Schema
 
+```mermaid
+  final String buttonLabel;
+  final int cachedAt;
+}
+```
 ```dart
 // onboarding_carousel table
 class OnboardingCarouselModel {

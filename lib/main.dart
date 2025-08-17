@@ -1,4 +1,3 @@
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -19,7 +18,6 @@ import 'package:spacemate/features/onboarding/presentation/bloc/feature_onboardi
 import 'package:spacemate/features/onboarding/presentation/bloc/onboarding_bloc.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart' as sqflite_ffi;
-import 'package:flutter_downloader/flutter_downloader.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -65,9 +63,6 @@ void main() async {
       child: const MyApp(),
     ),
   );
-  
-  // Initialize FlutterDownloader callbacks in the background
-  FlutterDownloader.registerCallback(DownloadService.downloadCallback);
 }
 
 class MyApp extends StatelessWidget {
@@ -82,10 +77,7 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider<MenuBloc>(
           create: (context) => sl<MenuBloc>()
-            ..add(LoadMenuEvent(
-              slug: MenuCategory.home.name,
-              forceRefresh: false,
-            )),
+            ..add(LoadMenuGridsEvent(placeId: MenuCategory.home.name, forceRefresh: false)),
         ),
         BlocProvider<OnboardingBloc>(
           create: (context) => sl<OnboardingBloc>(),

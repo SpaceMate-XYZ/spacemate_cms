@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:spacemate/core/error/failures.dart';
+import 'package:spacemate/features/menu/domain/entities/screen_entity.dart';
 import 'package:spacemate/features/menu/domain/entities/menu_item_entity.dart';
 
 /// A repository interface for menu-related data operations.
@@ -17,5 +18,15 @@ abstract class MenuRepository {
   /// Returns [List<String>] on success or [Failure] on error
   Future<Either<Failure, List<String>>> getSupportedLocales({
     String? placeId,
+  });
+
+  /// Fetch menu grids tailored for a user from the integration backend endpoint
+  /// 
+  /// [placeId] - Optional filter for place-specific menu grids
+  /// [authToken] - Authentication token for the user
+  /// Returns [List<ScreenEntity>] on success or [Failure] on error
+  Future<Either<Failure, List<ScreenEntity>>> getMenuGridsForUser({
+    String? placeId,
+    String? authToken,
   });
 }

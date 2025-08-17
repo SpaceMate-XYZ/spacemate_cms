@@ -57,5 +57,48 @@ class MenuRemoteDataSourceImpl implements MenuRemoteDataSource {
       return Left(ServerFailure('An unexpected error occurred: ${e.toString()}'));
     }
   }
+
+  @override
+  Future<Either<Failure, List<ScreenModel>>> getMenuGridsForUser({String? placeId, String? authToken}) async {
+    try {
+      final base = dioClient.baseUrl ?? '';
+      const path = '/api/v1/menu/grids/for-user';
+      final query = placeId != null ? '?placeId=$placeId' : '';
+      final url = base.isNotEmpty ? (path + query) : ('https://nowwococg4wcw884g4cskck0.server.spacemate.xyz$path$query');
+
+      developer.log('MenuRemoteDataSourceImpl: Calling menu grids for user at: $url');
+
+      final response = await dioClient.get(
+        url,
+        options: authToken != null ? Options(headers: {'Authorization': 'Bearer $authToken'}) : null,
+      );
+
+      developer.log('MenuRemoteDataSourceImpl: Integration API response status: ${response.statusCode}');
+
+      if (response.data == null) {
+        return const Left(ServerFailure('No data received from integration endpoint'));
+      }
+
+      try {
+        final screenResponse = ScreenApiResponse.fromJson(response.data as Map<String, dynamic>);
+        developer.log('MenuRemoteDataSourceImpl: Parsed ${screenResponse.data.length} screens from integration endpoint');
+        return Right(screenResponse.data);
+      } catch (e) {
+        if (response.data is List) {
+          final list = (response.data as List)
+              .map((item) => ScreenModel.fromJson(item as Map<String, dynamic>))
+              .toList();
+          return Right(list);
+        }
+        return const Left(ServerFailure('Unexpected response format from integration endpoint'));
+      }
+    } on DioException catch (e) {
+      developer.log('MenuRemoteDataSourceImpl: DioException (integration): ${e.message}');
+      return Left(ServerFailure(e.message ?? 'Failed to load menu grids from integration endpoint.'));
+    } catch (e) {
+      developer.log('MenuRemoteDataSourceImpl: Unexpected error (integration): $e');
+      return Left(ServerFailure('An unexpected error occurred: ${e.toString()}'));
+    }
+  }
 }
 

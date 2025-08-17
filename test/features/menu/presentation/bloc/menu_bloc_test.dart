@@ -5,17 +5,20 @@ import 'package:spacemate/core/error/failures.dart';
 import 'package:spacemate/features/menu/domain/entities/menu_item_entity.dart';
 import 'package:spacemate/features/menu/domain/repositories/menu_repository.dart';
 import 'package:spacemate/features/menu/domain/usecases/get_menu_items.dart';
+import 'package:spacemate/features/menu/domain/usecases/get_menu_grids_for_user.dart';
 import 'package:spacemate/features/menu/presentation/bloc/menu_bloc.dart';
 import 'package:spacemate/features/menu/presentation/bloc/menu_event.dart';
 import 'package:spacemate/features/menu/presentation/bloc/menu_state.dart';
 import 'package:dartz/dartz.dart';
 
 class MockMenuRepository extends Mock implements MenuRepository {}
+class MockGetMenuGridsForUser extends Mock implements GetMenuGridsForUser {}
 
 void main() {
   late MenuBloc menuBloc;
   late MockMenuRepository mockRepository;
   late GetMenuItems getMenuItems;
+  late GetMenuGridsForUser getMenuGridsForUser;
   
   final mockMenuItems = <MenuItemEntity>[
     const MenuItemEntity(
@@ -39,7 +42,8 @@ void main() {
   setUp(() {
     mockRepository = MockMenuRepository();
     getMenuItems = GetMenuItems(mockRepository);
-    menuBloc = MenuBloc(getMenuItems: getMenuItems);
+  getMenuGridsForUser = MockGetMenuGridsForUser();
+  menuBloc = MenuBloc(getMenuItems: getMenuItems, getMenuGridsForUser: getMenuGridsForUser);
   });
 
   tearDown(() {

@@ -1,11 +1,13 @@
 import 'package:equatable/equatable.dart';
 import 'package:spacemate/features/menu/domain/entities/menu_item_entity.dart';
+import 'package:spacemate/features/menu/domain/entities/screen_entity.dart';
 
 enum MenuStatus { initial, loading, success, failure }
 
 class MenuState extends Equatable {
   final MenuStatus status;
   final List<MenuItemEntity> items;
+  final List<ScreenEntity> screens;
   final String? errorMessage;
   final String? selectedLocale;
   final String slug;
@@ -13,6 +15,7 @@ class MenuState extends Equatable {
   const MenuState({
     this.status = MenuStatus.initial,
     this.items = const [],
+    this.screens = const [],
     this.errorMessage,
     this.selectedLocale,
     this.slug = 'home',
@@ -22,7 +25,7 @@ class MenuState extends Equatable {
   const MenuState.initial() : this();
 
   // Factory for loading state
-  const MenuState.loading({required this.slug, this.items = const []}) 
+  const MenuState.loading({required this.slug, this.items = const [], this.screens = const []}) 
     : status = MenuStatus.loading,
       errorMessage = null,
       selectedLocale = null;
@@ -30,6 +33,7 @@ class MenuState extends Equatable {
   // Factory for success state
   const MenuState.success({
     required this.items,
+    this.screens = const [],
     this.slug = 'home',
   })  : status = MenuStatus.success,
         errorMessage = null,
@@ -39,6 +43,7 @@ class MenuState extends Equatable {
   const MenuState.failure({
     required String message,
     this.items = const [],
+    this.screens = const [],
     this.slug = 'home',
   })  : status = MenuStatus.failure,
         errorMessage = message,
@@ -47,6 +52,7 @@ class MenuState extends Equatable {
   MenuState copyWith({
     MenuStatus? status,
     List<MenuItemEntity>? items,
+    List<ScreenEntity>? screens,
     String? errorMessage,
     bool clearErrorMessage = false,
     String? selectedLocale,
@@ -55,6 +61,7 @@ class MenuState extends Equatable {
     return MenuState(
       status: status ?? this.status,
       items: items ?? this.items,
+      screens: screens ?? this.screens,
       errorMessage: clearErrorMessage ? null : (errorMessage ?? this.errorMessage),
       selectedLocale: selectedLocale ?? this.selectedLocale,
       slug: slug ?? this.slug,
@@ -67,10 +74,10 @@ class MenuState extends Equatable {
   bool get hasError => errorMessage != null;
 
   @override
-  List<Object?> get props => [status, items, errorMessage, selectedLocale, slug];
+  List<Object?> get props => [status, items, screens, errorMessage, selectedLocale, slug];
   
   @override
   String toString() {
-    return 'MenuState(status: $status, items: ${items.length}, error: $errorMessage, slug: $slug)';
+    return 'MenuState(status: $status, items: ${items.length}, screens: ${screens.length}, error: $errorMessage, slug: $slug)';
   }
 }

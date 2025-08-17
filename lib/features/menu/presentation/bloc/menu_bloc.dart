@@ -1,24 +1,26 @@
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:spacemate/core/error/failures.dart';
 import 'package:spacemate/features/menu/domain/entities/menu_category.dart';
 import 'package:spacemate/features/menu/domain/entities/menu_item_entity.dart';
 import 'package:spacemate/features/menu/domain/usecases/get_menu_items.dart';
+import 'package:spacemate/features/menu/domain/usecases/get_menu_grids_for_user.dart';
 import 'package:spacemate/features/menu/presentation/bloc/menu_event.dart';
 import 'package:spacemate/features/menu/presentation/bloc/menu_state.dart';
 import 'dart:developer' as developer;
 
 class MenuBloc extends Bloc<MenuEvent, MenuState> {
   final GetMenuItems getMenuItems;
+  final GetMenuGridsForUser? getMenuGridsForUser;
   
   // Cache for each category's menu items
   final Map<String, List<MenuItemEntity>> _menuCache = {};
   final Map<String, bool> _isLoading = {};
   final Map<String, String?> _errorMessages = {};
 
-  MenuBloc({required this.getMenuItems}) : super(const MenuState.initial()) {
+  MenuBloc({required this.getMenuItems, this.getMenuGridsForUser}) : super(const MenuState.initial()) {
     on<LoadMenuEvent>(_onLoadMenu);
     on<RefreshMenuEvent>(_onRefreshMenu);
+    on<LoadMenuGridsEvent>(_onLoadMenuGrids);
     
     // Initialize loading states for all categories
     for (final category in MenuCategory.values) {
@@ -35,6 +37,19 @@ class MenuBloc extends Bloc<MenuEvent, MenuState> {
     // Skip if already loading this category
     if (_isLoading[slug] == true && !event.forceRefresh) {
       developer.log('MenuBloc: Already loading $slug, skipping');
+      return;
+    }
+
+    // If we already have cached items for this slug and refresh isn't forced,
+    // return cached items immediately and avoid calling repository again.
+    if (!event.forceRefresh && _menuCache.containsKey(slug) && _menuCache[slug]!.isNotEmpty) {
+      developer.log('MenuBloc: Returning cached items for $slug');
+      emit(state.copyWith(
+        slug: slug,
+        status: MenuStatus.success,
+        items: _menuCache[slug]!,
+        errorMessage: null,
+      ));
       return;
     }
 
@@ -67,13 +82,13 @@ class MenuBloc extends Bloc<MenuEvent, MenuState> {
         },
         (items) {
           try {
-            developer.log('MenuBloc: Successfully loaded ${items.length ?? 0} items for $slug');
+            developer.log('MenuBloc: Successfully loaded ${items.length} items for $slug');
             // Update cache
-            _menuCache[slug] = items ?? [];
+            _menuCache[slug] = items;
             emit(state.copyWith(
               slug: slug,
               status: MenuStatus.success,
-              items: items ?? [],
+              items: items,
               errorMessage: null,
             ));
           } catch (e) {
@@ -121,16 +136,52 @@ class MenuBloc extends Bloc<MenuEvent, MenuState> {
     ));
   }
 
-  String _mapFailureToMessage(Failure failure) {
-    switch (failure.runtimeType) {
-      case ServerFailure:
-        return 'Server Error: ${failure.message}';
-      case CacheFailure:
-        return 'Cache Error: ${failure.message}';
-      case NetworkFailure:
-        return 'Network Error: Please check your connection.';
-      default:
-        return 'An unexpected error occurred.';
+  Future<void> _onLoadMenuGrids(LoadMenuGridsEvent event, Emitter<MenuState> emit) async {
+    final placeId = event.placeId;
+    final authToken = event.authToken;
+
+    developer.log('MenuBloc: Loading menu grids for placeId: $placeId');
+
+    // Avoid concurrent loads for same place
+    if (_isLoading[placeId ?? 'default'] == true && !event.forceRefresh) {
+      developer.log('MenuBloc: Already loading grids for $placeId, skipping');
+      return;
+    }
+
+    _isLoading[placeId ?? 'default'] = true;
+    _errorMessages[placeId ?? 'default'] = null;
+
+    emit(state.copyWith(status: MenuStatus.loading, screens: state.screens, slug: placeId ?? state.slug));
+
+    try {
+      if (getMenuGridsForUser == null) {
+        developer.log('MenuBloc: getMenuGridsForUser not provided, skipping loadMenuGrids');
+        // If not provided, emit success with existing screens and return
+        emit(state.copyWith(status: MenuStatus.success, screens: state.screens, slug: placeId ?? state.slug));
+        return;
+      }
+
+      final result = await getMenuGridsForUser!(GetMenuGridsForUserParams(placeId: placeId, authToken: authToken));
+      result.fold(
+        (failure) {
+          developer.log('MenuBloc: Failed to load menu grids: ${failure.message}');
+          _errorMessages[placeId ?? 'default'] = failure.message;
+          emit(state.copyWith(status: MenuStatus.failure, errorMessage: failure.message));
+        },
+        (screens) {
+          developer.log('MenuBloc: Successfully loaded ${screens.length} screens for placeId: $placeId');
+          // Update state with new screens
+          emit(state.copyWith(status: MenuStatus.success, screens: screens, slug: placeId ?? state.slug));
+        },
+      );
+    } catch (e) {
+      developer.log('MenuBloc: Unexpected error loading grids: $e');
+      _errorMessages[placeId ?? 'default'] = 'An unexpected error occurred';
+      emit(state.copyWith(status: MenuStatus.failure, errorMessage: 'An unexpected error occurred: $e'));
+    } finally {
+      _isLoading[placeId ?? 'default'] = false;
     }
   }
+
+  // Helper to convert Failure to user-friendly message can be added if needed.
 }
