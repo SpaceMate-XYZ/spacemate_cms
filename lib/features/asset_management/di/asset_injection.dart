@@ -8,19 +8,25 @@ import 'package:sqflite/sqflite.dart';
 
 Future<void> initAssetDependencies(GetIt sl) async {
   // Register Permission Service
-  sl.registerLazySingleton<PermissionService>(() => PermissionService());
+  if (!sl.isRegistered<PermissionService>()) {
+    sl.registerLazySingleton<PermissionService>(() => PermissionService());
+  }
 
   // Register Local Data Source
-  sl.registerLazySingleton<AssetLocalDataSource>(
-    () => AssetLocalDataSourceImpl(database: sl<Database>()),
-  );
+  if (!sl.isRegistered<AssetLocalDataSource>()) {
+    sl.registerLazySingleton<AssetLocalDataSource>(
+      () => AssetLocalDataSourceImpl(database: sl<Database>()),
+    );
+  }
 
   // Register Repository
-  sl.registerLazySingleton<AssetRepository>(
-    () => AssetRepositoryImpl(
-      localDataSource: sl<AssetLocalDataSource>(),
-      dio: sl<Dio>(),
-      permissionService: sl<PermissionService>(),
-    ),
-  );
+  if (!sl.isRegistered<AssetRepository>()) {
+    sl.registerLazySingleton<AssetRepository>(
+      () => AssetRepositoryImpl(
+        localDataSource: sl<AssetLocalDataSource>(),
+        dio: sl<Dio>(),
+        permissionService: sl<PermissionService>(),
+      ),
+    );
+  }
 }

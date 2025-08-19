@@ -49,12 +49,19 @@ void main() async {
     DeviceOrientation.portraitDown,
   ]);
 
-  // Set up error handling for FlutterDownloader
-  FlutterError.onError = (details) {
-    FlutterError.presentError(details);
-    // TODO: Log error to crash reporting service
-    debugPrint('Flutter error: ${details.exception}');
-  };
+  // Set up error handling for FlutterDownloader (skip during tests to avoid interfering with test harness)
+  if (!const bool.fromEnvironment('FLUTTER_TEST')) {
+    final previousOnError = FlutterError.onError;
+    FlutterError.onError = (details) {
+      // Preserve any previous handler (test harness/framework) by calling it first.
+      try {
+        previousOnError?.call(details);
+      } catch (_) {}
+      FlutterError.presentError(details);
+      // TODO: Log error to crash reporting service
+      debugPrint('Flutter error: ${details.exception}');
+    };
+  }
 
   // Run the app with error boundaries
   runApp(

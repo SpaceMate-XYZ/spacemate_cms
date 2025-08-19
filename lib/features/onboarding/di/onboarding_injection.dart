@@ -13,14 +13,18 @@ final sl = GetIt.instance;
 
 void initOnboardingFeature() {
   // Data sources
-  sl.registerLazySingleton<OnboardingRemoteDataSource>(
-    () => OnboardingRemoteDataSourceImpl(dioClient: sl()),
-  );
+  if (!sl.isRegistered<OnboardingRemoteDataSource>()) {
+    sl.registerLazySingleton<OnboardingRemoteDataSource>(
+      () => OnboardingRemoteDataSourceImpl(dioClient: sl()),
+    );
+  }
 
   // DAOs
-  sl.registerLazySingleton<OnboardingCarouselDao>(
-    () => OnboardingCarouselDao(),
-  );
+  if (!sl.isRegistered<OnboardingCarouselDao>()) {
+    sl.registerLazySingleton<OnboardingCarouselDao>(
+      () => OnboardingCarouselDao(),
+    );
+  }
 
   // Ensure NetworkInfo is registered
   if (!sl.isRegistered<NetworkInfo>()) {
@@ -28,25 +32,35 @@ void initOnboardingFeature() {
   }
 
   // Repositories
-  sl.registerLazySingleton<OnboardingRepository>(
-    () => OnboardingRepositoryImpl(
-      remoteDataSource: sl(),
-      carouselDao: sl(),
-      networkInfo: sl(),
-    ),
-  );
+  if (!sl.isRegistered<OnboardingRepository>()) {
+    sl.registerLazySingleton<OnboardingRepository>(
+      () => OnboardingRepositoryImpl(
+        remoteDataSource: sl(),
+        carouselDao: sl(),
+        networkInfo: sl(),
+      ),
+    );
+  }
 
   // Use cases
-  sl.registerLazySingleton(() => GetFeaturesWithOnboarding(sl()));
-  sl.registerLazySingleton(() => GetFeatureByName(sl()));
+  if (!sl.isRegistered<GetFeaturesWithOnboarding>()) {
+    sl.registerLazySingleton(() => GetFeaturesWithOnboarding(sl()));
+  }
+  if (!sl.isRegistered<GetFeatureByName>()) {
+    sl.registerLazySingleton(() => GetFeatureByName(sl()));
+  }
 
   // Bloc
-  sl.registerFactory(() => OnboardingBloc(getFeaturesWithOnboarding: sl()));
+  if (!sl.isRegistered<OnboardingBloc>()) {
+    sl.registerFactory(() => OnboardingBloc(getFeaturesWithOnboarding: sl()));
+  }
 
   // Cubit
-  sl.registerFactory(() => FeatureOnboardingCubit(
-        getFeaturesWithOnboarding: sl(),
-        getFeatureByName: sl(),
-        sharedPreferences: sl(),
-      ));
+  if (!sl.isRegistered<FeatureOnboardingCubit>()) {
+    sl.registerFactory(() => FeatureOnboardingCubit(
+          getFeaturesWithOnboarding: sl(),
+          getFeatureByName: sl(),
+          sharedPreferences: sl(),
+        ));
+  }
 }

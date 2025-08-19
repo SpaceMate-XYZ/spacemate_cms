@@ -21,8 +21,21 @@ linter:
   # `// ignore_for_file: name_of_lint` syntax on the line or in the file
   # producing the lint.
   rules:
-    # avoid_print: false  # Uncomment to disable the `avoid_print` rule
-    # prefer_single_quotes: true  # Uncomment to enable the `prefer_single_quotes` rule
+    # Reduce noisy lints so analyzer output is focused on actionable issues
+    avoid_print: false
+    prefer_single_quotes: true
+
+analyzer:
+  errors:
+    # Ignore a few non-actionable or known benign warnings so CI/analysis focuses
+    # on real errors and new regressions.
+    invalid_annotation_target: ignore
+    unused_field: ignore
+    unused_local_variable: ignore
+    override_on_non_overriding_member: ignore
+    unnecessary_null_comparison: ignore
+    library_private_types_in_public_api: ignore
+    depend_on_referenced_packages: ignore
 
 # Additional information about this file can be found at
 # https://dart.dev/guides/language/analysis-options

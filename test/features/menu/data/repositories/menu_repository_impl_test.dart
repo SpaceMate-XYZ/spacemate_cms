@@ -7,7 +7,6 @@ import 'package:spacemate/features/menu/data/repositories/menu_repository_impl.d
 import 'package:spacemate/features/menu/data/datasources/menu_remote_data_source.dart';
 import 'package:spacemate/features/menu/data/models/menu_item_model.dart';
 import 'package:spacemate/features/menu/data/models/screen_model.dart';
-import 'package:spacemate/features/menu/domain/entities/menu_item_entity.dart';
 import 'package:spacemate/features/menu/domain/repositories/menu_local_data_source.dart';
 
 class MockRemoteDataSource extends Mock implements MenuRemoteDataSource {}

@@ -89,16 +89,22 @@ class DownloadService {
   }
 
   static Future<String> getDownloadDirectory() async {
+    if (kIsWeb) {
+      // No file system access on web; return empty string and let callers handle it.
+      debugPrint('DownloadService: getDownloadDirectory() not available on web');
+      return '';
+    }
+
     try {
       final directory = await getApplicationDocumentsDirectory();
       final downloadDir = '${directory.path}/downloads';
-      
+
       // Create directory if it doesn't exist
       final dir = Directory(downloadDir);
       if (!await dir.exists()) {
         await dir.create(recursive: true);
       }
-      
+
       return downloadDir;
     } catch (e) {
       debugPrint('Error getting download directory: $e');

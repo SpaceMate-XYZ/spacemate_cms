@@ -17,18 +17,28 @@ class ImageUtils {
 
   /// Get the cache directory for storing images
   static Future<Directory> getCacheDirectory() async {
+    // On web, the browser cache is used instead of a local filesystem.
+    if (kIsWeb) {
+      throw UnsupportedError('Image cache directory is not available on web; use browser cache.');
+    }
+
     final directory = await getApplicationDocumentsDirectory();
     final cacheDir = Directory('${directory.path}/$_imageCacheDir');
-    
+
     if (!await cacheDir.exists()) {
       await cacheDir.create(recursive: true);
     }
-    
+
     return cacheDir;
   }
 
   /// Get a file reference for a cached image
   static Future<File> getCachedImageFile(String url) async {
+    if (kIsWeb) {
+      // Not supported on web - callers should use CachedNetworkImage which relies on browser cache.
+      throw UnsupportedError('getCachedImageFile() is not supported on web');
+    }
+
     final cacheDir = await getCacheDirectory();
     final uri = Uri.parse(url);
     final filename = '${uri.pathSegments.last}.${uri.pathSegments.last.split('.').last}';
@@ -38,13 +48,14 @@ class ImageUtils {
   /// Check if an image is cached
   static Future<bool> isImageCached(String url) async {
     if (url.isEmpty) return false;
-    
+    if (kIsWeb) return false;
+
     try {
       final file = await getCachedImageFile(url);
       if (await file.exists()) {
         final lastModified = await file.lastModified();
         final now = DateTime.now();
-        
+
         // Check if the cache is still valid
         if (now.difference(lastModified) < _cacheDuration) {
           return true;
@@ -62,22 +73,27 @@ class ImageUtils {
 
   /// Cache an image from the network
   static Future<File?> cacheImageFromNetwork(String url) async {
+    if (kIsWeb) {
+      // Browser will handle caching; nothing to store on local filesystem.
+      return null;
+    }
+
     try {
       final file = await getCachedImageFile(url);
-      
+
       // Skip if already cached and valid
       if (await isImageCached(url)) {
         return file;
       }
-      
-      // Use CachedNetworkImage to handle the download and caching
-      final response = CachedNetworkImage(
+
+      // Use CachedNetworkImage to handle the download and caching (UI-driven cache)
+      CachedNetworkImage(
         imageUrl: url,
         imageBuilder: (context, imageProvider) => Container(),
         errorWidget: (context, url, error) => Container(),
       );
-      
-      // The image is now cached by CachedNetworkImage
+
+      // The image file may be managed by the caching library; return the expected file handle.
       return file;
     } catch (e) {
       return null;
@@ -223,6 +239,8 @@ class ImageUtils {
 
   /// Clear all cached images
   static Future<void> clearImageCache() async {
+    if (kIsWeb) return; // rely on browser cache
+
     try {
       final cacheDir = await getCacheDirectory();
       if (await cacheDir.exists()) {
@@ -235,6 +253,8 @@ class ImageUtils {
 
   /// Get the size of the image cache
   static Future<int> getImageCacheSize() async {
+    if (kIsWeb) return 0;
+
     try {
       final cacheDir = await getCacheDirectory();
       if (!await cacheDir.exists()) {
@@ -243,13 +263,13 @@ class ImageUtils {
 
       int totalSize = 0;
       final files = cacheDir.listSync(recursive: true);
-      
+
       for (var file in files) {
         if (file is File) {
           totalSize += await file.length();
         }
       }
-      
+
       return totalSize;
     } catch (e) {
       return 0;

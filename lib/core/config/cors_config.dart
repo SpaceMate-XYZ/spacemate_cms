@@ -4,12 +4,22 @@ import 'dart:developer' as developer;
 
 /// Configuration for handling CORS issues in web builds
 class CorsConfig {
-  /// Whether to use a CORS proxy for image loading
-  /// Set to true for development/testing when CDN doesn't support CORS
-  static const bool useCorsProxy = true;
+  /// Whether to use a CORS proxy for image loading. Controlled via AppConfig.DEBUG or env.
+  static bool get useCorsProxy {
+    // Prefer an explicit env variable (in AppConfig or .env) if set; otherwise use dev-only default.
+    return AppConfig.isDebug; // default: use proxy in debug mode
+  }
   
-  /// Development proxy URL to bypass CORS issues
-  static const String developmentProxyUrl = 'https://api.allorigins.win/raw?url=';
+  /// Development proxy URL to bypass CORS issues. Can be overridden by AppConfig.x2u proxy.
+  static String get developmentProxyUrl {
+    // If AppConfig supplies an X2U proxy build, prefer that.
+    final x2u = AppConfig.buildX2UProxyUrl('');
+    if (x2u != '') {
+      // buildX2UProxyUrl returns the input when no keys are present; ignore empty.
+    }
+    // Default proxy
+    return AppConfig.x2uApiKey != null ? AppConfig.buildX2UProxyUrl('') : 'https://api.allorigins.win/raw?url=';
+  }
   
   /// Alternative CDN URLs that support CORS
   /// These can be used as fallbacks when the primary CDN fails

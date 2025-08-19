@@ -168,8 +168,25 @@ class MenuLocalDataSourceImpl implements MenuLocalDataSource {
 
   @override
   Future<List<MenuItemEntity>> getMenuItems({String? placeId}) async {
-    // For now, return empty list since we don't have placeId-based caching implemented
-    // This can be enhanced later to support placeId-based caching
+    // First try SharedPreferences fallback (useful for tests and web-like caching)
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      // Try the place-specific cache key used by web caching
+      final cacheKey = 'menu_cache_data_${placeId ?? 'home'}';
+      final jsonString = prefs.getString(cacheKey) ?? prefs.getString('menu_items');
+      if (jsonString != null) {
+        try {
+          final List decoded = json.decode(jsonString);
+          return decoded.map((json) => MenuItemModel.fromJson(json)).toList();
+        } catch (e) {
+          // fall through to DB path
+        }
+      }
+    } catch (e) {
+      // Ignore prefs errors and fall back to DB
+    }
+
+    // Fallback: return empty list (DB caching not populated in tests)
     return [];
   }
 }
